@@ -1,0 +1,421 @@
+/* ============================================= */
+/* ===== ABOUT PAGE STYLES (about.html) ========== */
+/* ============================================= */
+
+/* ============================================= */
+/* ===== ABOUT PAGE SECTIONS ===================== */
+/* ============================================= */
+
+/* Story */
+.about-story {
+    position: relative;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 100px 40px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 70px;
+    align-items: center;
+}
+
+.about-story-text p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 18px;
+    max-width: 540px;
+}
+
+.about-story-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-top: 36px;
+    max-width: 540px;
+}
+
+.stat-item {
+    padding: 18px 14px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(0,60,30,0.18) 100%);
+    border: 1px solid rgba(0, 217, 87, 0.18);
+    backdrop-filter: blur(12px);
+    text-align: center;
+    transition: transform 0.4s ease, border-color 0.4s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 217, 87, 0.5);
+}
+
+.stat-item strong {
+    display: block;
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: 800;
+    background: linear-gradient(135deg, #00ff7a 0%, #00b347 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.stat-item span {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.about-story-figure {
+    position: relative;
+    aspect-ratio: 4/5;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 217, 87, 0.22);
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.about-story-figure img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(108%);
+    transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.about-story-figure:hover img { transform: scale(1.06); }
+
+.story-glow {
+    position: absolute;
+    inset: -20%;
+    background: radial-gradient(circle at 30% 30%, rgba(0, 217, 87, 0.25), transparent 60%);
+    filter: blur(40px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.story-ring {
+    position: absolute;
+    width: 80%;
+    aspect-ratio: 1;
+    top: 12%;
+    right: -15%;
+    border-radius: 50%;
+    border: 1px dashed rgba(0, 217, 87, 0.25);
+    animation: ringSpin 26s linear infinite;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.story-spark {
+    position: absolute;
+    z-index: 4;
+    color: #00ff7a;
+    font-size: 22px;
+    text-shadow: 0 0 14px rgba(0, 255, 122, 0.85);
+    animation: sparkleTwinkle 3s ease-in-out infinite;
+}
+.spark-a { top: 8%; right: 10%; }
+.spark-b { bottom: 14%; left: 6%; font-size: 16px; animation-delay: 1.5s; }
+
+.story-chip {
+    position: absolute;
+    bottom: 22px;
+    left: 22px;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 50px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 217, 87, 0.32);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.story-chip .chip-pulse {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #00ff7a;
+    box-shadow: 0 0 10px #00ff7a;
+    animation: tagPulse 1.6s ease-in-out infinite;
+}
+
+/* Pillars */
+.about-pillars {
+    position: relative;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 80px 40px;
+}
+
+.pillars-header { text-align: center; margin-bottom: 60px; }
+.pillars-header .section-title { max-width: 720px; margin: 0 auto; }
+
+.pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.pillar-card {
+    position: relative;
+    padding: 36px 30px;
+    border-radius: 24px;
+    background: linear-gradient(160deg,
+        rgba(20, 60, 50, 0.18) 0%,
+        rgba(0, 0, 0, 0.45) 100%);
+    border: 1px solid rgba(0, 217, 87, 0.18);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255,255,255,0.12);
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.6s ease, box-shadow 0.6s ease;
+    overflow: hidden;
+}
+
+.pillar-card::before {
+    content: attr(data-num);
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    font-size: 14px;
+    font-weight: 800;
+    color: rgba(0, 217, 87, 0.6);
+    letter-spacing: 2px;
+}
+
+.pillar-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(0, 217, 87, 0.5);
+    box-shadow:
+        0 30px 70px rgba(0, 0, 0, 0.65),
+        0 0 60px rgba(0, 217, 87, 0.18);
+}
+
+.pillar-glow {
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    bottom: -120px;
+    right: -80px;
+    background: radial-gradient(circle, rgba(0, 217, 87, 0.4), transparent 60%);
+    filter: blur(40px);
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    opacity: 0.4;
+}
+
+.pillar-card:hover .pillar-glow { opacity: 1; }
+
+.pillar-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #00ff7a 0%, #00b347 100%);
+    color: #001d0c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 24px rgba(0, 217, 87, 0.4);
+    margin-bottom: 22px;
+}
+
+.pillar-card h3 {
+    font-size: 19px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.3px;
+    margin-bottom: 10px;
+}
+
+.pillar-card p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+/* Crafted */
+.about-crafted {
+    position: relative;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 80px 40px;
+}
+
+.crafted-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    padding: 60px;
+    border-radius: 32px;
+    background:
+        linear-gradient(135deg, rgba(20,60,50,0.45) 0%, rgba(10,30,25,0.65) 50%, rgba(20,60,50,0.45) 100%);
+    backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(0, 217, 87, 0.24);
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+.crafted-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        url('../images/brick-bg.png') center/600px auto repeat;
+    opacity: 0.06;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, transparent 80%);
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, transparent 80%);
+    animation: bridgeBrickDrift 60s linear infinite;
+}
+
+.crafted-text { position: relative; z-index: 2; }
+
+.crafted-text p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 28px;
+    max-width: 480px;
+}
+
+.crafted-figure {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 217, 87, 0.22);
+    z-index: 2;
+}
+
+.crafted-figure img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s ease;
+}
+
+.crafted-card:hover .crafted-figure img { transform: scale(1.05); }
+
+.crafted-rings {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.crafted-ring {
+    position: absolute;
+    border-radius: 50%;
+}
+.crafted-ring.ring-a {
+    width: 70%;
+    aspect-ratio: 1;
+    top: 15%;
+    left: 15%;
+    border: 1px dashed rgba(0, 255, 122, 0.35);
+    animation: ringSpin 24s linear infinite;
+}
+.crafted-ring.ring-b {
+    width: 50%;
+    aspect-ratio: 1;
+    top: 25%;
+    left: 25%;
+    border: 1px solid rgba(0, 217, 87, 0.18);
+    animation: ringSpin 32s linear infinite reverse;
+}
+
+/* Final CTA */
+.about-final-cta {
+    position: relative;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 60px 40px 120px;
+}
+
+.about-final-card {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 80px 40px;
+    border-radius: 30px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(0, 217, 87, 0.22), transparent 60%),
+        linear-gradient(135deg, rgba(20,60,50,0.55) 0%, rgba(10,30,25,0.7) 100%);
+    border: 1px solid rgba(0, 217, 87, 0.32);
+    backdrop-filter: blur(28px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255,255,255,0.18);
+    animation: ctaCardFloat 9s ease-in-out infinite;
+}
+
+.final-shine {
+    position: absolute;
+    top: -50%;
+    left: -75%;
+    width: 60%;
+    height: 200%;
+    background: linear-gradient(115deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 60%);
+    transform: rotate(8deg);
+    pointer-events: none;
+    animation: finalShineSweep 5s ease-in-out infinite;
+}
+
+@keyframes finalShineSweep {
+    0%, 25%   { left: -75%; }
+    65%, 100% { left: 130%; }
+}
+
+.final-title {
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    margin-bottom: 14px;
+}
+
+.final-sub {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 32px;
+}
+
+.final-actions {
+    display: inline-flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* About responsive */
+@media (max-width: 980px) {
+    .about-story { grid-template-columns: 1fr; gap: 40px; }
+    .about-story-stats { grid-template-columns: repeat(2, 1fr); }
+    .pillars-grid { grid-template-columns: 1fr; }
+    .crafted-card { grid-template-columns: 1fr; gap: 40px; padding: 40px; }
+}
+
+@media (max-width: 720px) {
+    .about-story { padding: 60px 20px; }
+    .about-pillars { padding: 60px 20px; }
+    .about-crafted { padding: 40px 20px; }
+    .about-final-cta { padding: 40px 20px 80px; }
+    .about-final-card { padding: 50px 24px; }
+}
+

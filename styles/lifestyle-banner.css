@@ -1,0 +1,326 @@
+/* ============================================= */
+/* === LIFESTYLE BANNER (slim horizontal) ====== */
+/* ============================================= */
+
+.lifestyle-banner {
+    position: relative;
+    padding: 50px 6%;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+        radial-gradient(800px 300px at 50% -10%, rgba(0, 217, 87, 0.05), transparent 60%),
+        linear-gradient(180deg, #050505 0%, #0a0a0a 50%, #050505 100%);
+}
+
+/* Soft ambient orbs */
+.lifestyle-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+.lifestyle-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.5;
+}
+.lifestyle-orb-a {
+    width: 360px; height: 360px;
+    top: -100px; left: 8%;
+    background: radial-gradient(circle, rgba(0, 217, 87, 0.35), transparent 60%);
+}
+.lifestyle-orb-b {
+    width: 360px; height: 360px;
+    bottom: -100px; right: 8%;
+    background: radial-gradient(circle, rgba(0, 179, 71, 0.30), transparent 60%);
+}
+
+/* ============================================= */
+/* === LIQUID GLASS SHELL ====================== */
+/* ============================================= */
+.lifestyle-shell {
+    position: relative;
+    z-index: 2;
+    max-width: 1320px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    align-items: stretch;
+    gap: 0;
+    min-height: 280px;
+    border-radius: 24px;
+    background:
+        linear-gradient(155deg,
+            rgba(255, 255, 255, 0.06) 0%,
+            rgba(20, 60, 50, 0.16) 40%,
+            rgba(8, 22, 18, 0.65) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(0, 217, 87, 0.18),
+        inset 0 1px 1px rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    overflow: hidden;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.6s ease;
+}
+.lifestyle-shell:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 32px 70px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(0, 217, 87, 0.30),
+        inset 0 1px 1px rgba(255, 255, 255, 0.18);
+}
+
+/* Gradient mask-composite border */
+.lifestyle-shell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 1.5px;
+    background: linear-gradient(135deg,
+        rgba(0, 217, 87, 0.55),
+        rgba(255, 255, 255, 0.04) 35%,
+        rgba(0, 217, 87, 0.0) 60%,
+        rgba(255, 255, 255, 0.18) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+    z-index: 4;
+}
+
+/* Diagonal shimmer sweep */
+.lifestyle-shine {
+    position: absolute;
+    top: -60%;
+    left: -50%;
+    width: 55%;
+    height: 220%;
+    background: linear-gradient(115deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.04) 40%,
+        rgba(255, 255, 255, 0.14) 50%,
+        rgba(255, 255, 255, 0.04) 60%,
+        transparent 100%);
+    transform: rotate(8deg);
+    pointer-events: none;
+    z-index: 2;
+    animation: lifestyleShine 9s ease-in-out infinite;
+}
+@keyframes lifestyleShine {
+    0%   { transform: translateX(0%) rotate(8deg); opacity: 0; }
+    18%  { opacity: 0.7; }
+    100% { transform: translateX(300%) rotate(8deg); opacity: 0; }
+}
+
+/* ============================================= */
+/* === CONTENT (left column) =================== */
+/* ============================================= */
+.lifestyle-content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 44px;
+}
+
+.lifestyle-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 13px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(0, 217, 87, 0.18), rgba(0, 179, 71, 0.06));
+    border: 1px solid rgba(0, 217, 87, 0.40);
+    color: #00ff7a;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    width: max-content;
+    margin-bottom: 14px;
+    backdrop-filter: blur(8px);
+}
+.lifestyle-tag-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #00ff7a;
+    box-shadow: 0 0 10px rgba(0, 255, 122, 0.85);
+    animation: lifestylePulse 1.6s ease-in-out infinite;
+}
+@keyframes lifestylePulse {
+    0%, 100% { transform: scale(1);   opacity: 1;   }
+    50%      { transform: scale(1.5); opacity: 0.5; }
+}
+
+.lifestyle-title {
+    font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+}
+.lifestyle-accent {
+    background: linear-gradient(135deg, #00ff7a 0%, #00b347 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    font-style: italic;
+    font-weight: 700;
+}
+
+.lifestyle-sub {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.70);
+    max-width: 480px;
+    margin: 0 0 18px;
+}
+
+/* CTA — slim pill */
+.lifestyle-cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 24px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #00d957 0%, #00ff7a 100%);
+    color: #0a1f15;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    width: max-content;
+    box-shadow:
+        0 8px 22px rgba(0, 217, 87, 0.40),
+        inset 0 1px 1px rgba(255, 255, 255, 0.35);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.4s ease;
+    overflow: hidden;
+}
+.lifestyle-cta::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    transition: left 0.7s ease;
+}
+.lifestyle-cta:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 12px 28px rgba(0, 217, 87, 0.55),
+        inset 0 1px 1px rgba(255, 255, 255, 0.35);
+}
+.lifestyle-cta:hover::after { left: 130%; }
+.lifestyle-cta svg { transition: transform 0.3s ease; }
+.lifestyle-cta:hover svg { transform: translateX(4px); }
+
+/* ============================================= */
+/* === FIGURE (model image right) ============== */
+/* ============================================= */
+.lifestyle-figure {
+    position: relative;
+    z-index: 1;
+    align-self: stretch;
+    overflow: hidden;
+    border-radius: 0 24px 24px 0;
+}
+
+.lifestyle-figure img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 35%;
+    filter: brightness(0.85) contrast(1.05) saturate(1.05);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 1;
+}
+.lifestyle-shell:hover .lifestyle-figure img {
+    transform: scale(1.05);
+}
+
+/* Subtle green glow overlay tied to the brand */
+.lifestyle-figure-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(60% 70% at 60% 50%, rgba(0, 217, 87, 0.20) 0%, transparent 60%);
+    z-index: 3;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+/* Strong left-edge fade so the image blends into the dark card */
+.lifestyle-figure::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg,
+            rgba(8, 22, 18, 1) 0%,
+            rgba(8, 22, 18, 0.85) 8%,
+            rgba(8, 22, 18, 0.45) 22%,
+            rgba(8, 22, 18, 0.15) 38%,
+            transparent 60%),
+        linear-gradient(180deg,
+            rgba(8, 22, 18, 0.30) 0%,
+            transparent 25%,
+            transparent 75%,
+            rgba(8, 22, 18, 0.30) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* ============================================= */
+/* === RESPONSIVE ============================== */
+/* ============================================= */
+@media (max-width: 980px) {
+    .lifestyle-banner { padding: 40px 5%; }
+    .lifestyle-shell {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        border-radius: 22px;
+    }
+    .lifestyle-shell::before { border-radius: 22px; }
+    .lifestyle-figure {
+        order: 2;
+        border-radius: 0 0 22px 22px;
+        min-height: 240px;
+    }
+    .lifestyle-figure::after {
+        background:
+            linear-gradient(180deg,
+                rgba(8, 22, 18, 1) 0%,
+                rgba(8, 22, 18, 0.55) 18%,
+                rgba(8, 22, 18, 0.15) 35%,
+                transparent 55%);
+    }
+    .lifestyle-content {
+        order: 1;
+        padding: 30px 28px 26px;
+    }
+}
+
+@media (max-width: 600px) {
+    .lifestyle-banner { padding: 32px 4%; }
+    .lifestyle-shell { border-radius: 18px; }
+    .lifestyle-shell::before { border-radius: 18px; }
+    .lifestyle-figure { border-radius: 0 0 18px 18px; min-height: 200px; }
+    .lifestyle-content { padding: 26px 20px 24px; }
+    .lifestyle-title { font-size: 1.4rem; }
+    .lifestyle-sub { font-size: 0.84rem; margin-bottom: 16px; }
+    .lifestyle-cta { padding: 10px 20px; font-size: 0.66rem; }
+}

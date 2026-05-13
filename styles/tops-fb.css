@@ -1,0 +1,98 @@
+/* ============================================= */
+/* === TOPS F&B CATALOG (Front/Back hover swap) = */
+/* ============================================= */
+
+/* The wrap stacks two images on top of each other */
+.product-image-fb {
+    position: relative;
+}
+
+/* Both images: absolute centered, same footprint. Higher specificity than
+   .product-image-wrap img so the base rules don't override. */
+.product-image-fb img.fb-front,
+.product-image-fb img.fb-back {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 92%;
+    height: 92%;
+    object-fit: contain;
+    filter: drop-shadow(0 25px 30px rgba(0, 0, 0, 0.7));
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 2;
+}
+
+/* Default state: front visible, back hidden behind with subtle rotate */
+.product-image-fb img.fb-front {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotateY(0deg);
+}
+.product-image-fb img.fb-back {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.08) rotateY(8deg);
+}
+
+/* Desktop hover — flip to back */
+@media (hover: hover) and (pointer: fine) {
+    .product-card:hover .product-image-fb img.fb-front {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.94) rotateY(-8deg);
+    }
+    .product-card:hover .product-image-fb img.fb-back {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotateY(0deg);
+    }
+}
+
+/* The F·B hint badge */
+.fb-hint {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    z-index: 4;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.60rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    pointer-events: none;
+    opacity: 0.9;
+    transition: opacity 0.3s ease, background 0.3s ease,
+                color 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.3s ease;
+}
+.product-card:hover .fb-hint {
+    background: linear-gradient(135deg, rgba(0, 217, 87, 0.95), rgba(0, 179, 71, 0.95));
+    color: #001d0c;
+    transform: scale(1.06);
+    opacity: 1;
+    border-color: rgba(0, 217, 87, 0.55);
+}
+
+/* Touch devices: subtle auto-flip so users see the back too */
+@media (hover: none) {
+    .product-image-fb img.fb-front,
+    .product-image-fb img.fb-back {
+        animation: fbAutoFlip 8s ease-in-out infinite;
+    }
+    .product-image-fb img.fb-back {
+        animation-delay: 4s;
+    }
+}
+@keyframes fbAutoFlip {
+    0%, 45%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotateY(0); }
+    50%, 95%      { opacity: 0; transform: translate(-50%, -50%) scale(1.04) rotateY(8deg); }
+}
+
+/* Section-level accent — tinted pretitle pill */
+.catalogue-tops-fb .catalogue-pretitle {
+    background: linear-gradient(135deg, rgba(0, 217, 87, 0.18), rgba(0, 179, 71, 0.08));
+    border-color: rgba(0, 217, 87, 0.45);
+}

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product — FakeSmile</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/product.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="page-product">
+    <div class="page-shell">
+        <header class="liquid-glass-header">
+            <div class="header-inner">
+                <div class="logo">
+                    <a href="index.html"><img src="images/Fakesmile-1.png" alt="FakeSmile Logo"></a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="shop.html">Shop</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                    </ul>
+                </nav>
+                <div class="cart-wrapper">
+                    <a href="cart.html" class="cart-link">
+                        <span class="cart-amount">&#8358;0.00</span>
+                        <span class="cart-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white">
+                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                            </svg>
+                            <span class="cart-count">0</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== PAGE HERO ===== -->
+        <section class="page-hero page-hero-product">
+            <div class="page-hero-bg" aria-hidden="true">
+                <span class="page-orb page-orb-a"></span>
+                <span class="page-orb page-orb-b"></span>
+                <div class="page-grid"></div>
+                <div class="page-brick"></div>
+            </div>
+            <div class="page-hero-wordmark" aria-hidden="true" data-text="DROP" id="product-wordmark">DROP</div>
+            <div class="page-hero-content">
+                <span class="page-crumb" id="product-crumb">
+                    <a href="index.html">Home</a>
+                    <span>/</span>
+                    <a href="index.html#products" id="crumb-cat">Shop</a>
+                    <span>/</span>
+                    <span id="crumb-name">Product</span>
+                </span>
+                <h1 class="page-hero-title">The <span class="accent-italic" id="hero-title-accent">Drop</span></h1>
+                <p class="page-hero-sub" id="hero-sub">Detail on detail. Built on the bricks.</p>
+            </div>
+        </section>
+
+        <!-- ===== PRODUCT DETAIL ===== -->
+        <section class="product-detail" id="product-detail">
+            <div class="pd-layout">
+                <!-- LEFT: gallery -->
+                <div class="pd-gallery">
+                    <div class="pd-gallery-glass">
+                        <div class="pd-gallery-shine"></div>
+                        <span class="pd-badge" id="pd-badge" hidden></span>
+                        <div class="pd-image-frame" id="pd-image-frame">
+                            <div class="pd-glow"></div>
+                            <img id="pd-image" src="" alt="">
+                        </div>
+                    </div>
+                    <div class="pd-thumbs" id="pd-thumbs" aria-label="Product views"></div>
+                </div>
+
+                <!-- RIGHT: info -->
+                <div class="pd-info">
+                    <div class="pd-info-glass">
+                        <div class="pd-info-shine"></div>
+
+                        <span class="section-tag pd-tag">
+                            <span class="section-tag-dot"></span>
+                            <span id="pd-category">Drop</span>
+                        </span>
+                        <h2 class="pd-name"><span id="pd-name">Product</span> <em class="accent-italic" id="pd-name-tag"></em></h2>
+
+                        <div class="pd-stars" aria-label="4.9 out of 5">
+                            <span class="pd-star" aria-hidden="true">&#9733;</span>
+                            <span class="pd-star" aria-hidden="true">&#9733;</span>
+                            <span class="pd-star" aria-hidden="true">&#9733;</span>
+                            <span class="pd-star" aria-hidden="true">&#9733;</span>
+                            <span class="pd-star" aria-hidden="true">&#9733;</span>
+                            <span class="pd-rating-text">4.9 · 218 reviews</span>
+                        </div>
+
+                        <div class="pd-price-row">
+                            <span class="pd-price" id="pd-price">&#8358;0.00</span>
+                            <span class="pd-shipping">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Free worldwide shipping
+                            </span>
+                        </div>
+
+                        <p class="pd-desc" id="pd-desc">Loading product details…</p>
+
+                        <div class="pd-sizes" id="pd-sizes-row">
+                            <span class="pd-row-label">Size</span>
+                            <div class="pd-size-chips" id="pd-size-chips"></div>
+                        </div>
+
+                        <div class="pd-actions">
+                            <div class="pd-qty" aria-label="Quantity">
+                                <button type="button" class="pd-qty-btn" id="pd-qty-minus" aria-label="Decrease quantity">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                </button>
+                                <span class="pd-qty-value" id="pd-qty-value">1</span>
+                                <button type="button" class="pd-qty-btn" id="pd-qty-plus" aria-label="Increase quantity">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                </button>
+                            </div>
+
+                            <button type="button" class="page-btn page-btn-primary pd-add-btn" id="pd-add-btn">
+                                <span>Add To Cart</span>
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                            </button>
+
+                            <button type="button" class="pd-wish" id="pd-wish" aria-label="Add to wishlist">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            </button>
+                        </div>
+
+                        <ul class="pd-meta-list">
+                            <li>
+                                <span class="pd-meta-label">SKU</span>
+                                <span class="pd-meta-value" id="pd-sku">FS-—-—</span>
+                            </li>
+                            <li>
+                                <span class="pd-meta-label">Category</span>
+                                <span class="pd-meta-value" id="pd-meta-cat">—</span>
+                            </li>
+                            <li>
+                                <span class="pd-meta-label">Tag</span>
+                                <span class="pd-meta-value" id="pd-meta-tag">—</span>
+                            </li>
+                        </ul>
+
+                        <div class="pd-trust">
+                            <span class="pd-trust-item">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                Secure checkout
+                            </span>
+                            <span class="pd-trust-item">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                                14-day returns
+                            </span>
+                            <span class="pd-trust-item">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                Worldwide delivery
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== TABS ===== -->
+            <div class="pd-tabs">
+                <div class="pd-tabs-bar" role="tablist">
+                    <button type="button" class="pd-tab active" data-tab="description" role="tab" aria-selected="true">Description</button>
+                    <button type="button" class="pd-tab" data-tab="info" role="tab" aria-selected="false">Additional Info</button>
+                    <button type="button" class="pd-tab" data-tab="reviews" role="tab" aria-selected="false">Reviews <em>(218)</em></button>
+                    <span class="pd-tab-underline" aria-hidden="true"></span>
+                </div>
+
+                <div class="pd-tab-panels">
+                    <div class="pd-tab-panel active" data-panel="description">
+                        <p id="pd-desc-long">Loading…</p>
+                        <ul class="pd-feature-list">
+                            <li><span class="pd-bullet"></span>Premium-feel finish, double-stitched seams.</li>
+                            <li><span class="pd-bullet"></span>FakeSmile signature crest, woven in to last.</li>
+                            <li><span class="pd-bullet"></span>True-to-size streetwear cut.</li>
+                            <li><span class="pd-bullet"></span>Crafted in Lagos, shipped worldwide.</li>
+                        </ul>
+                    </div>
+
+                    <div class="pd-tab-panel" data-panel="info">
+                        <table class="pd-info-table" id="pd-info-table">
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <div class="pd-tab-panel" data-panel="reviews">
+                        <div class="pd-reviews-summary">
+                            <div class="pd-review-score">
+                                <strong>4.9</strong>
+                                <span class="pd-review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                <em>Based on 218 reviews</em>
+                            </div>
+                            <div class="pd-review-bars">
+                                <div class="pd-review-bar"><span>5</span><i style="--w: 92%"></i><em>201</em></div>
+                                <div class="pd-review-bar"><span>4</span><i style="--w: 6%"></i><em>13</em></div>
+                                <div class="pd-review-bar"><span>3</span><i style="--w: 1%"></i><em>3</em></div>
+                                <div class="pd-review-bar"><span>2</span><i style="--w: 0%"></i><em>1</em></div>
+                                <div class="pd-review-bar"><span>1</span><i style="--w: 0%"></i><em>0</em></div>
+                            </div>
+                        </div>
+
+                        <div class="pd-review-list">
+                            <article class="pd-review">
+                                <header>
+                                    <span class="pd-review-avatar">AT</span>
+                                    <div>
+                                        <strong>Ade T.</strong>
+                                        <span class="pd-review-meta">Verified buyer · 2 weeks ago</span>
+                                    </div>
+                                    <span class="pd-review-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                </header>
+                                <p>Hands down the heaviest cotton I've owned. Fits exactly like the size guide says, and the brick crest looks unreal in person.</p>
+                            </article>
+
+                            <article class="pd-review">
+                                <header>
+                                    <span class="pd-review-avatar">KO</span>
+                                    <div>
+                                        <strong>Kemi O.</strong>
+                                        <span class="pd-review-meta">Verified buyer · 1 month ago</span>
+                                    </div>
+                                    <span class="pd-review-rating">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                                </header>
+                                <p>Shipping was fast and the packaging was premium. Already ordered a second one in another colorway.</p>
+                            </article>
+
+                            <article class="pd-review">
+                                <header>
+                                    <span class="pd-review-avatar">DM</span>
+                                    <div>
+                                        <strong>Dami M.</strong>
+                                        <span class="pd-review-meta">Verified buyer · 1 month ago</span>
+                                    </div>
+                                    <span class="pd-review-rating">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+                                </header>
+                                <p>Quality is top-tier. Took one star off because the size ran a touch big on me — went down a size and it's perfect.</p>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RELATED ===== -->
+            <div class="pd-related">
+                <div class="pd-related-head">
+                    <span class="section-tag">
+                        <span class="section-tag-dot"></span>
+                        You Might Also Like
+                    </span>
+                    <h3 class="pd-related-title">More From The <span class="accent-italic">Drop</span></h3>
+                </div>
+                <div class="pd-related-grid" id="pd-related-grid"></div>
+            </div>
+
+            <!-- ===== NOT FOUND ===== -->
+            <div class="pd-not-found" id="pd-not-found" hidden>
+                <div class="pd-not-found-glow"></div>
+                <h2 class="pd-not-found-title">Product not <span class="accent-italic">found</span>.</h2>
+                <p class="pd-not-found-sub">That drop may have sold out or moved. Pull up the catalog to find your fit.</p>
+                <a href="index.html#products" class="page-btn page-btn-primary">
+                    <span>Back to Catalog</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="site-footer" id="footer">
+            <div class="footer-ambient"></div>
+
+            <div class="footer-marquee" aria-hidden="true">
+                <div class="marquee-track">
+                    <span class="marquee-item">Fake A Smile</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Drop 02 Live</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Built On The Bricks</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Worldwide Delivery</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Wear The Story</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Since 2024</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Fake A Smile</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Drop 02 Live</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Built On The Bricks</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Worldwide Delivery</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Wear The Story</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Since 2024</span>
+                    <span class="marquee-star">&#10022;</span>
+                </div>
+            </div>
+
+            <div class="footer-cta">
+                <div class="footer-cta-glass">
+                    <div class="footer-cta-text">
+                        <p class="footer-cta-pretitle">Join the movement</p>
+                        <h3 class="footer-cta-title">Be first on every <span class="accent">drop</span>.</h3>
+                        <p class="footer-cta-sub">Early access. Exclusive colorways. Members-only restocks.</p>
+                    </div>
+                    <form class="footer-newsletter" id="newsletter-form" novalidate>
+                        <div class="newsletter-field">
+                            <svg class="newsletter-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            <input type="email" placeholder="your@email.com" aria-label="Email address" required>
+                        </div>
+                        <button type="submit" class="newsletter-submit">
+                            <span>Subscribe</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                        <p class="newsletter-hint" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="images/Fakesmile-1.png" alt="FakeSmile">
+                        <span>FAKESMILE</span>
+                    </div>
+                    <p class="footer-tagline">Wear confidence with style that speaks, even in silence. Premium streetwear engineered for everyday identity.</p>
+                    <div class="footer-socials">
+                        <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                        <a href="#" class="social-link" aria-label="X / Twitter"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg></a>
+                        <a href="#" class="social-link" aria-label="TikTok"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.85a8.16 8.16 0 0 0 4.77 1.52V7a4.85 4.85 0 0 1-1.84-.31z"></path></svg></a>
+                        <a href="#" class="social-link" aria-label="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12C4.5 20.5 12 20.5 12 20.5s7.5 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.6V8.4l6.4 3.6z"></path></svg></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <ul>
+                        <li><a href="index.html#products">Tops &amp; Hoodies</a></li>
+                        <li><a href="index.html#bottoms">Joggers &amp; Shorts</a></li>
+                        <li><a href="index.html#headwear">Headwear</a></li>
+                        <li><a href="#">Accessories</a></li>
+                        <li><a href="#">Gift Cards</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Shipping &amp; Delivery</a></li>
+                        <li><a href="#">Returns &amp; Exchanges</a></li>
+                        <li><a href="#">Size Guide</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">Our Story</a></li>
+                        <li><a href="#">Wholesale</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-wordmark" aria-hidden="true" data-text="FAKESMILE">FAKESMILE</div>
+
+            <div class="footer-bottom">
+                <p class="footer-copy">&copy; <span id="footer-year"></span> FakeSmile Brand. All rights reserved.</p>
+                <div class="footer-payments" aria-label="Payment methods">
+                    <span class="pay-chip">VISA</span>
+                    <span class="pay-chip">MC</span>
+                    <span class="pay-chip">AMEX</span>
+                    <span class="pay-chip">PAYPAL</span>
+                    <span class="pay-chip">PSTACK</span>
+                </div>
+                <div class="footer-legal">
+                    <a href="#">Privacy</a>
+                    <span class="legal-dot"></span>
+                    <a href="#">Terms</a>
+                    <span class="legal-dot"></span>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="scripts/products.js"></script>
+    <script src="scripts/base.js"></script>
+    <script src="scripts/product.js"></script>
+</body>
+</html>

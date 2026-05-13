@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop — FakeSmile</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/home.css">
+    <link rel="stylesheet" href="styles/tops-fb.css">
+    <link rel="stylesheet" href="styles/shop.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="page-shop">
+    <div class="page-shell">
+        <header class="liquid-glass-header">
+            <div class="header-inner">
+                <div class="logo">
+                    <a href="index.html"><img src="images/Fakesmile-1.png" alt="FakeSmile Logo"></a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="shop.html" class="active">Shop</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="index.html#orders">Orders</a></li>
+                    </ul>
+                </nav>
+                <div class="cart-wrapper">
+                    <a href="cart.html" class="cart-link">
+                        <span class="cart-amount">&#8358;0.00</span>
+                        <span class="cart-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white">
+                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                            </svg>
+                            <span class="cart-count">0</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== PAGE HERO ===== -->
+        <section class="page-hero page-hero-shop">
+            <div class="page-hero-bg" aria-hidden="true">
+                <span class="page-orb page-orb-a"></span>
+                <span class="page-orb page-orb-b"></span>
+                <div class="page-grid"></div>
+                <div class="page-brick"></div>
+            </div>
+            <div class="page-hero-wordmark" aria-hidden="true" data-text="SHOP">SHOP</div>
+            <div class="page-hero-content">
+                <span class="page-crumb">
+                    <a href="index.html">Home</a>
+                    <span>/</span>
+                    <span>Shop</span>
+                </span>
+                <h1 class="page-hero-title">The <span class="accent-italic">Collection</span></h1>
+                <p class="page-hero-sub">Every drop. Every fit. The full FakeSmile rotation — built on the bricks.</p>
+            </div>
+        </section>
+
+        <!-- ===== SHOP BODY ===== -->
+        <section class="shop-section">
+            <div class="shop-toolbar">
+                <div class="shop-filters" id="shop-filters">
+                    <button type="button" class="shop-filter active" data-filter="all">
+                        <span>All Products</span>
+                        <em class="shop-filter-count" data-count-for="all">0</em>
+                    </button>
+                    <button type="button" class="shop-filter" data-filter="Tops &amp; Hoodies">
+                        <span>Tops &amp; Hoodies</span>
+                        <em class="shop-filter-count" data-count-for="Tops &amp; Hoodies">0</em>
+                    </button>
+                    <button type="button" class="shop-filter" data-filter="Statement Tops">
+                        <span>Statement Tops</span>
+                        <em class="shop-filter-count" data-count-for="Statement Tops">0</em>
+                    </button>
+                    <button type="button" class="shop-filter" data-filter="Joggers &amp; Shorts">
+                        <span>Joggers &amp; Shorts</span>
+                        <em class="shop-filter-count" data-count-for="Joggers &amp; Shorts">0</em>
+                    </button>
+                    <button type="button" class="shop-filter" data-filter="Headwear">
+                        <span>Headwear</span>
+                        <em class="shop-filter-count" data-count-for="Headwear">0</em>
+                    </button>
+                </div>
+                <div class="shop-meta">
+                    <label class="shop-sort">
+                        <span>Sort</span>
+                        <select id="shop-sort">
+                            <option value="featured">Featured</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="name-asc">Name: A &rarr; Z</option>
+                        </select>
+                    </label>
+                    <span class="shop-result">
+                        <strong id="shop-result-count">0</strong>
+                        <em>products</em>
+                    </span>
+                </div>
+            </div>
+
+            <div class="shop-grid" id="shop-grid">
+                <!-- Cards populated by scripts/shop.js -->
+            </div>
+
+            <div class="shop-empty" id="shop-empty" hidden>
+                <div class="shop-empty-icon">
+                    <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+                <h2 class="shop-empty-title">No products in this <span class="accent-italic">filter</span>.</h2>
+                <p class="shop-empty-sub">Try a different category &mdash; or shop the full collection.</p>
+                <button type="button" class="page-btn page-btn-primary" id="shop-empty-reset">
+                    <span>Show All Products</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="site-footer" id="footer">
+            <div class="footer-ambient"></div>
+
+            <div class="footer-marquee" aria-hidden="true">
+                <div class="marquee-track">
+                    <span class="marquee-item">Fake A Smile</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Drop 02 Live</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Built On The Bricks</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Worldwide Delivery</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Wear The Story</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Since 2024</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Fake A Smile</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Drop 02 Live</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Built On The Bricks</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Worldwide Delivery</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Wear The Story</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Since 2024</span>
+                    <span class="marquee-star">&#10022;</span>
+                </div>
+            </div>
+
+            <div class="footer-cta">
+                <div class="footer-cta-glass">
+                    <div class="footer-cta-text">
+                        <p class="footer-cta-pretitle">Join the movement</p>
+                        <h3 class="footer-cta-title">Be first on every <span class="accent">drop</span>.</h3>
+                        <p class="footer-cta-sub">Early access. Exclusive colorways. Members-only restocks.</p>
+                    </div>
+                    <form class="footer-newsletter" id="newsletter-form" novalidate>
+                        <div class="newsletter-field">
+                            <svg class="newsletter-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            <input type="email" placeholder="your@email.com" aria-label="Email address" required>
+                        </div>
+                        <button type="submit" class="newsletter-submit">
+                            <span>Subscribe</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                        <p class="newsletter-hint" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="images/Fakesmile-1.png" alt="FakeSmile">
+                        <span>FAKESMILE</span>
+                    </div>
+                    <p class="footer-tagline">Wear confidence with style that speaks, even in silence. Premium streetwear engineered for everyday identity.</p>
+                    <div class="footer-socials">
+                        <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                        <a href="#" class="social-link" aria-label="X / Twitter"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg></a>
+                        <a href="#" class="social-link" aria-label="TikTok"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.85a8.16 8.16 0 0 0 4.77 1.52V7a4.85 4.85 0 0 1-1.84-.31z"></path></svg></a>
+                        <a href="#" class="social-link" aria-label="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12C4.5 20.5 12 20.5 12 20.5s7.5 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.6V8.4l6.4 3.6z"></path></svg></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <ul>
+                        <li><a href="shop.html">All Products</a></li>
+                        <li><a href="index.html#products">Tops &amp; Hoodies</a></li>
+                        <li><a href="index.html#bottoms">Joggers &amp; Shorts</a></li>
+                        <li><a href="index.html#headwear">Headwear</a></li>
+                        <li><a href="#">Gift Cards</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Shipping &amp; Delivery</a></li>
+                        <li><a href="#">Returns &amp; Exchanges</a></li>
+                        <li><a href="#">Size Guide</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">Our Story</a></li>
+                        <li><a href="#">Wholesale</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-wordmark" aria-hidden="true" data-text="FAKESMILE">FAKESMILE</div>
+
+            <div class="footer-bottom">
+                <p class="footer-copy">&copy; <span id="footer-year"></span> FakeSmile Brand. All rights reserved.</p>
+                <div class="footer-payments" aria-label="Payment methods">
+                    <span class="pay-chip">VISA</span>
+                    <span class="pay-chip">MC</span>
+                    <span class="pay-chip">AMEX</span>
+                    <span class="pay-chip">PAYPAL</span>
+                    <span class="pay-chip">PSTACK</span>
+                </div>
+                <div class="footer-legal">
+                    <a href="#">Privacy</a>
+                    <span class="legal-dot"></span>
+                    <a href="#">Terms</a>
+                    <span class="legal-dot"></span>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="scripts/products.js"></script>
+    <script src="scripts/base.js"></script>
+    <script src="scripts/shop.js"></script>
+</body>
+</html>
