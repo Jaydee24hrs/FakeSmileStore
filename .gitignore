@@ -1,0 +1,15 @@
+# Editor / IDE
+.vscode/
+.idea/
+.claude/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs / temp
+*.log
+node_modules/
+.env
+.env.*

@@ -21,10 +21,6 @@
     let currentFilter = 'all';
     let currentSort = 'featured';
 
-    function ngnPrice(price) {
-        return '&#8358;' + Number(price).toLocaleString() + '.00';
-    }
-
     function safeAttr(s) {
         return String(s || '').replace(/"/g, '&quot;');
     }
@@ -58,7 +54,7 @@
                      '<span class="product-tag">' + p.tag + '</span>' +
                      '<h3 class="product-name">' + p.name + '</h3>' +
                      '<div class="product-meta">' +
-                       '<span class="product-price">' + ngnPrice(p.price) + '</span>' +
+                       '<span class="product-price" data-price-ngn="' + p.price + '">' + formatPrice(p.price) + '</span>' +
                        '<button class="product-add" aria-label="Add ' + ariaName + ' to cart">' +
                          '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>' +
                        '</button>' +
@@ -172,7 +168,7 @@
         const imgEl   = card.querySelector('.product-image-wrap img');
         const name  = nameEl  ? nameEl.textContent.trim()  : 'Product';
         const tag   = tagEl   ? tagEl.textContent.trim()   : '';
-        const price = priceEl ? parseInt(priceEl.textContent.replace(/[^\d]/g, ''), 10) || 0 : 0;
+        const price = readCardPriceNgn(priceEl);
         const image = imgEl   ? imgEl.getAttribute('src')  : '';
         const id    = typeof slugify === 'function'
             ? slugify(name + ' ' + tag)
@@ -191,6 +187,9 @@
         btn.style.transform = 'scale(1.25) rotate(180deg)';
         setTimeout(() => { btn.style.transform = ''; }, 350);
     }, true);
+
+    // Re-render when currency changes so price labels swap NGN↔GBP
+    document.addEventListener('currency:update', render);
 
     // First render
     updateCounts();

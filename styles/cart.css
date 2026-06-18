@@ -130,6 +130,33 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+}
+.cart-item-img:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: rgba(0, 217, 87, 0.45);
+    box-shadow: 0 12px 28px rgba(0, 217, 87, 0.18);
+}
+.cart-item-img img {
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cart-item-img:hover img {
+    transform: scale(1.06);
+}
+
+.cart-item-name-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.25s ease;
+}
+.cart-item-name-link:hover {
+    color: #00ff7a;
 }
 
 .cart-item-img img {
@@ -335,6 +362,9 @@
     font-size: 14px;
     color: rgba(255, 255, 255, 0.7);
 }
+
+/* The hidden attribute is overridden by the flex rule above otherwise */
+.cart-summary-lines li[hidden] { display: none; }
 
 .cart-summary-lines strong {
     font-size: 14px;
@@ -568,24 +598,70 @@
 }
 
 @media (max-width: 720px) {
-    .cart-section { padding: 40px 20px 80px; }
-    .cart-item {
-        grid-template-columns: 78px 1fr;
-        grid-template-rows: auto auto;
-        gap: 14px;
-        padding: 14px;
+    /* Leave room past the mobile browser's bottom toolbar so Checkout isn't hidden */
+    .cart-section {
+        padding: 40px 16px 40px;
+        padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
     }
-    .cart-item-img { width: 78px; height: 78px; }
+    .cart-items { gap: 12px; }
+    .cart-items-header { margin-bottom: 16px; }
+    .cart-items-title { font-size: 18px; }
+    .cart-item {
+        grid-template-columns: 92px 1fr;
+        grid-template-rows: auto auto;
+        gap: 12px 14px;
+        padding: 12px;
+        border-radius: 18px;
+    }
+    .cart-item-img { width: 92px; height: 92px; border-radius: 14px; }
+    .cart-item-body { gap: 4px; }
+    .cart-item-tag { font-size: 9px; letter-spacing: 1.6px; }
+    .cart-item-name { font-size: 15px; }
+    .cart-item-size {
+        padding: 3px 9px;
+        font-size: 0.58rem;
+        margin-top: 1px;
+    }
+    .cart-item-price { font-size: 12px; }
     .cart-item-controls {
         grid-column: 1 / -1;
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-        padding-top: 10px;
+        gap: 10px;
+        padding-top: 8px;
         border-top: 1px dashed rgba(255,255,255,0.08);
     }
-    .cart-summary-card { padding: 24px; }
+    .cart-item-remove { width: 28px; height: 28px; align-self: auto; }
+    .cart-qty { padding: 3px; gap: 2px; }
+    .cart-qty button { width: 26px; height: 26px; font-size: 13px; }
+    .cart-qty .cart-qty-value { min-width: 22px; font-size: 13px; }
+    .cart-item-subtotal { font-size: 15px; }
+
+    /* ===== Summary card — tighter ===== */
+    .cart-summary-card { padding: 22px 20px; border-radius: 22px; }
+    .cart-summary-title { font-size: 22px; margin-bottom: 18px; }
+    .cart-summary-lines { padding-bottom: 18px; margin-bottom: 18px; gap: 10px; }
+    .cart-summary-lines li,
+    .cart-summary-lines strong { font-size: 13px; }
+    .cart-summary-total strong { font-size: 26px; }
+    .cart-promo input { padding: 12px 16px; font-size: 12px; }
+    .cart-promo button { padding: 12px 18px; font-size: 11px; }
+    .cart-checkout-btn { padding: 16px 20px; font-size: 14px; }
+
     .cart-empty { padding: 60px 24px 70px; }
     .cart-empty-actions { flex-direction: column; align-items: stretch; width: 100%; max-width: 280px; margin: 0 auto; }
     .cart-empty-actions .page-btn { justify-content: center; }
+}
+
+@media (max-width: 420px) {
+    .cart-item {
+        grid-template-columns: 82px 1fr;
+        padding: 10px;
+        gap: 10px 12px;
+    }
+    .cart-item-img { width: 82px; height: 82px; }
+    .cart-item-name { font-size: 14px; }
+    .cart-summary-card { padding: 20px 16px; }
+    .cart-summary-total strong { font-size: 24px; }
 }

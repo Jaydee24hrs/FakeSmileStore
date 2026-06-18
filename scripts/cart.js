@@ -29,7 +29,7 @@
         'CREW10':    { off: 0.10, label: 'CREW10' },
     };
 
-    const fmt = (n) => `&#8358;${Number(n || 0).toLocaleString()}.00`;
+    const fmt = (n) => formatPrice(Number(n || 0));
 
     function getPromo() {
         const code = (localStorage.getItem(PROMO_KEY) || '').toUpperCase();
@@ -67,14 +67,19 @@
             const safeName = (it.name || 'Product').replace(/</g, '&lt;');
             const safeTag = (it.tag || '').replace(/</g, '&lt;');
             const safeSize = (it.size || '').replace(/</g, '&lt;');
+            // Resolve the product detail target. Set entries have a productId
+            // like "cloud-brick-hoodie-set"; strip the suffix so we land on
+            // the canonical hoodie/jersey product page.
+            const baseProductId = (it.productId || '').replace(/-set$/, '');
+            const productHref = baseProductId ? `product.html?id=${encodeURIComponent(baseProductId)}` : '#';
             return `
                 <article class="cart-item" data-id="${it.id}">
-                    <div class="cart-item-img">
+                    <a class="cart-item-img" href="${productHref}" aria-label="View ${safeName}">
                         <img src="${safeImg}" alt="${safeName}">
-                    </div>
+                    </a>
                     <div class="cart-item-body">
                         ${safeTag ? `<span class="cart-item-tag">${safeTag}</span>` : ''}
-                        <h3 class="cart-item-name">${safeName}</h3>
+                        <h3 class="cart-item-name"><a href="${productHref}" class="cart-item-name-link">${safeName}</a></h3>
                         ${safeSize ? `<span class="cart-item-size">Size <strong>${safeSize}</strong></span>` : ''}
                         <p class="cart-item-price">${fmt(it.price)} each</p>
                     </div>
@@ -187,21 +192,24 @@
 
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
-            const items = readCart();
-            if (items.length === 0) return;
-            const original = checkoutBtn.querySelector('span').textContent;
-            checkoutBtn.querySelector('span').textContent = 'Redirecting…';
+            if (readCart().length === 0) return;
+            const span = checkoutBtn.querySelector('span');
+            const original = span ? span.textContent : '';
+            if (span) span.textContent = 'Redirecting…';
             checkoutBtn.disabled = true;
+            // Brief delay so the user sees the state change before the page swaps
+            setTimeout(() => { window.location.href = 'checkout.html'; }, 200);
+            // Safety reset in case navigation is blocked / cancelled
             setTimeout(() => {
-                alert('Checkout flow coming soon. Your bag is saved.');
-                checkoutBtn.querySelector('span').textContent = original;
+                if (span) span.textContent = original;
                 checkoutBtn.disabled = false;
-            }, 600);
+            }, 2000);
         });
     }
 
     // Re-render if cart changes elsewhere (other tab / programmatic)
     document.addEventListener('cart:update', render);
+    document.addEventListener('currency:update', render);
     window.addEventListener('storage', (e) => {
         if (e.key === CART_KEY || e.key === PROMO_KEY) render();
     });

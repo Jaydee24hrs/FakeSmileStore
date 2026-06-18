@@ -180,7 +180,7 @@ document.addEventListener('click', (e) => {
         const nameEl  = card.querySelector('.product-name');
         const tagEl   = card.querySelector('.product-tag');
         const imgEl   = card.querySelector('.product-image-wrap img');
-        const price = priceEl ? parseInt(priceEl.textContent.replace(/[^\d]/g, ''), 10) || 0 : 0;
+        const price = readCardPriceNgn(priceEl);
         const name  = nameEl ? nameEl.textContent.trim() : 'Product';
         const tag   = tagEl ? tagEl.textContent.trim() : '';
         addToCart({
@@ -274,7 +274,7 @@ if (promoCard) {
         const link    = card.querySelector('a.product-image-wrap');
         const name  = nameEl  ? nameEl.textContent.trim()  : 'Product';
         const tag   = tagEl   ? tagEl.textContent.trim()   : '';
-        const price = priceEl ? parseInt(priceEl.textContent.replace(/[^\d]/g, ''), 10) || 0 : 0;
+        const price = readCardPriceNgn(priceEl);
         const image = imgEl   ? imgEl.getAttribute('src')  : '';
         const id    = typeof slugify === 'function'
             ? slugify(name + ' ' + tag)

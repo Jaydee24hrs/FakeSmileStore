@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout — FakeSmile</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/cart.css">
+    <link rel="stylesheet" href="styles/checkout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="page-checkout">
+    <div class="page-shell">
+        <header class="liquid-glass-header">
+            <div class="header-inner">
+                <div class="logo">
+                    <a href="index.html"><img src="images/Fakesmile-1.png" alt="FakeSmile Logo"></a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="shop.html">Shop</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                    </ul>
+                </nav>
+                <div class="cart-wrapper">
+                    <a href="cart.html" class="cart-link">
+                        <span class="cart-amount">&#8358;0.00</span>
+                        <span class="cart-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white">
+                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                            </svg>
+                            <span class="cart-count">0</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== PAGE HERO ===== -->
+        <section class="page-hero page-hero-checkout">
+            <div class="page-hero-bg" aria-hidden="true">
+                <span class="page-orb page-orb-a"></span>
+                <span class="page-orb page-orb-b"></span>
+                <div class="page-grid"></div>
+                <div class="page-brick"></div>
+            </div>
+            <div class="page-hero-wordmark" aria-hidden="true" data-text="CHECKOUT">CHECKOUT</div>
+            <div class="page-hero-content">
+                <span class="page-crumb">
+                    <a href="index.html">Home</a>
+                    <span>/</span>
+                    <a href="cart.html">Cart</a>
+                    <span>/</span>
+                    <span>Checkout</span>
+                </span>
+                <h1 class="page-hero-title">Secure <span class="accent-italic">Checkout</span></h1>
+                <p class="page-hero-sub" id="checkout-hero-sub">Confirm your fit. Lock in your details. Slide to complete.</p>
+            </div>
+        </section>
+
+        <!-- ===== CHECKOUT BODY ===== -->
+        <section class="checkout-section">
+            <div class="checkout-layout" id="checkout-layout">
+                <form class="checkout-form" id="checkout-form" novalidate>
+                    <!-- 01 Contact -->
+                    <section class="checkout-step">
+                        <header class="step-head">
+                            <span class="step-num">01</span>
+                            <h2 class="step-title">Contact</h2>
+                        </header>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="ck-email">Email</label>
+                                <input type="email" id="ck-email" name="email" placeholder="you@example.com" autocomplete="email" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="ck-phone">Phone</label>
+                                <input type="tel" id="ck-phone" name="phone" placeholder="+234 ..." autocomplete="tel" required>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 02 Shipping -->
+                    <section class="checkout-step">
+                        <header class="step-head">
+                            <span class="step-num">02</span>
+                            <h2 class="step-title">Shipping Address</h2>
+                        </header>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="ck-firstname">First name</label>
+                                <input type="text" id="ck-firstname" name="firstName" autocomplete="given-name" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="ck-lastname">Last name</label>
+                                <input type="text" id="ck-lastname" name="lastName" autocomplete="family-name" required>
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label for="ck-address1">Address line 1</label>
+                            <input type="text" id="ck-address1" name="address1" placeholder="Street + number" autocomplete="address-line1" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="ck-address2">Address line 2 <span class="opt">(optional)</span></label>
+                            <input type="text" id="ck-address2" name="address2" placeholder="Apartment, suite, building" autocomplete="address-line2">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="ck-city">City</label>
+                                <input type="text" id="ck-city" name="city" autocomplete="address-level2" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="ck-state">State / Region</label>
+                                <input type="text" id="ck-state" name="state" autocomplete="address-level1" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="ck-country">Country</label>
+                                <select id="ck-country" name="country" autocomplete="country" required>
+                                    <option value="">Select country</option>
+                                    <option value="NG">Nigeria</option>
+                                    <option value="GB">United Kingdom</option>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="GH">Ghana</option>
+                                    <option value="ZA">South Africa</option>
+                                    <option value="KE">Kenya</option>
+                                    <option value="EG">Egypt</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="FR">France</option>
+                                    <option value="NL">Netherlands</option>
+                                    <option value="ES">Spain</option>
+                                    <option value="IT">Italy</option>
+                                    <option value="IE">Ireland</option>
+                                    <option value="SE">Sweden</option>
+                                    <option value="NO">Norway</option>
+                                    <option value="DK">Denmark</option>
+                                    <option value="BE">Belgium</option>
+                                    <option value="CH">Switzerland</option>
+                                    <option value="AT">Austria</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="NZ">New Zealand</option>
+                                    <option value="AE">UAE</option>
+                                    <option value="SA">Saudi Arabia</option>
+                                    <option value="QA">Qatar</option>
+                                    <option value="IN">India</option>
+                                    <option value="JP">Japan</option>
+                                    <option value="KR">South Korea</option>
+                                    <option value="SG">Singapore</option>
+                                    <option value="HK">Hong Kong</option>
+                                    <option value="BR">Brazil</option>
+                                    <option value="MX">Mexico</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label for="ck-postal">Postal / ZIP code</label>
+                                <input type="text" id="ck-postal" name="postal" autocomplete="postal-code" required>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 03 Payment -->
+                    <section class="checkout-step">
+                        <header class="step-head">
+                            <span class="step-num">03</span>
+                            <h2 class="step-title">Payment</h2>
+                        </header>
+                        <div class="payment-methods payment-methods-2" id="payment-methods">
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="nomba" checked>
+                                <div class="payment-method-body">
+                                    <span class="pm-label">Pay with Nomba</span>
+                                    <span class="pm-sub">Card · Bank · USSD · Transfer</span>
+                                </div>
+                            </label>
+                            <label class="payment-method">
+                                <input type="radio" name="payment" value="bank">
+                                <div class="payment-method-body">
+                                    <span class="pm-label">Bank transfer</span>
+                                    <span class="pm-sub">Manual confirmation</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="payment-note" id="payment-note"></div>
+                    </section>
+
+                    <p class="form-hint" id="ck-hint" aria-live="polite"></p>
+
+                    <button type="submit" class="page-btn page-btn-primary checkout-place-btn" id="ck-place">
+                        <span>Place Order</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+
+                    <a href="cart.html" class="checkout-back">&larr; Back to cart</a>
+                </form>
+
+                <!-- Sticky summary -->
+                <aside class="checkout-summary">
+                    <div class="checkout-summary-card">
+                        <div class="cart-summary-shine"></div>
+                        <span class="section-tag">
+                            <span class="section-tag-dot"></span>
+                            Your Order
+                        </span>
+                        <h3 class="cart-summary-title">Final <span class="accent-italic">Drop</span></h3>
+
+                        <div class="ck-items" id="ck-items"></div>
+
+                        <ul class="cart-summary-lines">
+                            <li>
+                                <span>Subtotal</span>
+                                <strong id="ck-subtotal">&#8358;0.00</strong>
+                            </li>
+                            <li>
+                                <span>Shipping</span>
+                                <strong class="free">Free</strong>
+                            </li>
+                            <li class="discount-line" id="ck-discount-line" hidden>
+                                <span>Discount <em id="ck-discount-code"></em></span>
+                                <strong id="ck-discount">&#8722;&#8358;0.00</strong>
+                            </li>
+                        </ul>
+
+                        <div class="cart-summary-total">
+                            <span>Total</span>
+                            <strong id="ck-total">&#8358;0.00</strong>
+                        </div>
+
+                        <div class="cart-trust">
+                            <span class="trust-dot"></span>
+                            Secure checkout · 14-day returns · Worldwide delivery
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- Empty cart fallback -->
+            <div class="cart-empty" id="checkout-empty" hidden>
+                <div class="cart-empty-glow"></div>
+                <div class="cart-empty-icon">
+                    <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                </div>
+                <h2 class="cart-empty-title">Nothing to <span class="accent-italic">check out</span>.</h2>
+                <p class="cart-empty-sub">Add a fit to your bag before locking in the drop.</p>
+                <div class="cart-empty-actions">
+                    <a href="shop.html" class="page-btn page-btn-primary">
+                        <span>Shop The Drop</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Success state -->
+            <div class="checkout-success" id="checkout-success" hidden>
+                <div class="success-card">
+                    <div class="success-icon">
+                        <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <h2 class="success-title">Order <span class="accent-italic">Confirmed</span>.</h2>
+                    <p class="success-sub">Your fit is on the way. Confirmation sent to <strong id="success-email">—</strong>.</p>
+                    <div class="success-orderid">
+                        <span>Order ID</span>
+                        <strong id="success-orderid">—</strong>
+                    </div>
+                    <p class="success-total-line">Total charged: <strong id="success-total">—</strong></p>
+                    <div class="success-actions">
+                        <a href="orders.html" class="page-btn page-btn-primary">
+                            <span>Track Your Order</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </a>
+                        <a href="shop.html" class="page-btn page-btn-ghost">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="site-footer" id="footer">
+            <div class="footer-ambient"></div>
+
+            <div class="footer-marquee" aria-hidden="true">
+                <div class="marquee-track">
+                    <span class="marquee-item">Fake A Smile</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Drop 02 Live</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Built On The Bricks</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Worldwide Delivery</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Wear The Story</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Since 2024</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Fake A Smile</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Drop 02 Live</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Built On The Bricks</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Worldwide Delivery</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Wear The Story</span>
+                    <span class="marquee-star">&#10022;</span>
+                    <span class="marquee-item">Since 2024</span>
+                    <span class="marquee-star">&#10022;</span>
+                </div>
+            </div>
+
+            <div class="footer-cta">
+                <div class="footer-cta-glass">
+                    <div class="footer-cta-text">
+                        <p class="footer-cta-pretitle">Join the movement</p>
+                        <h3 class="footer-cta-title">Be first on every <span class="accent">drop</span>.</h3>
+                        <p class="footer-cta-sub">Early access. Exclusive colorways. Members-only restocks.</p>
+                    </div>
+                    <form class="footer-newsletter" id="newsletter-form" novalidate>
+                        <div class="newsletter-field">
+                            <svg class="newsletter-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            <input type="email" placeholder="your@email.com" aria-label="Email address" required>
+                        </div>
+                        <button type="submit" class="newsletter-submit">
+                            <span>Subscribe</span>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                        <p class="newsletter-hint" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="images/Fakesmile-1.png" alt="FakeSmile">
+                        <span>FAKESMILE</span>
+                    </div>
+                    <p class="footer-tagline">Wear confidence with style that speaks, even in silence. Premium streetwear engineered for everyday identity.</p>
+                    <div class="footer-socials">
+                        <a href="#" class="social-link" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+                        <a href="#" class="social-link" aria-label="X / Twitter"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg></a>
+                        <a href="#" class="social-link" aria-label="TikTok"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.85a8.16 8.16 0 0 0 4.77 1.52V7a4.85 4.85 0 0 1-1.84-.31z"></path></svg></a>
+                        <a href="#" class="social-link" aria-label="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.58A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12C4.5 20.5 12 20.5 12 20.5s7.5 0 9.4-.58a3 3 0 0 0 2.1-2.12A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.6 15.6V8.4l6.4 3.6z"></path></svg></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Shop</h4>
+                    <ul>
+                        <li><a href="shop.html">All Products</a></li>
+                        <li><a href="index.html#products">Tops &amp; Hoodies</a></li>
+                        <li><a href="index.html#bottoms">Joggers &amp; Shorts</a></li>
+                        <li><a href="index.html#headwear">Headwear</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Shipping &amp; Delivery</a></li>
+                        <li><a href="#">Returns &amp; Exchanges</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">Our Story</a></li>
+                        <li><a href="#">Wholesale</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-wordmark" aria-hidden="true" data-text="FAKESMILE">FAKESMILE</div>
+
+            <div class="footer-bottom">
+                <p class="footer-copy">&copy; <span id="footer-year"></span> FakeSmile Brand. All rights reserved.</p>
+                <div class="footer-payments" aria-label="Payment methods">
+                    <span class="pay-chip">VISA</span>
+                    <span class="pay-chip">MC</span>
+                    <span class="pay-chip">AMEX</span>
+                    <span class="pay-chip">PAYPAL</span>
+                    <span class="pay-chip">PSTACK</span>
+                </div>
+                <div class="footer-legal">
+                    <a href="#">Privacy</a>
+                    <span class="legal-dot"></span>
+                    <a href="#">Terms</a>
+                    <span class="legal-dot"></span>
+                    <a href="#">Cookies</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="scripts/products.js"></script>
+    <script src="scripts/base.js"></script>
+    <!-- EmailJS SDK — sends order confirmation emails. Free tier: 200/mo. -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="scripts/checkout.js"></script>
+</body>
+</html>

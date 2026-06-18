@@ -791,8 +791,8 @@
 
 .pd-related-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 18px;
 }
 
 .pd-related-card {
@@ -938,6 +938,10 @@
 }
 
 /* =================== RESPONSIVE =================== */
+@media (max-width: 1280px) {
+    .pd-related-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
 @media (max-width: 1100px) {
     .pd-layout {
         grid-template-columns: 1fr;
@@ -949,7 +953,7 @@
 @media (max-width: 820px) {
     .product-detail { padding: 50px 5% 70px; }
     .pd-info-glass { padding: 30px 26px; }
-    .pd-related-grid { grid-template-columns: repeat(2, 1fr); }
+    .pd-related-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
     .pd-tabs { margin-top: 60px; }
     .pd-reviews-summary {
         grid-template-columns: 1fr;

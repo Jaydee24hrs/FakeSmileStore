@@ -17,6 +17,124 @@ navLinks.forEach(link => {
 });
 
 
+// ===== CURRENCY (auto: GBP default, NGN for Nigeria IPs) =====
+// All prices in products.js + cart storage are NGN integers. formatPrice()
+// converts to GBP using a LIVE exchange rate fetched from a public FX API
+// (fawazahmed0 currency-api, sourced from the world FX market — same daily
+// rates the major UK/EU market data feeds publish). The rate is cached in
+// localStorage for 24 hours so we don't hammer the API.
+const CURRENCY_KEY = 'fs_currency';
+const FX_CACHE_KEY = 'fs_fx_rate';
+const FX_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+const FX_API_PRIMARY  = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/gbp.json';
+const FX_API_FALLBACK = 'https://latest.currency-api.pages.dev/v1/currencies/gbp.json';
+const FX_FALLBACK_NGN_PER_GBP = 2000; // used only if both API + cache are unavailable
+const CURRENCIES = {
+    NGN: { symbol: '₦' },
+    GBP: { symbol: '£' },
+};
+
+let currentCurrency = localStorage.getItem(CURRENCY_KEY);
+if (!currentCurrency || !CURRENCIES[currentCurrency]) currentCurrency = 'GBP';
+
+// Seed the live rate from cache so the first paint already has a real number
+let ngnPerGbp = FX_FALLBACK_NGN_PER_GBP;
+try {
+    const cached = JSON.parse(localStorage.getItem(FX_CACHE_KEY) || 'null');
+    if (cached && typeof cached.ratio === 'number' && cached.ratio > 0) {
+        ngnPerGbp = cached.ratio;
+    }
+} catch (_) { /* keep fallback */ }
+
+function formatPrice(ngnValue) {
+    const n = Number(ngnValue) || 0;
+    if (currentCurrency === 'NGN') {
+        return CURRENCIES.NGN.symbol + Math.round(n).toLocaleString() + '.00';
+    }
+    const gbp = n / ngnPerGbp;
+    return CURRENCIES.GBP.symbol + gbp.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+async function fetchExchangeRate() {
+    // Skip network if cache is still fresh
+    try {
+        const cached = JSON.parse(localStorage.getItem(FX_CACHE_KEY) || 'null');
+        if (cached && cached.fetchedAt && (Date.now() - cached.fetchedAt) < FX_CACHE_TTL_MS) {
+            return;
+        }
+    } catch (_) { /* fall through and fetch */ }
+
+    for (const url of [FX_API_PRIMARY, FX_API_FALLBACK]) {
+        try {
+            const r = await fetch(url);
+            if (!r.ok) continue;
+            const d = await r.json();
+            const rate = d && d.gbp && d.gbp.ngn;
+            if (typeof rate === 'number' && rate > 0) {
+                ngnPerGbp = rate;
+                localStorage.setItem(FX_CACHE_KEY, JSON.stringify({
+                    ratio: rate,
+                    date: d.date || null,
+                    fetchedAt: Date.now(),
+                }));
+                applyCurrencyToPage();
+                renderHeaderCart();
+                document.dispatchEvent(new CustomEvent('currency:update', { detail: { code: currentCurrency, rate } }));
+                return;
+            }
+        } catch (_) { /* try next mirror */ }
+    }
+}
+
+// Returns the underlying NGN integer for a price element, preferring the
+// data-price-ngn attribute and falling back to parsing the textContent
+// (which is in NGN on first run because every page hardcodes ₦ in HTML).
+function readCardPriceNgn(priceEl) {
+    if (!priceEl) return 0;
+    const attr = priceEl.getAttribute && priceEl.getAttribute('data-price-ngn');
+    if (attr) return parseInt(attr, 10) || 0;
+    const num = parseInt((priceEl.textContent || '').replace(/[^\d]/g, ''), 10);
+    return isNaN(num) ? 0 : num;
+}
+
+function applyCurrencyToPage() {
+    // Anything already tagged with the NGN value
+    document.querySelectorAll('[data-price-ngn]').forEach((el) => {
+        const ngn = parseInt(el.getAttribute('data-price-ngn'), 10);
+        if (!isNaN(ngn)) el.innerHTML = formatPrice(ngn);
+    });
+    // Catalog cards: first run extracts NGN from the hardcoded ₦ HTML, then tags
+    document.querySelectorAll('.product-price:not([data-price-ngn])').forEach((el) => {
+        const num = parseInt((el.textContent || '').replace(/[^\d]/g, ''), 10);
+        if (!isNaN(num) && num > 0) {
+            el.setAttribute('data-price-ngn', num);
+            el.innerHTML = formatPrice(num);
+        }
+    });
+}
+
+function setCurrency(code) {
+    if (!CURRENCIES[code] || code === currentCurrency) return;
+    currentCurrency = code;
+    localStorage.setItem(CURRENCY_KEY, code);
+    applyCurrencyToPage();
+    renderHeaderCart();
+    document.dispatchEvent(new CustomEvent('currency:update', { detail: { code } }));
+}
+
+async function detectCurrencyByIP() {
+    // Respect a saved user preference if one exists
+    if (localStorage.getItem(CURRENCY_KEY)) return;
+    try {
+        const r = await fetch('https://ipapi.co/json/');
+        if (!r.ok) return;
+        const d = await r.json();
+        const country = (d.country_code || d.country || '').toUpperCase();
+        const next = (country === 'NG') ? 'NGN' : 'GBP';
+        if (next !== currentCurrency) setCurrency(next);
+    } catch (_) { /* network blocked — keep GBP default */ }
+}
+
 // ===== CART FUNCTIONALITY (persisted across pages) =====
 const PRODUCT_PRICE = 5000;
 const CART_KEY = 'fs_cart_items';
@@ -48,7 +166,7 @@ function getCartTotal(items) {
 function renderHeaderCart() {
     const items = readCart();
     if (cartCountEl) cartCountEl.textContent = getCartCount(items);
-    if (cartAmountEl) cartAmountEl.innerHTML = `&#8358;${getCartTotal(items).toLocaleString()}.00`;
+    if (cartAmountEl) cartAmountEl.innerHTML = formatPrice(getCartTotal(items));
 }
 
 function pulseCart() {
@@ -183,11 +301,23 @@ function clearCart() {
     renderHeaderCart();
 }
 
+applyCurrencyToPage();
 renderHeaderCart();
+detectCurrencyByIP();
+fetchExchangeRate();
 
 // Sync header across tabs/windows
 window.addEventListener('storage', (e) => {
     if (e.key === CART_KEY) renderHeaderCart();
+    if (e.key === CURRENCY_KEY) {
+        const code = e.newValue;
+        if (CURRENCIES[code] && code !== currentCurrency) {
+            currentCurrency = code;
+            applyCurrencyToPage();
+            renderHeaderCart();
+            document.dispatchEvent(new CustomEvent('currency:update', { detail: { code } }));
+        }
+    }
 });
 
 // ===== FOOTER =====

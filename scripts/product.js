@@ -66,7 +66,10 @@
     const nameTagEl = document.getElementById('pd-name-tag');
     if (nameTagEl) nameTagEl.textContent = product.tag;
     const priceEl = document.getElementById('pd-price');
-    if (priceEl) priceEl.innerHTML = `&#8358;${product.price.toLocaleString()}.00`;
+    if (priceEl) {
+        priceEl.setAttribute('data-price-ngn', product.price);
+        priceEl.innerHTML = formatPrice(product.price);
+    }
     const descEl = document.getElementById('pd-desc');
     if (descEl) descEl.textContent = product.description || '';
     const descLongEl = document.getElementById('pd-desc-long');
@@ -262,10 +265,10 @@
         });
     }
 
-    // ===== Related products =====
+    // ===== Related products (1 of each: hoodie, tee, joggers, shorts, headwear) =====
     const grid = document.getElementById('pd-related-grid');
     if (grid && typeof getRelatedProducts === 'function') {
-        const related = getRelatedProducts(product.id, 4);
+        const related = getRelatedProducts(product.id);
         grid.innerHTML = '';
         related.forEach((p) => {
             const a = document.createElement('a');
@@ -280,7 +283,7 @@
                     <span class="pd-related-tag">${p.tag}</span>
                     <h4 class="pd-related-name">${p.name}</h4>
                     <div class="pd-related-meta">
-                        <span class="pd-related-price">&#8358;${p.price.toLocaleString()}</span>
+                        <span class="pd-related-price" data-price-ngn="${p.price}">${formatPrice(p.price)}</span>
                         <button type="button" class="pd-related-add" aria-label="Add ${p.name} to cart" data-id="${p.id}">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>

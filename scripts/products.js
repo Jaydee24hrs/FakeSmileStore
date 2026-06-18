@@ -121,8 +121,30 @@ const PRODUCTS = {
         price: 9500,
         image: 'images/92.png',
         backImage: 'images/93.png',
+        completewear: 'images/Completewear/63.png',
         description:
             'Vintage-wash heavyweight tank with the Twin Faces print — two icons, one duality. Soft-touch cotton, dropped armholes and a relaxed streetwear cut.',
+        details: {
+            Material: '240GSM washed cotton',
+            Fit: 'Relaxed, true-to-size',
+            Sizes: 'S / M / L / XL / XXL',
+            Care: 'Cold wash inside-out, hang dry',
+            Origin: 'Crafted in Lagos',
+        },
+    },
+    'cream-faces-tank': {
+        id: 'cream-faces-tank',
+        name: 'Cream Faces',
+        tag: 'Tank',
+        category: 'Tops & Hoodies',
+        categoryHash: 'products',
+        price: 9500,
+        image: 'images/98.png',
+        backImage: 'images/99.png',
+        completewear: 'images/Completewear/65.png',
+        badge: 'New',
+        description:
+            'Cream-sand vintage-wash tank with the FakeSmile statement graphic. Soft-touch heavyweight cotton, dropped armholes and a relaxed streetwear cut.',
         details: {
             Material: '240GSM washed cotton',
             Fit: 'Relaxed, true-to-size',
@@ -143,7 +165,28 @@ const PRODUCTS = {
         completewear: 'images/Completewear/66.png',
         badge: 'New',
         description:
-            'Forest green body, midnight black sleeves — a contrast long sleeve carrying the FakeSmile brick crest at chest. Heavyweight knit, ribbed cuffs, built for layering.',
+            'Forest green body, ivory contrast sleeves — a two-tone long sleeve carrying the FakeSmile brick crest at chest. Heavyweight knit, ribbed cuffs, built for layering.',
+        details: {
+            Material: '300GSM heavyweight cotton',
+            Fit: 'Relaxed, true-to-size',
+            Sizes: 'S / M / L / XL / XXL',
+            Care: 'Cold wash inside-out, hang dry',
+            Origin: 'Crafted in Lagos',
+        },
+    },
+    'onyx-two-tone-long-sleeve': {
+        id: 'onyx-two-tone-long-sleeve',
+        name: 'Onyx Two-Tone',
+        tag: 'Long Sleeve',
+        category: 'Tops & Hoodies',
+        categoryHash: 'products',
+        price: 15000,
+        image: 'images/104.png',
+        backImage: 'images/105.png',
+        completewear: 'images/Completewear/67.png',
+        badge: 'Bestseller',
+        description:
+            'Midnight-black body, ivory contrast sleeves. Heavyweight knit, ribbed cuffs and the FakeSmile crest at chest — the loudest layering piece in the rotation.',
         details: {
             Material: '300GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -173,18 +216,20 @@ const PRODUCTS = {
             Origin: 'Crafted in Lagos',
         },
     },
-    'ash-court-jersey': {
-        id: 'ash-court-jersey',
-        name: 'Ash Court',
+    'forest-court-jersey': {
+        id: 'forest-court-jersey',
+        name: 'Forest Court',
         tag: 'Jersey',
         category: 'Tops & Hoodies',
         categoryHash: 'products',
         price: 12500,
         image: 'images/68.png',
         backImage: 'images/69.png',
-        badge: 'Limited',
+        completewear: 'images/Completewear/51.png',
+        partner: 'forest-court-shorts',
+        badge: 'New',
         description:
-            'Ash-grey performance jersey with reflective trim. Breathable polyester tricot, embroidered FakeSmile crest and the "FAKE A SMILE" wordmark — built for motion.',
+            'Forest-green performance jersey with white trim. Lightweight breathable mesh tricot and the "FAKE A SMILE" wordmark — engineered for motion.',
         details: {
             Material: 'Lightweight breathable polyester tricot',
             Fit: 'Athletic, true-to-size',
@@ -193,41 +238,46 @@ const PRODUCTS = {
             Origin: 'Crafted in Lagos',
         },
     },
-    'smoke-faces-tank': {
-        id: 'smoke-faces-tank',
-        name: 'Smoke Faces',
-        tag: 'Tank',
+    'cloud-court-jersey': {
+        id: 'cloud-court-jersey',
+        name: 'Cloud Court',
+        tag: 'Jersey',
         category: 'Tops & Hoodies',
         categoryHash: 'products',
-        price: 9500,
-        image: 'images/83.png',
-        backImage: 'images/84.png',
+        price: 12500,
+        image: 'images/73.png',
+        backImage: 'images/74.png',
+        completewear: 'images/Completewear/53.png',
+        partner: 'cloud-stripe-shorts',
         description:
-            'Smoke-grey vintage-wash tank with the Twin Faces graphic. Soft-touch heavyweight cotton, dropped armholes and a relaxed streetwear cut.',
+            'Cloud-white performance jersey with crimson trim. Lightweight breathable mesh tricot, embroidered FakeSmile crest and the "FAKE A SMILE" wordmark.',
         details: {
-            Material: '240GSM washed cotton',
-            Fit: 'Relaxed, true-to-size',
+            Material: 'Lightweight breathable polyester tricot',
+            Fit: 'Athletic, true-to-size',
             Sizes: 'S / M / L / XL / XXL',
-            Care: 'Cold wash inside-out, hang dry',
+            Care: 'Cold wash, do not iron print',
             Origin: 'Crafted in Lagos',
         },
     },
-    'sage-two-tone-long-sleeve': {
-        id: 'sage-two-tone-long-sleeve',
-        name: 'Sage Two-Tone',
-        tag: 'Long Sleeve',
+    'sunset-court-jersey': {
+        id: 'sunset-court-jersey',
+        name: 'Sunset Court',
+        tag: 'Jersey',
         category: 'Tops & Hoodies',
         categoryHash: 'products',
-        price: 15000,
-        image: 'images/95.png',
-        backImage: 'images/96.png',
+        price: 12500,
+        image: 'images/83.png',
+        backImage: 'images/84.png',
+        completewear: 'images/Completewear/57.png',
+        partner: 'sunset-court-shorts',
+        badge: 'Limited',
         description:
-            'Sage body, midnight sleeves. Contrast long sleeve carrying the FakeSmile brick crest at chest, ribbed cuffs and a heavyweight knit feel.',
+            'Sunset-orange performance jersey with the "FAKE A SMILE" wordmark across the chest. Lightweight breathable tricot — the loudest fit on the court.',
         details: {
-            Material: '300GSM heavyweight cotton',
-            Fit: 'Relaxed, true-to-size',
+            Material: 'Lightweight breathable polyester tricot',
+            Fit: 'Athletic, true-to-size',
             Sizes: 'S / M / L / XL / XXL',
-            Care: 'Cold wash inside-out, hang dry',
+            Care: 'Cold wash, do not iron print',
             Origin: 'Crafted in Lagos',
         },
     },
@@ -238,12 +288,12 @@ const PRODUCTS = {
         category: 'Tops & Hoodies',
         categoryHash: 'products',
         price: 15000,
-        image: 'images/98.png',
-        backImage: 'images/99.png',
+        image: 'images/107.png',
+        backImage: 'images/108.png',
         completewear: 'images/Completewear/68.png',
         badge: 'New',
         description:
-            'Ivory body, sand sleeves — a soft-tone contrast long sleeve with the FakeSmile crest. Heavyweight knit, ribbed cuffs, premium pre-shrunk cotton.',
+            'Ivory body, midnight contrast sleeves — a soft-tone two-tone long sleeve carrying the FakeSmile crest at chest. Heavyweight knit, ribbed cuffs, premium pre-shrunk cotton.',
         details: {
             Material: '300GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -252,17 +302,17 @@ const PRODUCTS = {
             Origin: 'Crafted in Lagos',
         },
     },
-    'cream-brick-hoodie': {
-        id: 'cream-brick-hoodie',
-        name: 'Cream Brick',
+    'shadow-crest-hoodie': {
+        id: 'shadow-crest-hoodie',
+        name: 'Shadow Crest',
         tag: 'Hoodie',
         category: 'Tops & Hoodies',
         categoryHash: 'products',
         price: 18000,
-        image: 'images/104.png',
-        backImage: 'images/105.png',
+        image: 'images/119.png',
+        badge: 'New',
         description:
-            'Cream-tan heavyweight hoodie with the FakeSmile brick crest. Brushed inner, ribbed cuffs and metal-tipped drawstrings — the neutral hoodie that pairs with every fit.',
+            'Pitch-black heavyweight hoodie carrying the FakeSmile crest at chest. Brushed-back fleece, ribbed cuffs and metal-tipped drawstrings — clean silhouette, loud quality.',
         details: {
             Material: '320GSM heavyweight cotton, brushed back',
             Fit: 'Relaxed, true-to-size',
@@ -271,18 +321,35 @@ const PRODUCTS = {
             Origin: 'Crafted in Lagos',
         },
     },
-    'crimson-brick-hoodie': {
-        id: 'crimson-brick-hoodie',
-        name: 'Crimson Brick',
+    'heather-crest-hoodie': {
+        id: 'heather-crest-hoodie',
+        name: 'Heather Crest',
         tag: 'Hoodie',
         category: 'Tops & Hoodies',
         categoryHash: 'products',
         price: 18000,
-        image: 'images/107.png',
-        backImage: 'images/108.png',
-        badge: 'Limited',
+        image: 'images/189.png',
         description:
-            'Crimson-red heavyweight hoodie with the signature brick crest. Brushed cotton-fleece interior, ribbed cuffs and metal-tipped drawstrings — the loudest pull in the rotation.',
+            'Heathered grey heavyweight hoodie with the FakeSmile crest at chest. Brushed cotton-fleece interior, ribbed cuffs — the neutral pull that pairs with every fit.',
+        details: {
+            Material: '320GSM heavyweight cotton, brushed back',
+            Fit: 'Relaxed, true-to-size',
+            Sizes: 'S / M / L / XL / XXL',
+            Care: 'Cold wash inside-out, hang dry',
+            Origin: 'Crafted in Lagos',
+        },
+    },
+    'pearl-crest-hoodie': {
+        id: 'pearl-crest-hoodie',
+        name: 'Pearl Crest',
+        tag: 'Hoodie',
+        category: 'Tops & Hoodies',
+        categoryHash: 'products',
+        price: 18000,
+        image: 'images/190.png',
+        badge: 'New',
+        description:
+            'Pearl-white heavyweight hoodie carrying the FakeSmile crest at chest. Premium brushed inner, ribbed cuffs and metal-tipped drawstrings — clean, premium, signature.',
         details: {
             Material: '320GSM heavyweight cotton, brushed back',
             Fit: 'Relaxed, true-to-size',
@@ -663,6 +730,7 @@ const PRODUCTS = {
         price: 9500,
         image: 'images/70.png',
         completewear: 'images/Completewear/51.png',
+        partner: 'forest-court-jersey',
         description:
             'Forest-green court shorts with embroidered FakeSmile brick crest. Mesh-lined, drawstring elastic waist, signature off-court fit.',
         details: {
@@ -682,8 +750,30 @@ const PRODUCTS = {
         price: 9500,
         image: 'images/75.png',
         completewear: 'images/Completewear/53.png',
+        partner: 'cloud-court-jersey',
         description:
             'Cloud-white shorts with signature crimson stripes and waistband. Lightweight, breathable, and easy to pair top-to-bottom.',
+        details: {
+            Material: 'Lightweight polyester, mesh-lined',
+            Fit: 'Standard, true-to-size',
+            Sizes: 'S / M / L / XL',
+            Care: 'Cold wash, do not iron',
+            Origin: 'Crafted in Lagos',
+        },
+    },
+    'sunset-court-shorts': {
+        id: 'sunset-court-shorts',
+        name: 'Sunset Court',
+        tag: 'Shorts',
+        category: 'Joggers & Shorts',
+        categoryHash: 'bottoms',
+        price: 9500,
+        image: 'images/85.png',
+        completewear: 'images/Completewear/57.png',
+        partner: 'sunset-court-jersey',
+        badge: 'Limited',
+        description:
+            'Sunset-orange court shorts to complete the Sunset Court set. Lightweight mesh-lined polyester, drawstring elastic waist and signature off-court fit.',
         details: {
             Material: 'Lightweight polyester, mesh-lined',
             Fit: 'Standard, true-to-size',
@@ -713,26 +803,6 @@ const PRODUCTS = {
             Origin: 'Crafted in Lagos',
         },
     },
-    'smoke-court-shorts': {
-        id: 'smoke-court-shorts',
-        name: 'Smoke Court',
-        tag: 'Shorts',
-        category: 'Joggers & Shorts',
-        categoryHash: 'bottoms',
-        price: 9500,
-        image: 'images/73.png',
-        backImage: 'images/74.png',
-        description:
-            'Smoke-grey court shorts with reflective trim. Mesh-lined polyester, drawstring elastic waist and the off-court signature fit.',
-        details: {
-            Material: 'Lightweight polyester, mesh-lined',
-            Fit: 'Standard, true-to-size',
-            Sizes: 'S / M / L / XL',
-            Care: 'Cold wash, do not iron',
-            Origin: 'Crafted in Lagos',
-        },
-    },
-
     /* ===== HEADWEAR ===== */
     'sunshine-bucket-hat': {
         id: 'sunshine-bucket-hat',
@@ -809,20 +879,39 @@ const PRODUCTS = {
             Origin: 'Crafted in Lagos',
         },
     },
-    'ash-bucket-hat': {
-        id: 'ash-bucket-hat',
-        name: 'Ash',
-        tag: 'Bucket Hat',
+    'olive-globe-cap': {
+        id: 'olive-globe-cap',
+        name: 'Olive Globe',
+        tag: 'Cap',
         category: 'Headwear',
         categoryHash: 'headwear',
-        price: 7500,
-        image: 'images/85.png',
+        price: 8500,
+        image: 'images/651.png',
         badge: 'New',
         description:
-            'Ash-grey bucket hat in heavy cotton twill with the FakeSmile crest. Neutral, premium, and the easiest finish on any fit.',
+            'Army-olive curved-brim cap carrying the FakeSmile globe patch and the "Smile even if it\'s fake" embroidered tagline. Laser-perforated panels for airflow, black contrast brim trim — a clean field-ready finish.',
         details: {
-            Material: 'Heavy cotton twill',
-            Fit: 'One size, adjustable inner band',
+            Material: 'Performance twill, laser-perforated panels',
+            Fit: 'Curved brim, adjustable strap',
+            Sizes: 'OS · 56–60cm',
+            Care: 'Spot clean only',
+            Origin: 'Crafted in Lagos',
+        },
+    },
+    'voltage-globe-cap': {
+        id: 'voltage-globe-cap',
+        name: 'Voltage Globe',
+        tag: 'Cap',
+        category: 'Headwear',
+        categoryHash: 'headwear',
+        price: 8500,
+        image: 'images/652.png',
+        badge: 'New',
+        description:
+            'Midnight-black curved-brim cap with neon-yellow brim trim, the FakeSmile globe patch and the "Smile even if it\'s fake" embroidered script. Laser-perforated panels for breathability — the loudest finish in the rotation.',
+        details: {
+            Material: 'Performance twill, laser-perforated panels',
+            Fit: 'Curved brim, adjustable strap',
             Sizes: 'OS · 56–60cm',
             Care: 'Spot clean only',
             Origin: 'Crafted in Lagos',
@@ -835,17 +924,23 @@ function getProduct(id) {
     return id && PRODUCTS[id] ? PRODUCTS[id] : null;
 }
 
-/** Return up to N other products (excluding the given id), preferring same category. */
-function getRelatedProducts(id, n) {
-    n = n || 4;
-    const current = getProduct(id);
-    if (!current) return Object.values(PRODUCTS).slice(0, n);
-    const sameCat = [];
-    const others = [];
+/**
+ * Returns one random product from each of: Hoodie, Tee, Joggers, Shorts,
+ * Headwear (in that order), excluding the given id. Empty buckets are
+ * skipped silently so the row never breaks when a category runs out.
+ */
+function getRelatedProducts(id) {
+    const buckets = { hoodie: [], tee: [], joggers: [], shorts: [], headwear: [] };
     Object.values(PRODUCTS).forEach((p) => {
         if (p.id === id) return;
-        if (p.category === current.category) sameCat.push(p);
-        else others.push(p);
+        if (p.tag === 'Hoodie') buckets.hoodie.push(p);
+        else if (p.tag === 'Tee') buckets.tee.push(p);
+        else if (p.tag === 'Joggers') buckets.joggers.push(p);
+        else if (p.tag === 'Shorts') buckets.shorts.push(p);
+        else if (p.category === 'Headwear') buckets.headwear.push(p);
     });
-    return sameCat.concat(others).slice(0, n);
+    const pick = (arr) => arr.length ? arr[Math.floor(Math.random() * arr.length)] : null;
+    return [buckets.hoodie, buckets.tee, buckets.joggers, buckets.shorts, buckets.headwear]
+        .map(pick)
+        .filter(Boolean);
 }
