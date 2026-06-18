@@ -113,7 +113,7 @@ async function handleVerifyPayment(request, env) {
     const token = await getNombaToken(env);
 
     const res = await fetch(
-        `${nombaBase(env)}/transactions?orderReference=${encodeURIComponent(orderReference)}`,
+        `${nombaBase(env)}/transactions/accounts/single?orderReference=${encodeURIComponent(orderReference)}`,
         {
             method: 'GET',
             headers: {

@@ -400,8 +400,14 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     /* === EMAILJS: seller alert + customer confirm = */
     /* ============================================= */
     async function sendOrderEmails(order) {
-        if (typeof emailjs === 'undefined') return;
-        if (EMAILJS_PUBLIC_KEY.startsWith('YOUR_')) return; // not configured yet
+        if (typeof emailjs === 'undefined') {
+            console.error('[EmailJS] SDK not loaded — script tag missing from checkout.html?');
+            return;
+        }
+        if (EMAILJS_PUBLIC_KEY.startsWith('YOUR_')) {
+            console.warn('[EmailJS] Public key still a placeholder — skipping.');
+            return;
+        }
 
         const itemsText = (order.items || []).map((it) => {
             const sizeStr = it.size ? ` (Size ${it.size})` : '';
@@ -430,12 +436,22 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             nomba_reference: order.nombaReference || '',
         };
 
+        console.log('[EmailJS] Sending with params:', params);
+
         const tasks = [];
         if (EMAILJS_TEMPLATE_SELLER && !EMAILJS_TEMPLATE_SELLER.startsWith('YOUR_')) {
-            tasks.push(emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_SELLER, params));
+            tasks.push(
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_SELLER, params)
+                    .then((r) => console.log('[EmailJS] Seller email OK:', r))
+                    .catch((e) => console.error('[EmailJS] Seller email FAILED:', e))
+            );
         }
         if (EMAILJS_TEMPLATE_CUSTOMER && !EMAILJS_TEMPLATE_CUSTOMER.startsWith('YOUR_')) {
-            tasks.push(emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, params));
+            tasks.push(
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, params)
+                    .then((r) => console.log('[EmailJS] Customer email OK:', r))
+                    .catch((e) => console.error('[EmailJS] Customer email FAILED:', e))
+            );
         }
         await Promise.allSettled(tasks);
     }
