@@ -73,7 +73,7 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== Card header ===== */
+/* ===== Card header (clickable toggle) ===== */
 .order-card-head {
     display: flex;
     align-items: center;
@@ -82,12 +82,71 @@
     gap: 14px;
     padding: 20px 26px;
     border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    width: 100%;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    cursor: pointer;
+    transition: background 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
 }
+.order-card-head:hover { background: rgba(0, 217, 87, 0.04); }
+.order-card-head:focus-visible {
+    outline: 2px solid rgba(0, 217, 87, 0.5);
+    outline-offset: -2px;
+}
+.order-card.is-collapsed .order-card-head { border-bottom-color: transparent; }
+
+/* Body collapse animation — max-height clip (reliable across browsers) */
+.order-card-body {
+    max-height: 4000px;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.25s ease;
+}
+.order-card.is-collapsed .order-card-body {
+    max-height: 0;
+    opacity: 0;
+}
+
+/* Chevron */
+.order-chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, color 0.3s ease, background 0.3s ease;
+}
+.order-card:not(.is-collapsed) .order-chevron {
+    transform: rotate(180deg);
+    color: #00ff7a;
+    background: rgba(0, 217, 87, 0.12);
+    border-color: rgba(0, 217, 87, 0.35);
+}
+
+.order-summary-mini {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.55);
+    margin-top: 4px;
+    display: none;
+}
+.order-card.is-collapsed .order-summary-mini { display: inline-block; }
 
 .order-id-block {
     display: flex;
     flex-direction: column;
     gap: 3px;
+    min-width: 0;
 }
 
 .order-id-label {
@@ -409,29 +468,123 @@
 /* ============================================= */
 /* === RESPONSIVE ================================ */
 /* ============================================= */
-@media (max-width: 720px) {
-    .orders-section {
-        padding: 40px 16px 60px;
-        padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+@media (max-width: 900px) {
+    .orders-section { padding: 50px 20px 80px; }
+    .order-card-foot {
+        flex-direction: column;
+        align-items: stretch;
     }
-    .orders-head { margin-bottom: 20px; }
-    .orders-title { font-size: 18px; }
-    .order-card-head { padding: 16px 18px; }
-    .order-track { padding: 18px 18px 4px; }
-    .order-track-label { font-size: 8px; }
-    .order-items { padding: 16px 18px; }
-    .order-card-foot { padding: 16px 18px; }
     .order-foot-right {
         width: 100%;
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
     }
-    .order-total-block strong { font-size: 20px; }
-    .order-item-name { font-size: 13px; }
 }
 
-@media (max-width: 420px) {
-    .order-meta { gap: 8px; flex-wrap: wrap; }
-    .order-reorder { padding: 10px 16px; font-size: 11px; }
+@media (max-width: 720px) {
+    .orders-section {
+        padding: 36px 14px 60px;
+        padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    }
+    .orders-head {
+        margin-bottom: 18px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .orders-title { font-size: 18px; gap: 10px; }
+    .orders-count { font-size: 11px; padding: 4px 9px; }
+
+    .orders-list { gap: 14px; }
+    .order-card { border-radius: 20px; }
+
+    /* Header re-stacks on phone: id on top, then chevron+status row */
+    .order-card-head {
+        padding: 14px 16px;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    .order-id { font-size: 15px; letter-spacing: 0.6px; }
+    .order-id-label { font-size: 8px; letter-spacing: 1.6px; }
+    .order-summary-mini { font-size: 10px; }
+    .order-meta {
+        gap: 8px;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .order-date { font-size: 10px; }
+    .order-status {
+        font-size: 9px;
+        padding: 4px 9px;
+        letter-spacing: 1.1px;
+    }
+    .order-chevron { width: 26px; height: 26px; }
+    .order-chevron svg { width: 14px; height: 14px; }
+
+    .order-track {
+        padding: 16px 14px 4px;
+        gap: 4px;
+    }
+    .order-track-label { font-size: 8px; letter-spacing: 0.8px; }
+    .order-track-dot { width: 16px; height: 16px; }
+
+    .order-items {
+        padding: 14px 14px 10px;
+        gap: 10px;
+    }
+    .order-item {
+        grid-template-columns: 48px 1fr auto;
+        gap: 11px;
+    }
+    .order-item-thumb { width: 48px; height: 48px; border-radius: 10px; }
+    .order-item-name { font-size: 13px; }
+    .order-item-meta { font-size: 9px; letter-spacing: 1px; }
+    .order-item-price { font-size: 13px; }
+
+    .order-card-foot {
+        padding: 14px 16px 16px;
+        gap: 14px;
+    }
+    .order-foot-line { font-size: 11px; flex-wrap: wrap; }
+    .order-foot-line .label { font-size: 8px; letter-spacing: 1.3px; }
+    .order-foot-line .value {
+        font-size: 11px;
+        word-break: break-word;
+    }
+    .order-total-block strong { font-size: 20px; }
+    .order-total-block span { font-size: 10px; }
+}
+
+@media (max-width: 480px) {
+    .orders-section { padding: 30px 10px 60px; }
+    .order-card-head {
+        flex-wrap: nowrap;
+    }
+    .order-meta {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+    }
+    .order-status::before { width: 5px; height: 5px; }
+    .order-reorder {
+        padding: 10px 14px;
+        font-size: 11px;
+        letter-spacing: 0.8px;
+    }
+    .order-foot-right { gap: 8px; }
+    .order-total-block { gap: 6px; }
+}
+
+@media (max-width: 360px) {
+    .order-card-head { padding: 12px 14px; }
+    .order-track {
+        padding: 14px 10px 2px;
+    }
+    .order-track-label { display: none; }
+    .order-items { padding: 12px 12px 8px; }
+    .order-item { gap: 9px; }
+    .order-item-thumb { width: 42px; height: 42px; }
+    .order-item-name { font-size: 12px; }
+    .order-item-price { font-size: 12px; }
+    .order-card-foot { padding: 12px 14px 14px; }
 }

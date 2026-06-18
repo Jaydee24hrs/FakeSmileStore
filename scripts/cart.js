@@ -74,6 +74,9 @@
             const productHref = baseProductId ? `product.html?id=${encodeURIComponent(baseProductId)}` : '#';
             return `
                 <article class="cart-item" data-id="${it.id}">
+                    <button class="cart-item-remove" data-action="remove" aria-label="Remove ${safeName}">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                     <a class="cart-item-img" href="${productHref}" aria-label="View ${safeName}">
                         <img src="${safeImg}" alt="${safeName}">
                     </a>
@@ -83,10 +86,7 @@
                         ${safeSize ? `<span class="cart-item-size">Size <strong>${safeSize}</strong></span>` : ''}
                         <p class="cart-item-price">${fmt(it.price)} each</p>
                     </div>
-                    <div class="cart-item-controls">
-                        <button class="cart-item-remove" data-action="remove" aria-label="Remove ${safeName}">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                        </button>
+                    <div class="cart-item-bottom">
                         <div class="cart-qty">
                             <button data-action="dec" aria-label="Decrease">&minus;</button>
                             <span class="cart-qty-value">${it.qty}</span>

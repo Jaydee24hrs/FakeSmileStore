@@ -112,46 +112,55 @@
             ? `<div class="order-foot-line"><span class="label">Promo</span><span class="value">${escapeHtml(order.promoCode)} applied</span></div>`
             : '';
 
+        const itemCount = items.reduce((n, it) => n + (it.qty || 1), 0);
+        const itemLabel = itemCount === 1 ? '1 item' : `${itemCount} items`;
+
         return `
-            <article class="order-card" data-id="${escapeHtml(order.id)}">
-                <header class="order-card-head">
+            <article class="order-card is-collapsed" data-id="${escapeHtml(order.id)}">
+                <button type="button" class="order-card-head" aria-expanded="false" data-toggle="${escapeHtml(order.id)}">
                     <div class="order-id-block">
                         <span class="order-id-label">Order</span>
                         <strong class="order-id">${escapeHtml(order.id)}</strong>
+                        <span class="order-summary-mini">${itemLabel} &middot; ${formatPrice(order.total || 0)}</span>
                     </div>
                     <div class="order-meta">
                         <span class="order-date">${fmtDate(order.placedAt)}</span>
                         <span class="order-status order-status-${meta.key}">${meta.label}</span>
+                        <span class="order-chevron" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </span>
                     </div>
-                </header>
+                </button>
 
-                <div class="order-track">${trackerHTML(stage)}</div>
+                <div class="order-card-body">
+                    <div class="order-track">${trackerHTML(stage)}</div>
 
-                <div class="order-items">${itemsHtml}</div>
+                    <div class="order-items">${itemsHtml}</div>
 
-                <footer class="order-card-foot">
-                    <div class="order-foot-info">
-                        <div class="order-foot-line">
-                            <span class="label">Ship to</span>
-                            <span class="value">${escapeHtml(shipName)}${shipName && shipParts ? ' &mdash; ' : ''}${escapeHtml(shipParts)}</span>
+                    <footer class="order-card-foot">
+                        <div class="order-foot-info">
+                            <div class="order-foot-line">
+                                <span class="label">Ship to</span>
+                                <span class="value">${escapeHtml(shipName)}${shipName && shipParts ? ' &mdash; ' : ''}${escapeHtml(shipParts)}</span>
+                            </div>
+                            <div class="order-foot-line">
+                                <span class="label">Payment</span>
+                                <span class="value">${escapeHtml(payLabel)}</span>
+                            </div>
+                            ${promoLine}
                         </div>
-                        <div class="order-foot-line">
-                            <span class="label">Payment</span>
-                            <span class="value">${escapeHtml(payLabel)}</span>
+                        <div class="order-foot-right">
+                            <div class="order-total-block">
+                                <span>Total</span>
+                                <strong>${formatPrice(order.total || 0)}</strong>
+                            </div>
+                            <button type="button" class="order-reorder" data-id="${escapeHtml(order.id)}">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                                Buy Again
+                            </button>
                         </div>
-                        ${promoLine}
-                    </div>
-                    <div class="order-foot-right">
-                        <div class="order-total-block">
-                            <span>Total</span>
-                            <strong>${formatPrice(order.total || 0)}</strong>
-                        </div>
-                        <button type="button" class="order-reorder" data-id="${escapeHtml(order.id)}">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-                            Buy Again
-                        </button>
-                    </div>
-                </footer>
+                    </footer>
+                </div>
             </article>`;
     }
 
@@ -176,10 +185,22 @@
         listEl.innerHTML = orders.map(buildOrderHTML).join('');
     }
 
+    // ===== Toggle collapse/expand on header click =====
+    listEl.addEventListener('click', (e) => {
+        const head = e.target.closest('.order-card-head');
+        if (!head) return;
+        const card = head.closest('.order-card');
+        if (!card) return;
+        const willExpand = card.classList.contains('is-collapsed');
+        card.classList.toggle('is-collapsed');
+        head.setAttribute('aria-expanded', String(willExpand));
+    });
+
     // ===== Reorder — push the order's items back into the cart =====
     listEl.addEventListener('click', (e) => {
         const btn = e.target.closest('.order-reorder');
         if (!btn) return;
+        e.stopPropagation();
         const order = readOrders().find((o) => o.id === btn.dataset.id);
         if (!order || typeof addToCart !== 'function') return;
 

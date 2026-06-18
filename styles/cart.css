@@ -119,6 +119,8 @@
 }
 
 .cart-item-img {
+    grid-column: 1;
+    grid-row: 1;
     width: 110px;
     height: 110px;
     border-radius: 16px;
@@ -167,6 +169,8 @@
 }
 
 .cart-item-body {
+    grid-column: 2;
+    grid-row: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -217,11 +221,19 @@
     color: rgba(255, 255, 255, 0.55);
 }
 
-.cart-item-controls {
+/* Bottom row container.
+   Desktop: stacks vertically in column 3 (qty above subtotal, right-aligned).
+   Mobile (≤ 720px): becomes a full-width horizontal row under the image+body. */
+.cart-item-bottom {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: stretch; /* take full row height so flex-end pushes to bottom */
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 10px;
+    justify-content: flex-end; /* qty + subtotal anchor to the bottom of the card */
+    gap: 12px;
+    padding-top: 44px; /* clears the X (top:14 + height:32) with a small gap */
 }
 
 .cart-qty {
@@ -275,18 +287,22 @@
 }
 
 .cart-item-remove {
-    width: 30px;
-    height: 30px;
+    position: absolute;
+    top: 14px;
+    right: 18px; /* lines up with the qty pill's right edge (card padding-right) */
+    z-index: 2;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     border: 1px solid rgba(255, 122, 138, 0.3);
-    background: rgba(255, 122, 138, 0.06);
+    background: rgba(255, 122, 138, 0.08);
     color: #ff7a8a;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    align-self: flex-start;
+    backdrop-filter: blur(8px);
 }
 
 .cart-item-remove:hover {
@@ -608,12 +624,19 @@
     .cart-items-title { font-size: 18px; }
     .cart-item {
         grid-template-columns: 92px 1fr;
-        grid-template-rows: auto auto;
-        gap: 12px 14px;
+        column-gap: 14px;
+        row-gap: 10px;
         padding: 12px;
+        padding-right: 48px; /* keep room for the absolute X */
         border-radius: 18px;
     }
-    .cart-item-img { width: 92px; height: 92px; border-radius: 14px; }
+    /* Mobile: image only spans the top row so the bottom row can run full-width */
+    .cart-item-img {
+        grid-row: 1;
+        width: 92px;
+        height: 92px;
+        border-radius: 14px;
+    }
     .cart-item-body { gap: 4px; }
     .cart-item-tag { font-size: 9px; letter-spacing: 1.6px; }
     .cart-item-name { font-size: 15px; }
@@ -623,16 +646,22 @@
         margin-top: 1px;
     }
     .cart-item-price { font-size: 12px; }
-    .cart-item-controls {
+    .cart-item-bottom {
         grid-column: 1 / -1;
+        grid-row: 2;
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
+        padding-top: 10px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.08);
         gap: 10px;
-        padding-top: 8px;
-        border-top: 1px dashed rgba(255,255,255,0.08);
     }
-    .cart-item-remove { width: 28px; height: 28px; align-self: auto; }
+    .cart-item-remove {
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+    }
     .cart-qty { padding: 3px; gap: 2px; }
     .cart-qty button { width: 26px; height: 26px; font-size: 13px; }
     .cart-qty .cart-qty-value { min-width: 22px; font-size: 13px; }

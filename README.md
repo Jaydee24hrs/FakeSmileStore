@@ -354,6 +354,16 @@ Nomba's hosted page.)
 - 3 new hoodies added: Shadow Crest (119), Heather Crest (189), Pearl Crest (190).
 - 2 new curved-brim caps added to Headwear: Olive Globe (651), Voltage Globe (652).
   First caps in the catalog (existing headwear is all bucket hats); priced ₦8,500.
+- Orders page: each order card is now **collapsed by default** — the header shows
+  ID, date, item count, total, and status; a chevron toggles the tracker / items /
+  ship / payment / Buy Again. Reduces visual noise when a customer has multiple
+  orders. Mobile breakpoints rewritten (900 / 720 / 480 / 360) so the layout
+  reflows cleanly on every screen size.
+- Cart item card rebuilt: **X (remove) is now an absolute top-right button** and
+  the qty (–/+) + line subtotal share a single bottom row separated by a dashed
+  divider. Desktop keeps qty/subtotal in column 2 under the body; mobile lets
+  that bottom row span the full card width (image stays top-left, X stays
+  top-right, qty bottom-left, subtotal bottom-right — one consistent layout).
 - Currency system added — GBP default, NGN by IP, live FX rate.
 - "More From The Drop" related section: now 1 random product per category.
 - Checkout page + Orders page built and wired into cart / currency / order storage.
