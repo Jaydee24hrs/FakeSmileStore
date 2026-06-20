@@ -10,7 +10,7 @@
     min-height: 100vh;
     background:
         linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%),
-        url('../images/brick-bg.png') center/cover no-repeat fixed,
+        url('../images/brick-bg.webp') center/cover no-repeat fixed,
         #0a0a0a;
     background-blend-mode: normal;
     padding-bottom: 60px;
@@ -1453,7 +1453,7 @@ button.bento-card { appearance: none; }
 .bridge-brick {
     position: absolute;
     inset: 0;
-    background: url('../images/brick-bg.png') center/700px auto repeat;
+    background: url('../images/brick-bg.webp') center/700px auto repeat;
     opacity: 0.05;
     mix-blend-mode: screen;
     -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, transparent 80%);
@@ -1984,7 +1984,7 @@ button.bento-card { appearance: none; }
     content: "";
     position: absolute;
     inset: 0;
-    background: url('../images/brick-bg.png') center/600px auto repeat;
+    background: url('../images/brick-bg.webp') center/600px auto repeat;
     opacity: 0.05;
     mix-blend-mode: screen;
     -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 0%, transparent 80%);

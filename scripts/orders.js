@@ -84,7 +84,7 @@
         const items = Array.isArray(order.items) ? order.items : [];
 
         const itemsHtml = items.map((it) => {
-            const img = it.image || 'images/Fakesmile-1.png';
+            const img = it.image || 'images/Fakesmile-1.webp';
             const name = escapeHtml(it.name || 'Product');
             const size = it.size ? 'Size ' + escapeHtml(it.size) : 'One size';
             const line = (it.price || 0) * (it.qty || 0);

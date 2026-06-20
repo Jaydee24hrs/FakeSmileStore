@@ -63,7 +63,7 @@
 
         itemsEl.innerHTML = items.map((it) => {
             const lineTotal = (it.price || 0) * (it.qty || 0);
-            const safeImg = it.image || 'images/Fakesmile-1.png';
+            const safeImg = it.image || 'images/Fakesmile-1.webp';
             const safeName = (it.name || 'Product').replace(/</g, '&lt;');
             const safeTag = (it.tag || '').replace(/</g, '&lt;');
             const safeSize = (it.size || '').replace(/</g, '&lt;');

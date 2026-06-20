@@ -65,15 +65,20 @@ fakesmile33/
 │   ├── tops-fb.css     Front/Back image hover-swap (shared by home + shop)
 │   └── lifestyle-banner.css   Lifestyle banner on home
 │
-└── images/
+└── images/            All images are WebP (q80) — converted from PNG/JPG for fast loads
     ├── (root)          Product photos by number: 45–108, 119, 189, 190, 596, 650
     ├── Tops F&B/       Statement-tops front/back/extra shots (2–43, 63–68)
     ├── Completewear/   Full-outfit "lifestyle" set photos (4–68)
     ├── PNGIMG/         Lifestyle/model photos (IMG_6416 … IMG_6443)
     ├── ool/            Model cut-out shots (2–6)
-    ├── Fakesmile-1.png Brand logo
-    └── brick-bg.png    Brick-wall texture (footer/hero watermark)
+    ├── Fakesmile-1.webp Brand logo
+    └── brick-bg.webp   Brick-wall texture (footer/hero watermark)
 ```
+
+> **Images are WebP.** Every image is stored as `.webp` (quality 80) — the catalog
+> dropped ~64% (147 MB → 54 MB) versus the original PNG/JPG set, so pages load
+> much faster. When adding a new product image, convert it to WebP first and
+> reference the `.webp` path in `products.js`.
 
 ---
 
@@ -116,9 +121,9 @@ The brand logo links home.
     category: 'Tops & Hoodies',          // one of the 4 categories above
     categoryHash: 'products',
     price: 18000,                        // NGN integer (base currency — see §7)
-    image: 'images/45.png',              // front image
-    backImage: 'images/46.png',          // optional — enables F/B hover swap
-    completewear: 'images/Completewear/44.png',  // optional — full-set lifestyle photo
+    image: 'images/45.webp',             // front image
+    backImage: 'images/46.webp',         // optional — enables F/B hover swap
+    completewear: 'images/Completewear/44.webp', // optional — full-set lifestyle photo
     partner: 'matching-product-id',      // optional — for set merging (see §5)
     badge: 'New' | 'Bestseller' | 'Limited',     // optional
     description: '...',
@@ -346,6 +351,11 @@ Nomba's hosted page.)
 ---
 
 ## 14. Change Log
+
+- **Images converted to WebP** (quality 80): all 126 product/lifestyle/brand images
+  re-encoded from PNG/JPG and the originals removed. Catalog shrank ~64%
+  (147 MB → 54 MB); every `.png`/`.jpg` reference across HTML/CSS/JS now points to
+  `.webp`. Result: substantially faster page loads.
 
 - Cart mobile layout tightened; phantom discount line fixed.
 - Product catalog re-audited against the image folder — 7 mis-mapped products

@@ -273,7 +273,7 @@
     position: absolute;
     inset: 0;
     background:
-        url('../images/brick-bg.png') center/600px auto repeat;
+        url('../images/brick-bg.webp') center/600px auto repeat;
     opacity: 0.06;
     mix-blend-mode: screen;
     pointer-events: none;

@@ -180,7 +180,7 @@ html, body {
 .footer-brick-layer {
     position: absolute;
     inset: 0;
-    background: url('../images/brick-bg.png') center/700px auto repeat;
+    background: url('../images/brick-bg.webp') center/700px auto repeat;
     opacity: 0.06;
     mix-blend-mode: screen;
     pointer-events: none;
@@ -951,7 +951,7 @@ html, body {
 .page-brick {
     position: absolute;
     inset: 0;
-    background: url('../images/brick-bg.png') center/700px auto repeat;
+    background: url('../images/brick-bg.webp') center/700px auto repeat;
     opacity: 0.05;
     mix-blend-mode: screen;
     -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 0%, transparent 80%);

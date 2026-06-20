@@ -209,7 +209,7 @@ function slugify(s) {
 function addToCart(input) {
     // accept either a number (legacy hero price) or a full item object
     let item = typeof input === 'number'
-        ? { id: 'fakesmile-drop', name: 'FakeSmile Drop', tag: 'Featured', price: input, image: 'images/Fakesmile-1.png' }
+        ? { id: 'fakesmile-drop', name: 'FakeSmile Drop', tag: 'Featured', price: input, image: 'images/Fakesmile-1.webp' }
         : Object.assign({}, input);
     if (!item || !item.id) item.id = slugify(item.name) || 'item-' + Date.now();
 

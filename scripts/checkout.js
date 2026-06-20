@@ -97,7 +97,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             if (heroSubEl) heroSubEl.textContent = `${count} item${count > 1 ? 's' : ''} ready. Lock in your details to complete the drop.`;
 
             itemsEl.innerHTML = items.map((it) => {
-                const safeImg = it.image || 'images/Fakesmile-1.png';
+                const safeImg = it.image || 'images/Fakesmile-1.webp';
                 const safeName = (it.name || 'Product').replace(/</g, '&lt;');
                 const safeSize = (it.size || '').replace(/</g, '&lt;');
                 const lineTotal = (it.price || 0) * (it.qty || 0);
