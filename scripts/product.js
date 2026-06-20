@@ -277,7 +277,7 @@
             a.innerHTML = `
                 <div class="pd-related-img">
                     ${p.badge ? `<span class="pd-related-badge">${p.badge}</span>` : ''}
-                    <img src="${p.image}" alt="${p.name} ${p.tag}">
+                    <img loading="lazy" decoding="async" src="${p.image}" alt="${p.name} ${p.tag}">
                 </div>
                 <div class="pd-related-info">
                     <span class="pd-related-tag">${p.tag}</span>

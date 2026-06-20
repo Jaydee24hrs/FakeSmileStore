@@ -32,10 +32,10 @@
             : 'product-image-wrap';
 
         const imgs = hasBack
-            ? '<img class="fb-front" src="' + safeAttr(p.image) + '" alt="' + safeAttr(p.name + ' ' + p.tag) + '">' +
-              '<img class="fb-back" src="' + safeAttr(p.backImage) + '" alt="' + safeAttr(p.name + ' ' + p.tag + ' back') + '">' +
+            ? '<img loading="lazy" decoding="async" class="fb-front" src="' + safeAttr(p.image) + '" alt="' + safeAttr(p.name + ' ' + p.tag) + '">' +
+              '<img loading="lazy" decoding="async" class="fb-back" src="' + safeAttr(p.backImage) + '" alt="' + safeAttr(p.name + ' ' + p.tag + ' back') + '">' +
               '<span class="fb-hint">F &middot; B</span>'
-            : '<img src="' + safeAttr(p.image) + '" alt="' + safeAttr(p.name + ' ' + p.tag) + '">';
+            : '<img loading="lazy" decoding="async" src="' + safeAttr(p.image) + '" alt="' + safeAttr(p.name + ' ' + p.tag) + '">';
 
         const badge = p.badge
             ? '<span class="product-badge">' + p.badge + '</span>'

@@ -352,6 +352,15 @@ Nomba's hosted page.)
 
 ## 14. Change Log
 
+- **Fixed iOS Safari crash ("A problem repeatedly occurred").** Root cause was
+  image *memory*, not file size: 117/126 images were >4000px (many 3840×5760 = 22 MP),
+  each needing ~88 MB of RAM when decoded, and the home page eager-loaded 58 of them
+  at once — far past iOS Safari's per-tab limit. Fixes: (1) capped every image's long
+  edge at **2560px** (Lanczos, WebP q82) — invisible at display sizes, peak decoded
+  memory ~8 GB → ~2.5 GB worst case; (2) added `loading="lazy"` + `decoding="async"`
+  to all images (above-the-fold hero/logo/product-main stay `eager` with
+  `fetchpriority="high"`) so only near-viewport images decode; (3) removed 6
+  unreferenced duplicate root `IMG_*.webp`.
 - Fixed broken thumbnails for orders/cart saved **before** the WebP migration:
   `base.js` now exposes `fsImg()`, which rewrites any stored `.png`/`.jpg` path to
   `.webp` at render time (orders, cart, checkout, toast) and on re-save; image tags
