@@ -355,6 +355,19 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Payment completion fix + resume safety net.** Discovered Nomba *ignores* the
+  `orderId` we send and generates its **own `orderReference` (a UUID)** — that is
+  what it appends to the return URL and the only id its verify endpoint knows. We
+  now capture `data.orderReference` from the create-checkout response, store it on
+  the pending order (`nombaRef`), and match/verify against it on return (previously
+  we compared/verified against our `FS-XXX`, so the order never finalized). Added a
+  site-wide **"Finish order" banner** (`base.js` + `.fs-resume-banner`): if the
+  provider drops the user somewhere other than our `callbackUrl` (seen on mobile /
+  Nomba sandbox, which lands on nomba.com), reopening any page within 30 min of a
+  pending payment offers a one-tap return to checkout.html to verify + complete the
+  order. Note: Nomba **sandbox** does not reliably honor `callbackUrl` (redirects to
+  nomba.com) and its verify endpoint returns canned sample data — both behave
+  correctly with live keys.
 - **Fixed mobile payment return (stuck on nomba.com after paying).** Two bugs:
   (1) the `callbackUrl` was built as `${RETURN_URL}?orderRef=<id>`, but Nomba
   *appends its own* `?orderReference=<id>` — the resulting double-`?` URL was

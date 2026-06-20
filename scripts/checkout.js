@@ -284,6 +284,13 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             const link = data.checkoutLink || data.checkout_url || data.link;
             if (!link) throw new Error('Nomba response missing checkoutLink');
 
+            // IMPORTANT: Nomba ignores the orderId we send and generates its OWN
+            // orderReference (a UUID). That is the value it appends to the return
+            // URL and the only id its transaction-lookup knows — so we must store
+            // it and use it for matching + verification on return.
+            order.nombaRef = data.orderReference || data.orderRef || data.reference || null;
+            localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(order));
+
             // Redirect to Nomba — flow continues in handleReturnFromNomba()
             window.location.href = link;
         } catch (err) {
@@ -315,9 +322,14 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         // auto-verify when Nomba sent a ref back, or the pending order is fresh.
         const isRecent = pending.placedAt && (Date.now() - pending.placedAt) < 30 * 60 * 1000;
         if (!returnedRef && !isRecent) { localStorage.removeItem(PENDING_ORDER_KEY); return false; }
-        if (returnedRef && returnedRef !== pending.id) return false; // not our order
 
-        const orderRef = pending.id;
+        // Verify with NOMBA's orderReference (the UUID it generated — see
+        // processNombaPayment). Nomba appends that same ref to the return URL, so
+        // if a ref came back it must match what we stored. If the query string was
+        // dropped (common on mobile) we fall back to the stored Nomba ref.
+        const nombaRef = pending.nombaRef || null;
+        if (returnedRef && nombaRef && returnedRef !== nombaRef) return false; // not our order
+        const orderRef = nombaRef || returnedRef || pending.id;
 
         // Show "Verifying payment…" while we check with Nomba
         layout.style.display = 'none';

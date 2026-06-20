@@ -11,6 +11,43 @@ function fsImg(path) {
     return String(path).replace(/\.(png|jpe?g)(\?.*)?$/i, '.webp$2');
 }
 
+// ===== RESUME UNFINISHED PAYMENT =====
+// Safety net for the Nomba return trip: if the payment provider drops the user
+// somewhere other than our callbackUrl (seen on mobile / sandbox — they end up
+// on nomba.com), the order would never finalize. We keep the in-progress order
+// in localStorage.fs_pending_order; whenever the user reopens any page of the
+// site with a RECENT pending order, show a banner to finish it on checkout.html
+// (where handleReturnFromNomba verifies + completes it).
+(function resumePendingPayment() {
+    function run() {
+        try {
+            const raw = localStorage.getItem('fs_pending_order');
+            if (!raw) return;
+            const pending = JSON.parse(raw);
+            const recent = pending && pending.placedAt &&
+                (Date.now() - pending.placedAt) < 30 * 60 * 1000;
+            if (!recent) { localStorage.removeItem('fs_pending_order'); return; }
+            // checkout.html handles completion itself — no banner needed there.
+            if (/checkout\.html$/i.test(window.location.pathname)) return;
+
+            const bar = document.createElement('div');
+            bar.className = 'fs-resume-banner';
+            bar.innerHTML =
+                '<span class="fs-resume-text">Payment started — finish your order ' +
+                (pending.id ? '<strong>' + pending.id + '</strong>' : '') + '</span>' +
+                '<a class="fs-resume-btn" href="checkout.html">Finish order</a>' +
+                '<button class="fs-resume-close" aria-label="Dismiss">&times;</button>';
+            document.body.appendChild(bar);
+            bar.querySelector('.fs-resume-close').addEventListener('click', () => bar.remove());
+        } catch (_) {}
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+    } else {
+        run();
+    }
+})();
+
 // ===== ACTIVE NAV LINK =====
 const navLinks = document.querySelectorAll('.main-nav a');
 navLinks.forEach(link => {
