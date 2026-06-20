@@ -5,12 +5,13 @@
  *  Payment flow (Nomba via Cloudflare Worker + EmailJS notifications):
  *
  *  1. User clicks "Place Order"
- *  2. validate form → build draft order → save to sessionStorage as "pending"
+ *  2. validate form → build draft order → save to localStorage as "pending"
+ *     (localStorage, not sessionStorage — survives the mobile payment round-trip)
  *  3. POST to Worker /create-checkout → Worker auths with Nomba → returns checkoutLink
  *  4. window.location = checkoutLink (Nomba's hosted page)
  *  5. User pays on Nomba (card / USSD / transfer)
- *  6. Nomba redirects back to /checkout.html?orderRef=FS-XXX&status=...
- *  7. On page load we detect the URL params, POST to Worker /verify-payment
+ *  6. Nomba redirects back to the clean callbackUrl, appending ?orderReference=FS-XXX
+ *  7. On page load we detect the pending order + ref, POST to Worker /verify-payment
  *  8. If verified: save order to localStorage.fs_orders, send EmailJS x 2,
  *     clear cart, show success card
  *  9. Bank-transfer branch skips Nomba and goes straight to success.
@@ -84,7 +85,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         const discount = promo ? Math.round(subtotal * promo.off) : 0;
         const total = Math.max(0, subtotal - discount);
 
-        if (count === 0 && !sessionStorage.getItem(PENDING_ORDER_KEY)) {
+        if (count === 0 && !localStorage.getItem(PENDING_ORDER_KEY)) {
             layout.style.display = 'none';
             if (emptyEl) emptyEl.hidden = false;
             if (heroSubEl) heroSubEl.textContent = 'Nothing to check out — add a fit first.';
@@ -255,8 +256,10 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             return;
         }
 
-        // Save pending order so we can complete it after the Nomba return
-        sessionStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(order));
+        // Save pending order so we can complete it after the Nomba return.
+        // Use localStorage (not sessionStorage): mobile Safari frequently clears
+        // sessionStorage across the cross-site payment round-trip.
+        localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(order));
 
         try {
             const res = await fetch(`${NOMBA_WORKER_URL}/create-checkout`, {
@@ -266,7 +269,11 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
                     amount: order.total, // NGN integer
                     email: order.customer.email,
                     orderId: order.id,
-                    callbackUrl: `${NOMBA_RETURN_URL}?orderRef=${encodeURIComponent(order.id)}`,
+                    // Pass a CLEAN url — Nomba appends its own ?orderReference=<id>
+                    // on redirect. Adding our own ?orderRef= here produced a
+                    // malformed double-"?" URL that broke the return redirect
+                    // (browser ended up stuck on nomba.com on mobile).
+                    callbackUrl: NOMBA_RETURN_URL,
                     customerName: `${order.customer.firstName} ${order.customer.lastName}`.trim(),
                 }),
             });
@@ -280,7 +287,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             // Redirect to Nomba — flow continues in handleReturnFromNomba()
             window.location.href = link;
         } catch (err) {
-            sessionStorage.removeItem(PENDING_ORDER_KEY);
+            localStorage.removeItem(PENDING_ORDER_KEY);
             hint.classList.add('error');
             hint.textContent = 'Payment setup failed: ' + (err.message || 'Unknown error');
             resetPlaceBtn();
@@ -291,15 +298,26 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     /* === RETURN FROM NOMBA (verify + complete) ==== */
     /* ============================================= */
     async function handleReturnFromNomba() {
-        const params = new URLSearchParams(window.location.search);
-        const orderRef = params.get('orderRef');
-        if (!orderRef) return false;
-
-        const pendingRaw = sessionStorage.getItem(PENDING_ORDER_KEY);
-        if (!pendingRaw) return false;
+        const pendingRaw = localStorage.getItem(PENDING_ORDER_KEY);
+        if (!pendingRaw) return false;            // no payment in progress
         let pending;
-        try { pending = JSON.parse(pendingRaw); } catch (_) { return false; }
-        if (pending.id !== orderRef) return false;
+        try { pending = JSON.parse(pendingRaw); }
+        catch (_) { localStorage.removeItem(PENDING_ORDER_KEY); return false; }
+
+        // Nomba appends ?orderReference=<id> to the callbackUrl on redirect
+        // (older links used orderRef). On mobile the query string is sometimes
+        // dropped when returning from a banking app, so fall back to the
+        // pending order we stored before redirecting.
+        const params = new URLSearchParams(window.location.search);
+        const returnedRef = params.get('orderReference') || params.get('orderRef');
+
+        // Guard against a stale pending order from an abandoned attempt: only
+        // auto-verify when Nomba sent a ref back, or the pending order is fresh.
+        const isRecent = pending.placedAt && (Date.now() - pending.placedAt) < 30 * 60 * 1000;
+        if (!returnedRef && !isRecent) { localStorage.removeItem(PENDING_ORDER_KEY); return false; }
+        if (returnedRef && returnedRef !== pending.id) return false; // not our order
+
+        const orderRef = pending.id;
 
         // Show "Verifying payment…" while we check with Nomba
         layout.style.display = 'none';
@@ -320,7 +338,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             const isSuccess = status === 'SUCCESS' || status === 'COMPLETED' || status === 'PAID' || status === 'SUCCESSFUL';
 
             if (!isSuccess) {
-                sessionStorage.removeItem(PENDING_ORDER_KEY);
+                localStorage.removeItem(PENDING_ORDER_KEY);
                 showFailure('Payment did not complete. Your bag is still saved — try again when ready.');
                 return true;
             }
@@ -332,7 +350,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             persistOrder(pending);
 
             // Clear cart + promo + pending
-            sessionStorage.removeItem(PENDING_ORDER_KEY);
+            localStorage.removeItem(PENDING_ORDER_KEY);
             clearCart();
             localStorage.removeItem(PROMO_KEY);
 

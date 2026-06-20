@@ -230,7 +230,7 @@ Browser → /create-checkout (Worker)
             creates a checkout session, returns checkoutLink.
 Browser → window.location = checkoutLink (Nomba hosted page)
        User pays (card / USSD / bank transfer / Nigerian wallet)
-Nomba → redirects back to /checkout.html?orderRef=FS-XXX
+Nomba → redirects back to checkout.html?orderReference=FS-XXX  (Nomba appends this)
 Browser → /verify-payment (Worker)
             ↓
             Worker asks Nomba: "Did FS-XXX clear?"
@@ -310,9 +310,12 @@ Stored in `localStorage.fs_cart_promo`. The home bento grid copies `STREETS25` t
 | `fs_fx_rate` | Cached FX rate `{ ratio, date, fetchedAt }` |
 | `fs_orders` | Placed orders (array) |
 
-(`sessionStorage` also holds a short-lived `fs_pending_order` key during the
+(`localStorage` also holds a short-lived `fs_pending_order` key during the
 Nomba round-trip — it lets checkout.js complete the order on return from
-Nomba's hosted page.)
+Nomba's hosted page. It's in `localStorage` rather than `sessionStorage` because
+mobile Safari frequently clears `sessionStorage` across the cross-site payment
+redirect; `handleReturnFromNomba()` removes it once the order is finalized or
+found stale, 30 min after `placedAt`.)
 
 ---
 
@@ -352,6 +355,15 @@ Nomba's hosted page.)
 
 ## 14. Change Log
 
+- **Fixed mobile payment return (stuck on nomba.com after paying).** Two bugs:
+  (1) the `callbackUrl` was built as `${RETURN_URL}?orderRef=<id>`, but Nomba
+  *appends its own* `?orderReference=<id>` — the resulting double-`?` URL was
+  malformed, so the post-payment redirect failed. Now we pass a clean
+  `callbackUrl` and read Nomba's `orderReference`. (2) The pending order was kept
+  in `sessionStorage`, which mobile Safari clears across the cross-site round-trip,
+  so the order never completed on return — moved to `localStorage` with a 30-min
+  stale guard and a fallback that completes the order even if the query string is
+  dropped. (checkout.js only — no Worker redeploy needed.)
 - **Fixed iOS Safari crash ("A problem repeatedly occurred").** Root cause was
   image *memory*, not file size: 117/126 images were >4000px (many 3840×5760 = 22 MP),
   each needing ~88 MB of RAM when decoded, and the home page eager-loaded 58 of them
