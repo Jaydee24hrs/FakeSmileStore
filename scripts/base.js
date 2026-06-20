@@ -2,6 +2,15 @@
 /* === BASE SCRIPT (shared by every page) ====== */
 /* ============================================= */
 
+// ===== IMAGE PATH NORMALIZER =====
+// All images are WebP now. Orders/cart items saved in localStorage BEFORE the
+// WebP migration still hold .png/.jpg paths that no longer exist, so rewrite any
+// raster extension to .webp at render time. Falls back to the brand logo.
+function fsImg(path) {
+    if (!path) return 'images/Fakesmile-1.webp';
+    return String(path).replace(/\.(png|jpe?g)(\?.*)?$/i, '.webp$2');
+}
+
 // ===== ACTIVE NAV LINK =====
 const navLinks = document.querySelectorAll('.main-nav a');
 navLinks.forEach(link => {
@@ -183,9 +192,9 @@ function showCartToast(item) {
     const toast = document.createElement('div');
     toast.className = 'cart-toast';
     const safeName = (item && item.name ? item.name : 'Item').replace(/</g, '&lt;');
-    const img = item && item.image ? item.image : '';
+    const img = item && item.image ? fsImg(item.image) : '';
     toast.innerHTML = `
-        ${img ? `<span class="toast-thumb"><img src="${img}" alt=""></span>` : ''}
+        ${img ? `<span class="toast-thumb"><img src="${img}" alt="" onerror="this.onerror=null;this.src='images/Fakesmile-1.webp'"></span>` : ''}
         <span class="toast-body">
             <span class="toast-eyebrow">Added to bag</span>
             <strong class="toast-name">${safeName}</strong>
@@ -270,7 +279,7 @@ function addToCart(input) {
             tag: item.tag || '',
             size: item.size || '',
             price: item.price || 0,
-            image: item.image || '',
+            image: item.image ? fsImg(item.image) : '',
             qty: item.qty || 1,
         });
     }

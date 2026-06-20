@@ -352,6 +352,10 @@ Nomba's hosted page.)
 
 ## 14. Change Log
 
+- Fixed broken thumbnails for orders/cart saved **before** the WebP migration:
+  `base.js` now exposes `fsImg()`, which rewrites any stored `.png`/`.jpg` path to
+  `.webp` at render time (orders, cart, checkout, toast) and on re-save; image tags
+  also carry an `onerror` fallback to the brand logo.
 - **Images converted to WebP** (quality 80): all 126 product/lifestyle/brand images
   re-encoded from PNG/JPG and the originals removed. Catalog shrank ~64%
   (147 MB → 54 MB); every `.png`/`.jpg` reference across HTML/CSS/JS now points to

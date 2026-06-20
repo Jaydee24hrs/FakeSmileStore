@@ -84,14 +84,14 @@
         const items = Array.isArray(order.items) ? order.items : [];
 
         const itemsHtml = items.map((it) => {
-            const img = it.image || 'images/Fakesmile-1.webp';
+            const img = fsImg(it.image);
             const name = escapeHtml(it.name || 'Product');
             const size = it.size ? 'Size ' + escapeHtml(it.size) : 'One size';
             const line = (it.price || 0) * (it.qty || 0);
             return `
                 <div class="order-item">
                     <span class="order-item-thumb">
-                        <img src="${img}" alt="">
+                        <img src="${img}" alt="" onerror="this.onerror=null;this.src='images/Fakesmile-1.webp'">
                         <span class="order-item-qty">${it.qty || 1}</span>
                     </span>
                     <div class="order-item-info">
@@ -213,7 +213,7 @@
                 tag: it.tag,
                 size: it.size,
                 price: it.price,
-                image: it.image,
+                image: fsImg(it.image),
                 qty: it.qty || 1,
             });
         });

@@ -97,14 +97,14 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             if (heroSubEl) heroSubEl.textContent = `${count} item${count > 1 ? 's' : ''} ready. Lock in your details to complete the drop.`;
 
             itemsEl.innerHTML = items.map((it) => {
-                const safeImg = it.image || 'images/Fakesmile-1.webp';
+                const safeImg = fsImg(it.image);
                 const safeName = (it.name || 'Product').replace(/</g, '&lt;');
                 const safeSize = (it.size || '').replace(/</g, '&lt;');
                 const lineTotal = (it.price || 0) * (it.qty || 0);
                 return `
                     <div class="ck-item">
                         <span class="ck-item-thumb">
-                            <img src="${safeImg}" alt="">
+                            <img src="${safeImg}" alt="" onerror="this.onerror=null;this.src='images/Fakesmile-1.webp'">
                             <span class="ck-item-qty">${it.qty || 1}</span>
                         </span>
                         <div class="ck-item-body">
