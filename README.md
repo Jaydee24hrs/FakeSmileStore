@@ -356,6 +356,10 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- Content: founding year corrected to **2023** across all pages (hero marquees,
+  about "started in 2023" / "Est. 2023"); home hero copy replaced with the
+  "more than a brand… welcome to the movement" manifesto; free-shipping threshold
+  in the contact FAQ raised **₦50,000 → ₦100,000**.
 - **Server-side order completion via Nomba webhook (browser-independent).** The
   Worker now exposes `/webhook` (HMAC-SHA256 signature-verified), `/finalize`
   (idempotent), and `/order-status`, and persists the full order in Cloudflare
