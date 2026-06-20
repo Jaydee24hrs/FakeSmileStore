@@ -1,6 +1,6 @@
 # FakeSmile — Streetwear E-commerce Site
 
-A premium streetwear e-commerce website for the **FakeSmile** brand (Lagos, Nigeria).
+A premium streetwear e-commerce website for the **FakeSmile** brand (UK & Nigeria).
 Dark theme, liquid-glass aesthetic, brand-green accent (`#00d957` / `#00ff7a`),
 brick/streetwear vibe. Tagline: _"Smile Even If It's Fake" · "Wear The Story" · "Built On The Bricks"._
 
