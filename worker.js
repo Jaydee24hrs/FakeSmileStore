@@ -64,14 +64,19 @@ async function handleCreateCheckout(request, env) {
     if (!amount || !email || !orderId || !callbackUrl) {
         return json({ error: 'Missing required fields: amount, email, orderId, callbackUrl' }, 400, env);
     }
-    if (typeof amount !== 'number' || amount <= 0) {
+    // Accept a number or numeric string from the browser, but Nomba's checkout
+    // API requires amount as a STRING in major units, e.g. "10000.00".
+    // Sending a raw number is a spec violation that can make Nomba ignore the
+    // callbackUrl and fall back to a default redirect (it lands on nomba.com).
+    const amountNum = Number(amount);
+    if (!isFinite(amountNum) || amountNum <= 0) {
         return json({ error: 'amount must be a positive number (in NGN)' }, 400, env);
     }
+    const amountStr = amountNum.toFixed(2);
 
     const token = await getNombaToken(env);
 
-    // Nomba checkout: amount in NGN integer (not kobo for the checkout endpoint).
-    // If your testing shows otherwise, multiply by 100 here.
+    // Nomba checkout: amount in NGN major units (naira, not kobo) as a string.
     const res = await fetch(`${nombaBase(env)}/checkout/order`, {
         method: 'POST',
         headers: {
@@ -84,7 +89,7 @@ async function handleCreateCheckout(request, env) {
                 orderReference: orderId,
                 customerId: email,
                 customerEmail: email,
-                amount: amount,
+                amount: amountStr,
                 currency: 'NGN',
                 callbackUrl: callbackUrl,
                 customerName: customerName || '',

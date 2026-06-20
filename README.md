@@ -355,6 +355,14 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Worker now sends `amount` as a string** (`"10000.00"`), per Nomba's checkout
+  spec. It was sending a raw number — a spec violation that can make Nomba ignore
+  the `callbackUrl` and fall back to a default redirect (lands on nomba.com after
+  payment instead of returning to checkout.html). **Requires a Worker redeploy** to
+  take effect (the site auto-deploys, but `worker.js` runs on Cloudflare and must
+  be re-uploaded). If it still redirects to nomba.com on **sandbox** keys after
+  redeploy, that's a sandbox limitation — verify with **live** keys; the
+  "Finish order" resume banner recovers the order either way.
 - **Payment completion fix + resume safety net.** Discovered Nomba *ignores* the
   `orderId` we send and generates its **own `orderReference` (a UUID)** — that is
   what it appends to the return URL and the only id its verify endpoint knows. We
