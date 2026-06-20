@@ -39,6 +39,7 @@ fakesmile33/
 ├── contact.html        Contact form
 ├── README.md           This file
 ├── worker.js           Cloudflare Worker (deployed separately) — Nomba payment proxy
+│                        + webhook / idempotent order completion (KV-backed)
 ├── DEPLOY-WORKER.md    Step-by-step setup for Nomba + EmailJS (one-time, ~25 min)
 │
 ├── scripts/
@@ -355,6 +356,19 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Server-side order completion via Nomba webhook (browser-independent).** The
+  Worker now exposes `/webhook` (HMAC-SHA256 signature-verified), `/finalize`
+  (idempotent), and `/order-status`, and persists the full order in Cloudflare
+  **KV** at create-checkout time. On `payment_success` (or browser return), one
+  shared `finalizeOrder()` marks the order paid and sends the seller + customer
+  emails **server-side, exactly once** (KV `emailsSent` flag) — so an order is
+  recorded and emailed even if the customer's browser never returns from Nomba.
+  checkout.js now sends the full order to `/create-checkout` and completes through
+  `/finalize`, only emailing client-side when the server reports it didn't (no
+  duplicates). Fully backward-compatible: with no KV/webhook configured it falls
+  back to the previous browser-side flow. **Requires a Worker redeploy + KV +
+  webhook setup — see `DEPLOY-WORKER.md` §9.** Note: testable only with live keys
+  (Nomba sandbox doesn't deliver webhooks reliably).
 - **Worker now sends `amount` as a string** (`"10000.00"`), per Nomba's checkout
   spec. It was sending a raw number — a spec violation that can make Nomba ignore
   the `callbackUrl` and fall back to a default redirect (lands on nomba.com after

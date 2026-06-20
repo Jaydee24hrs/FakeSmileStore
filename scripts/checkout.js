@@ -266,7 +266,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: order.total, // NGN integer
+                    amount: order.total, // NGN integer (Worker formats to "X.XX")
                     email: order.customer.email,
                     orderId: order.id,
                     // Pass a CLEAN url — Nomba appends its own ?orderReference=<id>
@@ -275,6 +275,10 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
                     // (browser ended up stuck on nomba.com on mobile).
                     callbackUrl: NOMBA_RETURN_URL,
                     customerName: `${order.customer.firstName} ${order.customer.lastName}`.trim(),
+                    // Full order so the Worker can store it (KV) and finalize +
+                    // email server-side via the webhook even if this browser
+                    // never returns. Harmless if the Worker has no KV configured.
+                    order: order,
                 }),
             });
             const data = await res.json();
@@ -337,28 +341,26 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         if (heroSubEl) heroSubEl.textContent = 'Verifying payment with Nomba…';
 
         try {
-            const res = await fetch(`${NOMBA_WORKER_URL}/verify-payment`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderReference: orderRef }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Verify failed');
+            // Prefer the Worker's idempotent /finalize: it verifies with Nomba,
+            // records the order server-side, and emails ONCE (so it never clashes
+            // with the webhook). If /finalize isn't available (older Worker), fall
+            // back to /verify-payment + client-side EmailJS (legacy behavior).
+            let outcome = await finalizeViaWorker(orderRef);
+            if (!outcome) outcome = await verifyViaWorker(orderRef);
 
-            // Defensive status read — Nomba response shape varies
-            const status = String(data.status || data.transactionStatus || data.paymentStatus || '').toUpperCase();
-            const isSuccess = status === 'SUCCESS' || status === 'COMPLETED' || status === 'PAID' || status === 'SUCCESSFUL';
-
-            if (!isSuccess) {
-                localStorage.removeItem(PENDING_ORDER_KEY);
-                showFailure('Payment did not complete. Your bag is still saved — try again when ready.');
-                return true;
+            if (!outcome || outcome.status !== 'paid') {
+                if (outcome && outcome.status === 'failed') {
+                    localStorage.removeItem(PENDING_ORDER_KEY);
+                    showFailure('Payment did not complete. Your bag is still saved — try again when ready.');
+                    return true;
+                }
+                throw new Error('Could not confirm payment status');
             }
 
-            // Mark paid + persist
+            // Mark paid + persist locally (Orders page reads localStorage)
             pending.status = 'paid';
             pending.paidAt = Date.now();
-            pending.nombaReference = data.reference || data.transactionId || orderRef;
+            pending.nombaReference = outcome.nombaReference || orderRef;
             persistOrder(pending);
 
             // Clear cart + promo + pending
@@ -366,14 +368,56 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             clearCart();
             localStorage.removeItem(PROMO_KEY);
 
-            // Send notification emails
-            sendOrderEmails(pending).catch((e) => console.warn('EmailJS:', e));
+            // Only email from the browser if the server did NOT already (no dupes).
+            if (!outcome.emailed) {
+                sendOrderEmails(pending).catch((e) => console.warn('EmailJS:', e));
+            }
 
             showSuccess(pending);
         } catch (err) {
             showFailure('Could not verify payment: ' + (err.message || 'Unknown error'));
         }
         return true;
+    }
+
+    // POST /finalize — returns { status, emailed, nombaReference } or null if the
+    // endpoint is unavailable (e.g. Worker not yet redeployed with /finalize).
+    async function finalizeViaWorker(orderRef) {
+        try {
+            const res = await fetch(`${NOMBA_WORKER_URL}/finalize`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderReference: orderRef }),
+            });
+            if (res.status === 404) return null; // old Worker — use legacy path
+            const data = await res.json();
+            if (!res.ok) return null;
+            return {
+                status: data.status,
+                emailed: !!data.emailed,
+                nombaReference: data.nombaReference || (data.order && data.order.nombaReference) || null,
+            };
+        } catch (_) { return null; }
+    }
+
+    // Legacy fallback: POST /verify-payment, client emails afterwards.
+    async function verifyViaWorker(orderRef) {
+        try {
+            const res = await fetch(`${NOMBA_WORKER_URL}/verify-payment`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderReference: orderRef }),
+            });
+            const data = await res.json();
+            if (!res.ok) return null;
+            const status = String(data.status || data.transactionStatus || data.paymentStatus || '').toUpperCase();
+            const isSuccess = ['SUCCESS', 'COMPLETED', 'PAID', 'SUCCESSFUL'].includes(status);
+            return {
+                status: isSuccess ? 'paid' : (status ? 'failed' : 'unknown'),
+                emailed: false, // legacy → browser sends the emails
+                nombaReference: data.reference || data.transactionId || orderRef,
+            };
+        } catch (_) { return null; }
     }
 
     function persistOrder(order) {

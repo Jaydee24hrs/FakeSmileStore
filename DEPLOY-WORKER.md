@@ -189,6 +189,70 @@ Paste your 4 values in. Done.
 
 ---
 
+## 9. (Recommended) Server-side completion — webhook + KV
+
+By default the order is finalized by the **browser** when it returns from Nomba.
+If the customer's browser never comes back (mobile redirect fails, app closed,
+Nomba sandbox dumps them on nomba.com), the order would never be recorded or
+emailed. This step makes completion **server-authoritative** so it never depends
+on the browser. It's all additive — skip it and everything still works as before.
+
+The Worker already exposes `/webhook`, `/finalize`, and `/order-status`. You just
+need to give it somewhere to store orders and a way to send email + verify the
+webhook signature.
+
+### 9a. Create a KV namespace (stores the in-progress order)
+
+1. Cloudflare dashboard → **Storage & Databases → KV → Create namespace**.
+   Name it e.g. `fakesmile-orders`.
+2. Your Worker → **Settings → Bindings → Add → KV namespace**.
+   - **Variable name:** `ORDERS`  (must be exactly this)
+   - **KV namespace:** the one you just created.
+3. Save & Deploy.
+
+Now `/create-checkout` saves the full order under `order:<nombaOrderReference>`
+(30-day TTL), and `/finalize` + `/webhook` mark it paid and email it.
+
+### 9b. Add the webhook signature key + EmailJS server vars
+
+Add these in **Settings → Variables and Secrets** (Secret type):
+
+| Variable name | Value |
+|---|---|
+| `NOMBA_SIGNATURE_KEY` | **Signature Key** from Nomba dashboard → Developers/Webhooks |
+| `EMAILJS_PRIVATE_KEY` | EmailJS → Account → **API Keys → Private Key** (and enable "Allow EmailJS API for non-browser applications") |
+| `EMAILJS_PUBLIC_KEY` | same public key as in `checkout.js` |
+| `EMAILJS_SERVICE_ID` | same service id as in `checkout.js` |
+| `EMAILJS_TEMPLATE_SELLER` | same seller template id |
+| `EMAILJS_TEMPLATE_CUSTOMER` | same customer template id |
+
+> The browser still has its own EmailJS keys. To avoid **duplicate** emails the
+> Worker emails *once* (a KV `emailsSent` flag), and the site only emails from the
+> browser when the server reports it did **not** — so once the server vars above
+> are set, the Worker becomes the single sender automatically.
+
+### 9c. Register the webhook URL in Nomba
+
+In the Nomba dashboard → **Webhooks** (or Developers → Webhooks):
+
+1. **Webhook URL:** `https://<your-worker-subdomain>.workers.dev/webhook`
+2. Subscribe to the **`payment_success`** event.
+3. Copy the **Signature Key** into `NOMBA_SIGNATURE_KEY` (step 9b).
+4. Save & Deploy the Worker.
+
+### 9d. Verify
+
+- Cloudflare → your Worker → **Logs** (live tail), then do a test payment.
+- You should see the `/webhook` hit, signature pass, and `finalizeOrder` run.
+- Re-deliver the event from Nomba's dashboard: it should be idempotent (no second
+  email). `GET /order-status?ref=<nombaOrderReference>` should return `"paid"`.
+
+> **Note:** this needs **live** keys to fully test — Nomba **sandbox** does not
+> reliably deliver `payment_success` webhooks or honor `callbackUrl` (it lands on
+> nomba.com), and its verify endpoint returns canned sample data.
+
+---
+
 ## Troubleshooting
 
 | Problem | Fix |
@@ -198,6 +262,10 @@ Paste your 4 values in. Done.
 | Nomba returns 401 | Keys are wrong, or you're hitting `api.nomba.com` with sandbox keys (or vice versa). Verify `NOMBA_BASE` matches your key environment. |
 | Customer doesn't get confirmation email | Check EmailJS dashboard → History tab. Often a free-tier email service needs a verification click. Also check the customer's spam folder. |
 | Payment success but order doesn't save | Open browser DevTools → Application → Local Storage. Check `fs_orders`. If empty, the verify-payment call probably failed — check Worker logs (Cloudflare dashboard → your Worker → Logs). |
+| Webhook returns 401 "invalid signature" | `NOMBA_SIGNATURE_KEY` doesn't match the dashboard Signature Key, or the body was altered. Re-copy the key and redeploy. |
+| Webhook returns 503 "webhook not configured" | `NOMBA_SIGNATURE_KEY` isn't set on the Worker (step 9b). |
+| Duplicate order emails | Both browser and Worker emailed. Make sure the EmailJS server vars (step 9b) are set so the Worker is the single sender; the site auto-skips browser email when the server reports `emailed:true`. |
+| Webhook fires but no email / order | KV not bound as `ORDERS`, or EmailJS server vars missing. Without KV the Worker can confirm payment but can't store/email the order details. |
 
 ---
 
