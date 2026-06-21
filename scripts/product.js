@@ -45,8 +45,13 @@
     // ===== Populate info panel =====
     const badgeEl = document.getElementById('pd-badge');
     if (badgeEl) {
-        if (product.badge) {
-            badgeEl.textContent = product.badge;
+        // One badge: inactive products keep a "Limited" badge but show "Coming
+        // Soon" for Bestseller/New/none.
+        let badgeText = product.badge;
+        if (product.comingSoon) badgeText = (product.badge === 'Limited') ? 'Limited' : 'Coming Soon';
+        badgeEl.classList.toggle('product-badge-soon', badgeText === 'Coming Soon');
+        if (badgeText) {
+            badgeEl.textContent = badgeText;
             badgeEl.hidden = false;
         } else {
             badgeEl.hidden = true;
@@ -288,8 +293,9 @@
             a.href = 'product.html?id=' + encodeURIComponent(p.id);
             a.innerHTML = `
                 <div class="pd-related-img">
-                    ${p.badge ? `<span class="pd-related-badge">${p.badge}</span>` : ''}
-                    ${p.comingSoon ? '<span class="pd-related-soon">Coming Soon</span>' : ''}
+                    ${(p.comingSoon && p.badge !== 'Limited')
+                        ? '<span class="pd-related-soon">Coming Soon</span>'
+                        : (p.badge ? `<span class="pd-related-badge">${p.badge}</span>` : '')}
                     <img loading="lazy" decoding="async" src="${p.image}" alt="${p.name} ${p.tag}">
                 </div>
                 <div class="pd-related-info">

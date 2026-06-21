@@ -356,6 +356,10 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- Joggers are now **priced/active** (₦40,000 base — review). Fixed stacked badges
+  on inactive cards: one badge only — a **Limited** item keeps its Limited badge,
+  Bestseller/New/none show **Coming Soon** (applied on shop, product detail,
+  related, and home carousels).
 - **Per-item price markup + Coming-Soon products.** (1) Contact emails now point to
   `fakeasmile29@gmail.com`. (2) Catalog prices set best-guess **by type** from the
   WhatsApp catalog screenshots (`CATALOG_PRICE_BY_TAG` in `products.js`: Hoodie

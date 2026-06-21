@@ -39,9 +39,16 @@
 
         const cs = !!p.comingSoon;
 
-        const badge = cs
-            ? '<span class="product-badge product-badge-soon">Coming Soon</span>'
-            : (p.badge ? '<span class="product-badge">' + p.badge + '</span>' : '');
+        // One badge only (never stacked). For inactive products: keep a "Limited"
+        // badge as-is; everything else (Bestseller / New / none) shows "Coming Soon".
+        let badge;
+        if (cs && p.badge === 'Limited') {
+            badge = '<span class="product-badge">Limited</span>';
+        } else if (cs) {
+            badge = '<span class="product-badge product-badge-soon">Coming Soon</span>';
+        } else {
+            badge = p.badge ? '<span class="product-badge">' + p.badge + '</span>' : '';
+        }
 
         const ariaName = safeAttr(p.name + ' ' + p.tag);
 

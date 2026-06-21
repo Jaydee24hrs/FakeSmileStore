@@ -29,11 +29,19 @@ function syncHomeCardsToCatalog() {
                 priceEl.textContent = 'Coming Soon';
             }
             if (addBtn) { addBtn.disabled = true; addBtn.setAttribute('aria-disabled', 'true'); }
-            if (!card.querySelector('.product-badge-soon')) {
-                const b = document.createElement('span');
-                b.className = 'product-badge product-badge-soon';
-                b.textContent = 'Coming Soon';
-                glass.insertBefore(b, glass.firstChild);
+            // One badge only — REPLACE the existing one (don't stack a second).
+            // Keep "Limited" as-is; Bestseller/New/none become "Coming Soon".
+            let badgeEl = card.querySelector('.product-badge');
+            if (p.badge === 'Limited') {
+                if (badgeEl) { badgeEl.textContent = 'Limited'; badgeEl.classList.remove('product-badge-soon'); }
+            } else {
+                if (!badgeEl) {
+                    badgeEl = document.createElement('span');
+                    badgeEl.className = 'product-badge';
+                    glass.insertBefore(badgeEl, glass.firstChild);
+                }
+                badgeEl.textContent = 'Coming Soon';
+                badgeEl.classList.add('product-badge-soon');
             }
         } else if (priceEl && typeof formatMarked === 'function') {
             priceEl.setAttribute('data-price-ngn', p.price);

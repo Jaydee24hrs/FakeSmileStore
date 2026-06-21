@@ -938,6 +938,7 @@ const CATALOG_PRICE_BY_TAG = {
     'Tee': 38000,
     'Bucket Hat': 35000,
     'Cap': 20000,
+    'Joggers': 40000, // best-guess standalone jogger price — adjust as needed
 };
 Object.values(PRODUCTS).forEach((p) => {
     const catalogPrice = CATALOG_PRICE_BY_TAG[p.tag];
