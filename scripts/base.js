@@ -328,11 +328,16 @@ function addToCart(input) {
             const top = isTop ? p : partner;
             const bottom = isTop ? partner : p;
             const setId = top.id + '-set';
+            // Sold as ONE complete outfit at a single price (top.outfitPrice).
+            // Fall back to summing the pieces only if no outfit price is set.
+            const outfitPrice = (top.outfitPrice != null)
+                ? top.outfitPrice
+                : (top.price || 0) + (bottom.price || 0);
             item = {
                 id: setId,
                 name: top.name,
                 tag: top.tag + ' + ' + bottom.tag,
-                price: (top.price || 0) + (bottom.price || 0),
+                price: outfitPrice,
                 image: top.completewear || top.image,
                 size: item.size || '',
                 qty: item.qty || 1,

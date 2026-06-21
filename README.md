@@ -356,6 +356,12 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Complete outfits sold as ONE product at ONE price.** Hoodie+joggers sets no
+  longer sum the two pieces (was ₦60k+₦40k=₦100k) — each outfit has a single
+  `OUTFIT_PRICE` (₦80,000, the catalog "track suit"; in `products.js`, review per
+  set). Both the top and bottom inherit it, and adding either piece adds the one
+  outfit at that price (`base.js` set merge uses `outfitPrice`, not the sum).
+  Standalone (non-set) hoodies keep their ₦60k price.
 - Joggers are now **priced/active** (₦40,000 base — review). Fixed stacked badges
   on inactive cards: one badge only — a **Limited** item keeps its Limited badge,
   Bestseller/New/none show **Coming Soon** (applied on shop, product detail,

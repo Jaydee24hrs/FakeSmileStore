@@ -950,6 +950,29 @@ Object.values(PRODUCTS).forEach((p) => {
     }
 });
 
+/* =====================================================================
+   COMPLETE-OUTFIT (SET) PRICING.
+   Matching tops + bottoms are sold as ONE complete fit (up + down) at a
+   SINGLE price — never the two pieces summed, and never separately. Keyed
+   by the TOP product id; the matching bottom (top.partner) inherits the
+   same outfit price. Adding EITHER piece adds the one outfit (see the set
+   merge in base.js). Catalog "track suit" = ₦80,000 — REVIEW per set.
+   ===================================================================== */
+const OUTFIT_PRICE = {
+    'sunset-brick-hoodie': 80000,
+    'cloud-brick-hoodie': 80000,
+    'midnight-brick-hoodie': 80000,
+    'steel-brick-hoodie': 80000,
+};
+Object.keys(OUTFIT_PRICE).forEach((topId) => {
+    const top = PRODUCTS[topId];
+    if (!top) return;
+    const price = OUTFIT_PRICE[topId];
+    top.price = price; top.outfitPrice = price; top.comingSoon = false;
+    const bottom = top.partner && PRODUCTS[top.partner];
+    if (bottom) { bottom.price = price; bottom.outfitPrice = price; bottom.comingSoon = false; }
+});
+
 /** Look up a product by id, returning null if not found. */
 function getProduct(id) {
     return id && PRODUCTS[id] ? PRODUCTS[id] : null;
