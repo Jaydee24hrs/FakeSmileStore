@@ -544,6 +544,7 @@ const PRODUCTS = {
             Origin: 'Crafted in Lagos',
         },
     },
+    /* ===== TEMPORARILY HIDDEN — uncomment this whole block to relist these tees =====
     'olive-anthem-tee': {
         id: 'olive-anthem-tee',
         name: 'Olive Anthem',
@@ -617,6 +618,7 @@ const PRODUCTS = {
             Origin: 'Crafted in Lagos',
         },
     },
+    ===== END TEMPORARILY HIDDEN ===== */
     /* ===== BOTTOMS ===== */
     'sunset-signature-joggers': {
         id: 'sunset-signature-joggers',

@@ -356,6 +356,12 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- Hooked up real **social links** site-wide (Instagram `@trendsbyfakeasmile`, TikTok,
+  WhatsApp) — replacing the `#` placeholders in every page footer and the contact
+  page's community block. Dropped the unused X/Twitter and YouTube icons (no handles).
+- Temporarily **hid 4 tees** (Olive Anthem, Onyx Stack, Storm Anthem, Mist Stack) —
+  commented out in `products.js` (catalog now 41 products); uncomment the block to
+  relist them.
 - Content: founding year corrected to **2023** across all pages (hero marquees,
   about "started in 2023" / "Est. 2023"); home hero copy replaced with the
   "more than a brand… welcome to the movement" manifesto; free-shipping threshold
