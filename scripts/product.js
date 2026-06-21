@@ -67,8 +67,14 @@
     if (nameTagEl) nameTagEl.textContent = product.tag;
     const priceEl = document.getElementById('pd-price');
     if (priceEl) {
-        priceEl.setAttribute('data-price-ngn', product.price);
-        priceEl.innerHTML = formatPrice(product.price);
+        if (product.comingSoon) {
+            priceEl.removeAttribute('data-price-ngn');
+            priceEl.innerHTML = 'Coming Soon';
+            priceEl.classList.add('product-price-soon');
+        } else {
+            priceEl.setAttribute('data-price-ngn', product.price);
+            priceEl.innerHTML = formatMarked(product.price, 1);
+        }
     }
     const descEl = document.getElementById('pd-desc');
     if (descEl) descEl.textContent = product.description || '';
@@ -202,7 +208,13 @@
 
     // ===== Add to Cart =====
     const addBtn = document.getElementById('pd-add-btn');
-    if (addBtn && typeof addToCart === 'function') {
+    if (addBtn && product.comingSoon) {
+        addBtn.disabled = true;
+        addBtn.setAttribute('aria-disabled', 'true');
+        addBtn.classList.add('is-disabled');
+        const span = addBtn.querySelector('span');
+        if (span) span.textContent = 'Coming Soon';
+    } else if (addBtn && typeof addToCart === 'function') {
         addBtn.addEventListener('click', () => {
             addToCart({
                 id: product.id,
@@ -277,13 +289,14 @@
             a.innerHTML = `
                 <div class="pd-related-img">
                     ${p.badge ? `<span class="pd-related-badge">${p.badge}</span>` : ''}
+                    ${p.comingSoon ? '<span class="pd-related-soon">Coming Soon</span>' : ''}
                     <img loading="lazy" decoding="async" src="${p.image}" alt="${p.name} ${p.tag}">
                 </div>
                 <div class="pd-related-info">
                     <span class="pd-related-tag">${p.tag}</span>
                     <h4 class="pd-related-name">${p.name}</h4>
                     <div class="pd-related-meta">
-                        <span class="pd-related-price" data-price-ngn="${p.price}">${formatPrice(p.price)}</span>
+                        ${p.comingSoon ? '<span class="pd-related-price product-price-soon">Coming Soon</span>' : `<span class="pd-related-price" data-price-ngn="${p.price}">${formatMarked(p.price, 1)}</span>`}
                         <button type="button" class="pd-related-add" aria-label="Add ${p.name} to cart" data-id="${p.id}">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         </button>

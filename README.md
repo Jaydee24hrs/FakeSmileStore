@@ -356,6 +356,19 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Per-item price markup + Coming-Soon products.** (1) Contact emails now point to
+  `fakeasmile29@gmail.com`. (2) Catalog prices set best-guess **by type** from the
+  WhatsApp catalog screenshots (`CATALOG_PRICE_BY_TAG` in `products.js`: Hoodie
+  ₦60k, Tee ₦38k, Bucket Hat ₦35k, Cap ₦20k — 19 products). (3) Every product
+  carries a **per-item markup in the displayed currency**: +₦5,000 in Naira, +£15
+  in Pounds, applied at listing, cart, and checkout (`unitDisplayAmount` /
+  `formatMarked` / `unitChargeNgn` in `base.js`). GBP is display; the £ total is
+  converted to NGN and charged via Nomba. (4) Products with **no catalog price**
+  (Jersey, Tank, Long Sleeve, Crewneck, Joggers, Shorts — 22 products) show a
+  **"Coming Soon"** badge with a disabled Add-to-Cart (shop, product, related, and
+  the synced home carousels; `addToCart` also hard-blocks them). Orders/emails store
+  the marked NGN so records stay consistent. *(Prices are a best-guess for review —
+  adjust `CATALOG_PRICE_BY_TAG` or individual products.)*
 - Hooked up real **social links** site-wide (Instagram `@trendsbyfakeasmile`, TikTok,
   WhatsApp) — replacing the `#` placeholders in every page footer and the contact
   page's community block. Dropped the unused X/Twitter and YouTube icons (no handles).

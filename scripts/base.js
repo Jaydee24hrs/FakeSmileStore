@@ -101,6 +101,38 @@ function formatPrice(ngnValue) {
     return CURRENCIES.GBP.symbol + gbp.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// ===== PER-ITEM MARKUP =====
+// Business rule: every product carries a per-unit surcharge in the DISPLAYED
+// currency — +₦5,000 when shown in Naira, +£15 when shown in Pounds. products.js
+// prices are NGN base values. GBP shoppers see the GBP price (incl. £15) but pay
+// in NGN: the GBP total is converted back to NGN at checkout (Nomba is NGN-only).
+const MARKUP_NGN = 5000;
+const MARKUP_GBP = 15;
+
+// Per-unit price as a NUMBER in the active display currency, incl. markup.
+function unitDisplayAmount(baseNgn) {
+    const n = Number(baseNgn) || 0;
+    if (currentCurrency === 'NGN') return n + MARKUP_NGN;
+    return n / ngnPerGbp + MARKUP_GBP;
+}
+// Format a number that is ALREADY in the active display currency.
+function formatMoney(amount) {
+    const a = Number(amount) || 0;
+    if (currentCurrency === 'NGN') return CURRENCIES.NGN.symbol + Math.round(a).toLocaleString() + '.00';
+    return CURRENCIES.GBP.symbol + a.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+// Format a product/cart price: base NGN per unit × qty, WITH per-item markup.
+function formatMarked(baseNgn, qty) {
+    return formatMoney(unitDisplayAmount(baseNgn) * (qty == null ? 1 : qty));
+}
+// Marked per-unit price expressed in NGN — what actually gets charged via Nomba.
+// NGN view: base + ₦5,000. GBP view: the GBP unit price converted back to NGN.
+function unitChargeNgn(baseNgn) {
+    const n = Number(baseNgn) || 0;
+    if (currentCurrency === 'NGN') return Math.round(n + MARKUP_NGN);
+    return Math.round((n / ngnPerGbp + MARKUP_GBP) * ngnPerGbp);
+}
+
 async function fetchExchangeRate() {
     // Skip network if cache is still fresh
     try {
@@ -144,17 +176,17 @@ function readCardPriceNgn(priceEl) {
 }
 
 function applyCurrencyToPage() {
-    // Anything already tagged with the NGN value
+    // Product unit prices (data-price-ngn) — show base + per-item markup.
     document.querySelectorAll('[data-price-ngn]').forEach((el) => {
         const ngn = parseInt(el.getAttribute('data-price-ngn'), 10);
-        if (!isNaN(ngn)) el.innerHTML = formatPrice(ngn);
+        if (!isNaN(ngn)) el.innerHTML = formatMarked(ngn, 1);
     });
     // Catalog cards: first run extracts NGN from the hardcoded ₦ HTML, then tags
     document.querySelectorAll('.product-price:not([data-price-ngn])').forEach((el) => {
         const num = parseInt((el.textContent || '').replace(/[^\d]/g, ''), 10);
         if (!isNaN(num) && num > 0) {
             el.setAttribute('data-price-ngn', num);
-            el.innerHTML = formatPrice(num);
+            el.innerHTML = formatMarked(num, 1);
         }
     });
 }
@@ -212,7 +244,10 @@ function getCartTotal(items) {
 function renderHeaderCart() {
     const items = readCart();
     if (cartCountEl) cartCountEl.textContent = getCartCount(items);
-    if (cartAmountEl) cartAmountEl.innerHTML = formatPrice(getCartTotal(items));
+    if (cartAmountEl) {
+        const totalDisp = items.reduce((s, i) => s + unitDisplayAmount(i.price) * (i.qty || 0), 0);
+        cartAmountEl.innerHTML = formatMoney(totalDisp);
+    }
 }
 
 function pulseCart() {
@@ -260,6 +295,12 @@ function addToCart(input) {
     if (!item || !item.id) item.id = slugify(item.name) || 'item-' + Date.now();
 
     const baseId = item.id;
+
+    // ===== COMING-SOON GUARD =====
+    // Products with no catalog price yet can't be purchased.
+    if (typeof PRODUCTS !== 'undefined' && PRODUCTS[baseId] && PRODUCTS[baseId].comingSoon) {
+        return;
+    }
 
     // ===== SIZE DEFAULT =====
     // If no size was passed AND the product has sizes defined, default to "M"

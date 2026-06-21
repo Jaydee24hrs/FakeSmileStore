@@ -2,6 +2,51 @@
 /* === HOME SCRIPT (index.html) ================ */
 /* ============================================= */
 
+// ===== SYNC STATIC HOME CARDS TO THE CATALOG =====
+// The home carousels are hand-authored HTML. Pull the product id out of each
+// card's link and reconcile it with products.js so prices (incl. the per-item
+// markup) and Coming-Soon state match the shop instead of drifting.
+function cardProductId(card) {
+    const link = card && card.querySelector('a[href*="product.html?id="]');
+    if (!link) return null;
+    const m = (link.getAttribute('href') || '').match(/[?&]id=([^&]+)/);
+    return m ? decodeURIComponent(m[1]) : null;
+}
+function syncHomeCardsToCatalog() {
+    if (typeof PRODUCTS === 'undefined') return;
+    document.querySelectorAll('.product-card').forEach((card) => {
+        const id = cardProductId(card);
+        const p = id && PRODUCTS[id];
+        if (!p) return;
+        const priceEl = card.querySelector('.product-price');
+        const addBtn = card.querySelector('.product-add');
+        const glass = card.querySelector('.product-glass') || card;
+        if (p.comingSoon) {
+            card.classList.add('coming-soon');
+            if (priceEl) {
+                priceEl.removeAttribute('data-price-ngn');
+                priceEl.classList.add('product-price-soon');
+                priceEl.textContent = 'Coming Soon';
+            }
+            if (addBtn) { addBtn.disabled = true; addBtn.setAttribute('aria-disabled', 'true'); }
+            if (!card.querySelector('.product-badge-soon')) {
+                const b = document.createElement('span');
+                b.className = 'product-badge product-badge-soon';
+                b.textContent = 'Coming Soon';
+                glass.insertBefore(b, glass.firstChild);
+            }
+        } else if (priceEl && typeof formatMarked === 'function') {
+            priceEl.setAttribute('data-price-ngn', p.price);
+            priceEl.innerHTML = formatMarked(p.price, 1);
+        }
+    });
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncHomeCardsToCatalog);
+} else {
+    syncHomeCardsToCatalog();
+}
+
 // ===== TYPEWRITER EFFECT FOR FAKESMILE =====
 const typewriterEl = document.getElementById('typewriter');
 const text = 'FAKESMILE';
@@ -184,7 +229,7 @@ document.addEventListener('click', (e) => {
         const name  = nameEl ? nameEl.textContent.trim() : 'Product';
         const tag   = tagEl ? tagEl.textContent.trim() : '';
         addToCart({
-            id: slugify(name + ' ' + tag),
+            id: cardProductId(card) || slugify(name + ' ' + tag),
             name,
             tag,
             price,
@@ -276,9 +321,9 @@ if (promoCard) {
         const tag   = tagEl   ? tagEl.textContent.trim()   : '';
         const price = readCardPriceNgn(priceEl);
         const image = imgEl   ? imgEl.getAttribute('src')  : '';
-        const id    = typeof slugify === 'function'
+        const id    = cardProductId(card) || (typeof slugify === 'function'
             ? slugify(name + ' ' + tag)
-            : name.toLowerCase().replace(/\s+/g, '-');
+            : name.toLowerCase().replace(/\s+/g, '-'));
         addToCart({ id, name, tag, price, image });
         if (link) {
             link.style.transform = 'scale(0.97)';

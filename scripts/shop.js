@@ -37,13 +37,25 @@
               '<span class="fb-hint">F &middot; B</span>'
             : '<img loading="lazy" decoding="async" src="' + safeAttr(p.image) + '" alt="' + safeAttr(p.name + ' ' + p.tag) + '">';
 
-        const badge = p.badge
-            ? '<span class="product-badge">' + p.badge + '</span>'
-            : '';
+        const cs = !!p.comingSoon;
+
+        const badge = cs
+            ? '<span class="product-badge product-badge-soon">Coming Soon</span>'
+            : (p.badge ? '<span class="product-badge">' + p.badge + '</span>' : '');
 
         const ariaName = safeAttr(p.name + ' ' + p.tag);
 
-        return '<article class="product-card shop-card" data-category="' + safeAttr(p.category) + '">' +
+        const addSvg = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+
+        const priceHTML = cs
+            ? '<span class="product-price product-price-soon">Coming Soon</span>'
+            : '<span class="product-price" data-price-ngn="' + p.price + '">' + formatMarked(p.price, 1) + '</span>';
+
+        const addBtn = cs
+            ? '<button class="product-add" disabled aria-disabled="true" aria-label="' + ariaName + ' coming soon">' + addSvg + '</button>'
+            : '<button class="product-add" aria-label="Add ' + ariaName + ' to cart">' + addSvg + '</button>';
+
+        return '<article class="product-card shop-card' + (cs ? ' coming-soon' : '') + '" data-category="' + safeAttr(p.category) + '">' +
                  '<div class="product-glass">' +
                    badge +
                    '<a class="' + wrapClass + '" href="product.html?id=' + encodeURIComponent(p.id) + '" aria-label="View ' + ariaName + '">' +
@@ -54,10 +66,8 @@
                      '<span class="product-tag">' + p.tag + '</span>' +
                      '<h3 class="product-name">' + p.name + '</h3>' +
                      '<div class="product-meta">' +
-                       '<span class="product-price" data-price-ngn="' + p.price + '">' + formatPrice(p.price) + '</span>' +
-                       '<button class="product-add" aria-label="Add ' + ariaName + ' to cart">' +
-                         '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>' +
-                       '</button>' +
+                       priceHTML +
+                       addBtn +
                      '</div>' +
                    '</div>' +
                  '</div>' +

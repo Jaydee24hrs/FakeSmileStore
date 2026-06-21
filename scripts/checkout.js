@@ -80,9 +80,10 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     function renderSummary() {
         const items = readCart();
         const count = items.reduce((s, i) => s + (i.qty || 0), 0);
-        const subtotal = items.reduce((s, i) => s + (i.price || 0) * (i.qty || 0), 0);
         const promo = getPromo();
-        const discount = promo ? Math.round(subtotal * promo.off) : 0;
+        // Display totals in the active currency, including the per-item markup.
+        const subtotal = items.reduce((s, i) => s + unitDisplayAmount(i.price) * (i.qty || 0), 0);
+        const discount = promo ? subtotal * promo.off : 0;
         const total = Math.max(0, subtotal - discount);
 
         if (count === 0 && !localStorage.getItem(PENDING_ORDER_KEY)) {
@@ -101,7 +102,6 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
                 const safeImg = fsImg(it.image);
                 const safeName = (it.name || 'Product').replace(/</g, '&lt;');
                 const safeSize = (it.size || '').replace(/</g, '&lt;');
-                const lineTotal = (it.price || 0) * (it.qty || 0);
                 return `
                     <div class="ck-item">
                         <span class="ck-item-thumb">
@@ -112,17 +112,17 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
                             <strong class="ck-item-name">${safeName}</strong>
                             <span class="ck-item-meta">${safeSize ? 'Size ' + safeSize : 'One size'}</span>
                         </div>
-                        <span class="ck-item-price">${formatPrice(lineTotal)}</span>
+                        <span class="ck-item-price">${formatMarked(it.price, it.qty)}</span>
                     </div>
                 `;
             }).join('');
 
-            subtotalEl.innerHTML = formatPrice(subtotal);
-            totalEl.innerHTML = formatPrice(total);
+            subtotalEl.innerHTML = formatMoney(subtotal);
+            totalEl.innerHTML = formatMoney(total);
 
             if (promo) {
                 discountLineEl.hidden = false;
-                discountAmountEl.innerHTML = '&minus;' + formatPrice(discount);
+                discountAmountEl.innerHTML = '&minus;' + formatMoney(discount);
                 discountCodeEl.textContent = promo.label;
             } else {
                 discountLineEl.hidden = true;
@@ -183,8 +183,13 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     function buildOrderFromForm() {
         const data = new FormData(form);
         const items = readCart();
-        const subtotal = items.reduce((s, i) => s + (i.price || 0) * (i.qty || 0), 0);
+        // Charge in NGN (Nomba is NGN-only). unitChargeNgn() bakes in the per-item
+        // markup expressed in NGN: Naira view = base + ₦5,000; Pounds view = the
+        // £ unit price (incl. £15) converted to NGN at the live rate. We store the
+        // marked NGN prices on the order so records/emails/Orders page stay
+        // consistent (no extra markup applied downstream).
         const promo = getPromo();
+        const subtotal = items.reduce((s, i) => s + unitChargeNgn(i.price) * (i.qty || 0), 0);
         const discount = promo ? Math.round(subtotal * promo.off) : 0;
         const total = Math.max(0, subtotal - discount);
 
@@ -208,7 +213,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             payment: { method: (data.get('payment') || 'nomba').toString().trim() },
             items: items.map((it) => ({
                 id: it.id, productId: it.productId, name: it.name, tag: it.tag,
-                size: it.size, price: it.price, qty: it.qty, image: it.image,
+                size: it.size, price: unitChargeNgn(it.price), qty: it.qty, image: it.image,
             })),
             subtotal, discount,
             promoCode: promo ? promo.code : null,

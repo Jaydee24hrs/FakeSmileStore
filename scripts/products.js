@@ -921,6 +921,34 @@ const PRODUCTS = {
     },
 };
 
+/* =====================================================================
+   CATALOG PRICING (best-guess by type — from the WhatsApp catalog
+   screenshots; REVIEW / adjust per product as needed).
+   These are NGN BASE prices. The per-item markup (+₦5,000 in Naira /
+   +£15 in Pounds) is applied at display + checkout time in base.js.
+   Any product whose tag is NOT in this table is flagged comingSoon →
+   the card shows a "Coming Soon" badge and a disabled Add-to-Cart.
+   No catalog price yet: Jersey, Tank, Long Sleeve, Crewneck, Joggers,
+   Shorts. (Catalog also listed: track hoodie ₦80k, track suit ₦80k,
+   handler tees ₦50k, stone-wash tee ₦40k, "PROJECT: FAKE" ₦55k — bump
+   specific products to those if you want.)
+   ===================================================================== */
+const CATALOG_PRICE_BY_TAG = {
+    'Hoodie': 60000,
+    'Tee': 38000,
+    'Bucket Hat': 35000,
+    'Cap': 20000,
+};
+Object.values(PRODUCTS).forEach((p) => {
+    const catalogPrice = CATALOG_PRICE_BY_TAG[p.tag];
+    if (catalogPrice != null) {
+        p.price = catalogPrice;
+        p.comingSoon = false;
+    } else {
+        p.comingSoon = true; // no catalog price yet → Coming Soon, not for sale
+    }
+});
+
 /** Look up a product by id, returning null if not found. */
 function getProduct(id) {
     return id && PRODUCTS[id] ? PRODUCTS[id] : null;

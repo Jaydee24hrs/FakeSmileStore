@@ -8,6 +8,45 @@
     box-sizing: border-box;
 }
 
+/* ===== Coming-soon products (no catalog price yet) ===== */
+.product-badge-soon {
+    background: rgba(20, 20, 20, 0.85) !important;
+    color: #cfeede !important;
+    border: 1px solid rgba(0, 217, 87, 0.35);
+    backdrop-filter: blur(6px);
+}
+.product-price-soon {
+    color: #8b9a90 !important;
+    font-style: italic;
+    letter-spacing: 0.02em;
+}
+.product-card.coming-soon .product-image-wrap img {
+    filter: grayscale(0.35) brightness(0.82);
+}
+.product-add:disabled,
+.product-add[disabled],
+.product-add.is-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(0.6);
+}
+.pd-related-soon {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #cfeede;
+    background: rgba(20, 20, 20, 0.85);
+    border: 1px solid rgba(0, 217, 87, 0.35);
+}
+
 /* ===== Resume-unfinished-payment banner (see base.js) ===== */
 .fs-resume-banner {
     position: fixed;

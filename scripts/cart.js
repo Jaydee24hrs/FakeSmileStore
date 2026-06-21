@@ -29,8 +29,6 @@
         'CREW10':    { off: 0.10, label: 'CREW10' },
     };
 
-    const fmt = (n) => formatPrice(Number(n || 0));
-
     function getPromo() {
         const code = (localStorage.getItem(PROMO_KEY) || '').toUpperCase();
         return VALID_PROMOS[code] ? { code, ...VALID_PROMOS[code] } : null;
@@ -44,9 +42,10 @@
     function render() {
         const items = readCart();
         const count = items.reduce((s, i) => s + (i.qty || 0), 0);
-        const subtotal = items.reduce((s, i) => s + (i.price || 0) * (i.qty || 0), 0);
         const promo = getPromo();
-        const discount = promo ? Math.round(subtotal * promo.off) : 0;
+        // Totals in the DISPLAY currency, including the per-item markup.
+        const subtotal = items.reduce((s, i) => s + unitDisplayAmount(i.price) * (i.qty || 0), 0);
+        const discount = promo ? subtotal * promo.off : 0;
         const total = Math.max(0, subtotal - discount);
 
         if (count === 0) {
@@ -62,7 +61,6 @@
         if (itemsCountEl) itemsCountEl.textContent = String(count);
 
         itemsEl.innerHTML = items.map((it) => {
-            const lineTotal = (it.price || 0) * (it.qty || 0);
             const safeImg = fsImg(it.image);
             const safeName = (it.name || 'Product').replace(/</g, '&lt;');
             const safeTag = (it.tag || '').replace(/</g, '&lt;');
@@ -84,7 +82,7 @@
                         ${safeTag ? `<span class="cart-item-tag">${safeTag}</span>` : ''}
                         <h3 class="cart-item-name"><a href="${productHref}" class="cart-item-name-link">${safeName}</a></h3>
                         ${safeSize ? `<span class="cart-item-size">Size <strong>${safeSize}</strong></span>` : ''}
-                        <p class="cart-item-price">${fmt(it.price)} each</p>
+                        <p class="cart-item-price">${formatMarked(it.price, 1)} each</p>
                     </div>
                     <div class="cart-item-bottom">
                         <div class="cart-qty">
@@ -92,18 +90,18 @@
                             <span class="cart-qty-value">${it.qty}</span>
                             <button data-action="inc" aria-label="Increase">+</button>
                         </div>
-                        <span class="cart-item-subtotal">${fmt(lineTotal)}</span>
+                        <span class="cart-item-subtotal">${formatMarked(it.price, it.qty)}</span>
                     </div>
                 </article>`;
         }).join('');
 
-        if (subtotalEl) subtotalEl.innerHTML = fmt(subtotal);
-        if (totalEl) totalEl.innerHTML = fmt(total);
+        if (subtotalEl) subtotalEl.innerHTML = formatMoney(subtotal);
+        if (totalEl) totalEl.innerHTML = formatMoney(total);
 
         if (discountLineEl && discountAmountEl && discountCodeEl) {
             if (promo) {
                 discountLineEl.hidden = false;
-                discountAmountEl.innerHTML = `&minus;${fmt(discount)}`;
+                discountAmountEl.innerHTML = `&minus;${formatMoney(discount)}`;
                 discountCodeEl.textContent = promo.label;
             } else {
                 discountLineEl.hidden = true;
