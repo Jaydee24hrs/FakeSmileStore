@@ -356,6 +356,11 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Added a "Request a Custom Fit" banner to the shop page.** Slim glass banner
+  (reuses the `lifestyle-banner` component + a new dual-CTA `lifestyle-cta-ghost`
+  style) inviting bespoke orders: primary **Request on WhatsApp** CTA
+  (`wa.me/message/3VNCZSD34JUIE1`) and a secondary **Email Us** CTA (prefilled
+  `mailto:fakeasmile29@gmail.com`). Sits above the footer on `shop.html`.
 - **Fixed 3 tees mis-tagged as "Crewneck" → were stuck in Coming Soon.** Sunset
   Echo, Midnight Echo, and Sand Echo are short-sleeve tees but carried a
   `Crewneck` tag, which has no catalog price and so auto-flagged them Coming Soon.
