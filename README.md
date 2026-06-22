@@ -356,6 +356,10 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- Custom-order WhatsApp CTAs now point to the short link `wa.link/igce8d`
+  (both Custom Fit banners). Contact form **Subject** dropdown trimmed: removed
+  "Sizing & Fit" and "Wholesale Enquiry" (now Order Status / Press & Collabs /
+  Custom Order / Something else).
 - **Added a "Request a Custom Fit" banner.** Slim glass banner (reuses the
   `lifestyle-banner` component + a new dual-CTA `lifestyle-cta-ghost` style)
   inviting bespoke orders: primary **Request on WhatsApp** CTA
