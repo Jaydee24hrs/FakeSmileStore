@@ -356,6 +356,17 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Accurate category labels.** A jersey no longer reads "Tops & Hoodies".
+  Categories are now assigned centrally by garment type (`CATEGORY_BY_TAG` in
+  `products.js`): Hoodies → *Tops & Hoodies*; Tees/Crewnecks, Tanks & Long
+  Sleeves → *Statement Tops*; Jerseys + Shorts → *Jerseys & Shorts*; Joggers →
+  *Joggers*; Caps/Bucket Hats → *Headwear*. Shop filters updated to match
+  (split the old "Joggers & Shorts" into *Jerseys & Shorts* + *Joggers*). Set
+  merge in `base.js` now finds the "top" by garment type, not category, so
+  jersey+shorts sets still collapse correctly.
+- **Contact page:** socials grid fixed (was 4 columns for 3 items → centered
+  3-column) and the dual-image Custom Fit banner added above the community
+  section (IMG_6428 / IMG_6430).
 - **Home product images now open the preview page.** Removed the home.js
   handler that hijacked image clicks into add-to-cart (and blocked the anchor):
   clicking any home-page card image now navigates to `product.html` via its

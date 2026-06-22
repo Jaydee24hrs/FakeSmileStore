@@ -324,7 +324,10 @@ function addToCart(input) {
         const p = PRODUCTS[baseId];
         const partner = PRODUCTS[p.partner];
         if (partner) {
-            const isTop = (p.category === 'Tops & Hoodies');
+            // Identify the top by garment type, not category (jerseys live in
+            // their own "Jerseys & Shorts" category but are still the top).
+            const bottomTags = ['Joggers', 'Shorts'];
+            const isTop = !bottomTags.includes(p.tag);
             const top = isTop ? p : partner;
             const bottom = isTop ? partner : p;
             const setId = top.id + '-set';

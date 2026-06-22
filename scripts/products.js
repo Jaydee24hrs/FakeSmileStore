@@ -933,6 +933,34 @@ const PRODUCTS = {
    handler tees ₦50k, stone-wash tee ₦40k, "PROJECT: FAKE" ₦55k — bump
    specific products to those if you want.)
    ===================================================================== */
+/* =====================================================================
+   CANONICAL CATEGORY + HOME-SECTION ANCHOR per garment type. Keeps the
+   shop filters and the product-detail breadcrumb label accurate so a
+   jersey never reads "Tops & Hoodies", etc.
+     - Hoodies        -> Tops & Hoodies
+     - Tees/Crewnecks, Tanks, Long Sleeves -> Statement Tops
+     - Jerseys + Shorts (the court sets)   -> Jerseys & Shorts
+     - Joggers        -> Joggers
+     - Caps/Bucket Hats -> Headwear
+   This OVERRIDES whatever category was set inline on each product above.
+   ===================================================================== */
+const CATEGORY_BY_TAG = {
+    'Hoodie':      { category: 'Tops & Hoodies',   hash: 'products' },
+    'Tee':         { category: 'Statement Tops',   hash: 'tops' },
+    'Crewneck':    { category: 'Statement Tops',   hash: 'tops' },
+    'Tank':        { category: 'Statement Tops',   hash: 'tops' },
+    'Long Sleeve': { category: 'Statement Tops',   hash: 'tops' },
+    'Jersey':      { category: 'Jerseys & Shorts', hash: 'products' },
+    'Shorts':      { category: 'Jerseys & Shorts', hash: 'bottoms' },
+    'Joggers':     { category: 'Joggers',          hash: 'bottoms' },
+    'Bucket Hat':  { category: 'Headwear',         hash: 'headwear' },
+    'Cap':         { category: 'Headwear',         hash: 'headwear' },
+};
+Object.values(PRODUCTS).forEach((p) => {
+    const c = CATEGORY_BY_TAG[p.tag];
+    if (c) { p.category = c.category; p.categoryHash = c.hash; }
+});
+
 const CATALOG_PRICE_BY_TAG = {
     'Hoodie': 60000,
     'Tee': 38000,
