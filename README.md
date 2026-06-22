@@ -356,6 +356,16 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Fixed 3 tees mis-tagged as "Crewneck" → were stuck in Coming Soon.** Sunset
+  Echo, Midnight Echo, and Sand Echo are short-sleeve tees but carried a
+  `Crewneck` tag, which has no catalog price and so auto-flagged them Coming Soon.
+  Retagged to **Tee** (now active at ₦38k + markup), with their copy/material
+  corrected to tee wording. Static home cards and aria/alt text updated to match;
+  no `Crewneck` products remain.
+- **Coming-Soon look now consistent on the product preview page.** The detail page
+  (`product.html`) now dims its gallery/thumb images for inactive products with the
+  same grayscale/brightness treatment as the shop cards (`.product-detail.coming-soon`
+  in `base.css`, toggled in `product.js`).
 - **Complete outfits sold as ONE product at ONE price.** Hoodie+joggers sets no
   longer sum the two pieces (was ₦60k+₦40k=₦100k) — each outfit has a single
   `OUTFIT_PRICE` (₦80,000, the catalog "track suit"; in `products.js`, review per

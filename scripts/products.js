@@ -404,7 +404,7 @@ const PRODUCTS = {
     'sunset-echo-crewneck': {
         id: 'sunset-echo-crewneck',
         name: 'Sunset Echo',
-        tag: 'Crewneck',
+        tag: 'Tee',
         category: 'Statement Tops',
         categoryHash: 'tops',
         price: 18000,
@@ -413,9 +413,9 @@ const PRODUCTS = {
         completewear: 'images/Completewear/10.webp',
         badge: 'Bestseller',
         description:
-            'Sunset-orange crewneck with brushed inner. Brick crest at chest, signature wordmark across the back — heavyweight cotton-blend fleece.',
+            'Sunset-orange heavyweight tee. Brick crest at chest, signature wordmark across the back — premium pre-shrunk cotton.',
         details: {
-            Material: '320GSM cotton-blend fleece',
+            Material: '260GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
             Sizes: 'S / M / L / XL / XXL',
             Care: 'Cold wash inside-out, hang dry',
@@ -425,7 +425,7 @@ const PRODUCTS = {
     'midnight-echo-crewneck': {
         id: 'midnight-echo-crewneck',
         name: 'Midnight Echo',
-        tag: 'Crewneck',
+        tag: 'Tee',
         category: 'Statement Tops',
         categoryHash: 'tops',
         price: 18000,
@@ -433,9 +433,9 @@ const PRODUCTS = {
         backImage: 'images/Tops F&B/12.webp',
         completewear: 'images/Completewear/13.webp',
         description:
-            'Midnight-black crewneck. Brushed-back fleece, FakeSmile crest at chest and the signature script across the back.',
+            'Midnight-black heavyweight tee. FakeSmile crest at chest and the signature script across the back — premium-feel cotton, built to last.',
         details: {
-            Material: '320GSM cotton-blend fleece',
+            Material: '260GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
             Sizes: 'S / M / L / XL / XXL',
             Care: 'Cold wash inside-out, hang dry',
@@ -507,7 +507,7 @@ const PRODUCTS = {
     'sand-echo-crewneck': {
         id: 'sand-echo-crewneck',
         name: 'Sand Echo',
-        tag: 'Crewneck',
+        tag: 'Tee',
         category: 'Statement Tops',
         categoryHash: 'tops',
         price: 18000,
@@ -515,9 +515,9 @@ const PRODUCTS = {
         backImage: 'images/Tops F&B/24.webp',
         completewear: 'images/Completewear/25.webp',
         description:
-            'Sand-tan crewneck with brushed inner and signature graphic across the back. Heavyweight cotton-blend fleece — the neutral pairer for every fit.',
+            'Sand-tan heavyweight tee with the signature graphic across the back. Premium pre-shrunk cotton — the neutral pairer for every fit.',
         details: {
-            Material: '320GSM cotton-blend fleece',
+            Material: '260GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
             Sizes: 'S / M / L / XL / XXL',
             Care: 'Cold wash inside-out, hang dry',
@@ -928,8 +928,8 @@ const PRODUCTS = {
    +£15 in Pounds) is applied at display + checkout time in base.js.
    Any product whose tag is NOT in this table is flagged comingSoon →
    the card shows a "Coming Soon" badge and a disabled Add-to-Cart.
-   No catalog price yet: Jersey, Tank, Long Sleeve, Crewneck, Joggers,
-   Shorts. (Catalog also listed: track hoodie ₦80k, track suit ₦80k,
+   No catalog price yet: Jersey, Tank, Long Sleeve, Shorts.
+   (Catalog also listed: track hoodie ₦80k, track suit ₦80k,
    handler tees ₦50k, stone-wash tee ₦40k, "PROJECT: FAKE" ₦55k — bump
    specific products to those if you want.)
    ===================================================================== */

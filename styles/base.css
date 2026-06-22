@@ -23,6 +23,11 @@
 .product-card.coming-soon .product-image-wrap img {
     filter: grayscale(0.35) brightness(0.82);
 }
+/* Preview (product detail) page mirrors the shop card's coming-soon look. */
+.product-detail.coming-soon .pd-image-frame img,
+.product-detail.coming-soon .pd-thumbs img {
+    filter: grayscale(0.35) brightness(0.82);
+}
 .product-add:disabled,
 .product-add[disabled],
 .product-add.is-disabled {

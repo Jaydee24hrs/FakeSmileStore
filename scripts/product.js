@@ -63,6 +63,10 @@
         imgEl.src = product.image;
         imgEl.alt = `${product.name} ${product.tag}`;
     }
+    // Match the shop card: dim the gallery for coming-soon products so the
+    // inactive state reads the same on the listing and the preview page.
+    const galleryEl = document.getElementById('product-detail');
+    if (galleryEl) galleryEl.classList.toggle('coming-soon', !!product.comingSoon);
 
     const categoryEl = document.getElementById('pd-category');
     if (categoryEl) categoryEl.textContent = product.category;
