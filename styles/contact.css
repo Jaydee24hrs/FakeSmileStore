@@ -233,10 +233,11 @@
 
 .community-socials {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
-    max-width: 800px;
+    max-width: 660px;
     margin: 0 auto;
+    justify-content: center;
 }
 
 .community-social {
@@ -360,7 +361,7 @@
 @media (max-width: 980px) {
     .contact-split { grid-template-columns: 1fr; }
     .contact-info { grid-template-columns: 1fr 1fr; }
-    .community-socials { grid-template-columns: repeat(2, 1fr); }
+    .community-socials { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 720px) {
