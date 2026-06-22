@@ -9,6 +9,7 @@
     const filterButtons = document.querySelectorAll('.shop-filter');
     const resultCount = document.getElementById('shop-result-count');
     const sortSelect = document.getElementById('shop-sort');
+    const bannerTpl = document.getElementById('shop-fit-banner-tpl');
 
     if (!grid || typeof PRODUCTS === 'undefined') return;
 
@@ -105,10 +106,27 @@
         return arr;
     }
 
+    // Drop the "Request a Custom Fit" banner into the middle of the grid as a
+    // full-width row. Snap it to a row boundary (based on the live column count)
+    // so it never leaves a gap in a partial row.
+    function injectFitBanner(count) {
+        if (!bannerTpl || count < 6) return;
+        let cols = 1;
+        const tracks = getComputedStyle(grid).gridTemplateColumns;
+        if (tracks && tracks !== 'none') cols = tracks.split(' ').filter(Boolean).length;
+        let mid = Math.round(count / 2 / cols) * cols;   // nearest row start
+        if (mid < cols) mid = cols;
+        if (mid >= count) mid = count - (count % cols || cols);
+        const node = bannerTpl.content.firstElementChild.cloneNode(true);
+        const ref = grid.children[mid];
+        if (ref) grid.insertBefore(node, ref); else grid.appendChild(node);
+    }
+
     function render() {
         const filtered = applyFilter(allProducts);
         const sorted = applySort(filtered);
         grid.innerHTML = sorted.map(buildCardHTML).join('');
+        injectFitBanner(sorted.length);
         if (resultCount) resultCount.textContent = sorted.length;
 
         if (sorted.length === 0) {

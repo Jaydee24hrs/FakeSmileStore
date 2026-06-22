@@ -356,6 +356,15 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Home product images now open the preview page.** Removed the home.js
+  handler that hijacked image clicks into add-to-cart (and blocked the anchor):
+  clicking any home-page card image now navigates to `product.html` via its
+  native link; only the **+** button adds to cart.
+- **Twin Faces & Cream Faces tanks priced at ₦60k** (now active, no longer
+  Coming Soon) via a new per-product `PRICE_OVERRIDE` map in `products.js`.
+- **Shop "Request a Custom Fit" banner moved into the middle of the product
+  grid** (full-width row, snapped to a row boundary so it never leaves a gap)
+  and now uses `IMG_6422`. Injected by `shop.js` from a `<template>`.
 - Custom-order WhatsApp CTAs now point to the short link `wa.link/igce8d`
   (both Custom Fit banners). Contact form **Subject** dropdown trimmed: removed
   "Sizing & Fit" and "Wholesale Enquiry" (now Order Status / Press & Collabs /

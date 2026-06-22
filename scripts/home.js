@@ -308,112 +308,11 @@ if (promoCard) {
 }
 
 // ============================================= //
-// === CLICK PRODUCT IMAGE → ADD TO CART ======== //
+// === CLICK PRODUCT IMAGE → OPEN PREVIEW ======= //
 // ============================================= //
-// Implementation note: cards have 3D transforms (translateZ + rotateY on hover
-// inside a perspective container). Browser hit-testing on 3D-transformed
-// elements is inconsistent — clicks on the visually-correct card can resolve
-// to the wrong DOM target. To work around that we look up the element at the
-// SCREEN POSITION via document.elementFromPoint() on pointerup, which always
-// matches what the user actually sees. mouse / touch / pen all flow through
-// the same path, with mouse/touch fallbacks for older browsers.
-(function () {
-    function fsAddFromCard(card) {
-        if (!card || typeof addToCart !== 'function') return;
-        const nameEl  = card.querySelector('.product-name');
-        const tagEl   = card.querySelector('.product-tag');
-        const priceEl = card.querySelector('.product-price');
-        const imgEl   = card.querySelector('.product-image-wrap img');
-        const link    = card.querySelector('a.product-image-wrap');
-        const name  = nameEl  ? nameEl.textContent.trim()  : 'Product';
-        const tag   = tagEl   ? tagEl.textContent.trim()   : '';
-        const price = readCardPriceNgn(priceEl);
-        const image = imgEl   ? imgEl.getAttribute('src')  : '';
-        const id    = cardProductId(card) || (typeof slugify === 'function'
-            ? slugify(name + ' ' + tag)
-            : name.toLowerCase().replace(/\s+/g, '-'));
-        addToCart({ id, name, tag, price, image });
-        if (link) {
-            link.style.transform = 'scale(0.97)';
-            setTimeout(() => { link.style.transform = ''; }, 200);
-        } else {
-            card.style.transform = 'scale(0.99)';
-            setTimeout(() => { card.style.transform = ''; }, 200);
-        }
-    }
-
-    let downX = 0, downY = 0, downAt = 0, hasDown = false;
-
-    function shouldIgnore(target) {
-        if (!target || !target.closest) return true;
-        if (target.closest('.product-add')) return true; // + button has its own handler
-        if (target.closest('.carousel-btn')) return true; // carousel nav arrows
-        return false;
-    }
-
-    function recordDown(target, x, y) {
-        if (shouldIgnore(target)) { hasDown = false; return; }
-        // Only arm if we're actually starting on a product card or its descendants
-        const cardAtStart = target.closest && target.closest('.product-card');
-        if (!cardAtStart) { hasDown = false; return; }
-        downX = x; downY = y; downAt = Date.now(); hasDown = true;
-    }
-
-    function tryFire(x, y) {
-        if (!hasDown) return false;
-        hasDown = false;
-        if (Math.abs(x - downX) > 10 || Math.abs(y - downY) > 10) return false; // it was a drag
-        if (Date.now() - downAt > 1500) return false; // long press
-
-        // CRITICAL: ask the browser what's actually visible at this screen
-        // position — not the event target — to bypass 3D-transform hit-test
-        // weirdness.
-        const elAtPoint = document.elementFromPoint(x, y);
-        if (!elAtPoint || shouldIgnore(elAtPoint)) return false;
-        const card = elAtPoint.closest && elAtPoint.closest('.product-card');
-        if (!card) return false;
-        fsAddFromCard(card);
-        return true;
-    }
-
-    // ===== Pointer events (modern, unifies mouse + touch + pen) =====
-    document.addEventListener('pointerdown', (e) => {
-        recordDown(e.target, e.clientX, e.clientY);
-    }, true);
-    document.addEventListener('pointerup', (e) => {
-        if (tryFire(e.clientX, e.clientY)) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    }, true);
-    document.addEventListener('pointercancel', () => { hasDown = false; }, true);
-
-    // ===== Mouse fallback (older browsers without PointerEvent) =====
-    if (!window.PointerEvent) {
-        document.addEventListener('mousedown', (e) => {
-            recordDown(e.target, e.clientX, e.clientY);
-        }, true);
-        document.addEventListener('mouseup', (e) => {
-            if (tryFire(e.clientX, e.clientY)) {
-                e.preventDefault();
-            }
-        }, true);
-    }
-
-    // ===== Block native anchor navigation =====
-    // Even if pointer-event tracking misses, the anchor's click should not
-    // navigate to product.html — we handle the action ourselves.
-    document.addEventListener('click', (e) => {
-        const link = e.target.closest && e.target.closest('a.product-image-wrap');
-        if (!link) return;
-        e.preventDefault();
-        e.stopPropagation();
-        // If we missed the pointer pair (rare), fire now using elementFromPoint.
-        const elAtPoint = document.elementFromPoint(e.clientX, e.clientY);
-        const card = elAtPoint && elAtPoint.closest && elAtPoint.closest('.product-card');
-        if (card && !shouldIgnore(elAtPoint)) {
-            fsAddFromCard(card);
-        }
-    }, true);
-})();
+// Clicking a product image navigates to its preview (product.html) via the
+// card's native <a class="product-image-wrap" href="..."> link. Only the
+// "+" button adds to cart (handled by the .product-add listener above).
+// (Previously the image click was hijacked to add-to-cart; that is removed so
+//  the image opens the product detail page as users expect.)
 

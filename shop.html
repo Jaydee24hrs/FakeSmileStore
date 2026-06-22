@@ -120,8 +120,9 @@
             </div>
         </section>
 
-        <!-- ===== REQUEST A CUSTOM FIT ===== -->
-        <section class="lifestyle-banner lifestyle-banner-custom" aria-label="Request a custom fit">
+        <!-- ===== REQUEST A CUSTOM FIT (injected into the middle of the grid by shop.js) ===== -->
+        <template id="shop-fit-banner-tpl">
+        <section class="lifestyle-banner lifestyle-banner-custom shop-fit-banner" aria-label="Request a custom fit">
             <div class="lifestyle-bg" aria-hidden="true">
                 <span class="lifestyle-orb lifestyle-orb-a"></span>
                 <span class="lifestyle-orb lifestyle-orb-b"></span>
@@ -158,10 +159,11 @@
 
                 <div class="lifestyle-figure" aria-hidden="true">
                     <div class="lifestyle-figure-glow"></div>
-                    <img loading="lazy" decoding="async" src="images/PNGIMG/IMG_6416.JPG.webp" alt="">
+                    <img loading="lazy" decoding="async" src="images/PNGIMG/IMG_6422.JPG.webp" alt="">
                 </div>
             </div>
         </section>
+        </template>
 
         <!-- ===== FOOTER ===== -->
         <footer class="site-footer" id="footer">

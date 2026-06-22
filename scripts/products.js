@@ -973,6 +973,20 @@ Object.keys(OUTFIT_PRICE).forEach((topId) => {
     if (bottom) { bottom.price = price; bottom.outfitPrice = price; bottom.comingSoon = false; }
 });
 
+/* =====================================================================
+   PER-PRODUCT PRICE OVERRIDES (NGN base; markup applied at display time).
+   For individual products priced outside their tag's default — these win
+   over the tag table above and take the product off "Coming Soon".
+   ===================================================================== */
+const PRICE_OVERRIDE = {
+    'twin-faces-tank': 60000,
+    'cream-faces-tank': 60000,
+};
+Object.keys(PRICE_OVERRIDE).forEach((id) => {
+    const p = PRODUCTS[id];
+    if (p) { p.price = PRICE_OVERRIDE[id]; p.comingSoon = false; }
+});
+
 /** Look up a product by id, returning null if not found. */
 function getProduct(id) {
     return id && PRODUCTS[id] ? PRODUCTS[id] : null;
