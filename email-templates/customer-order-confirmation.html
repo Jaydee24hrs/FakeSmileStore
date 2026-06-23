@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="only light">
+<meta name="supported-color-schemes" content="light">
+<title>FakeSmile · Order Confirmed</title>
+<style>
+  :root { color-scheme: only light; supported-color-schemes: light; }
+  body { margin:0; padding:0; background:#eef1ef; }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#eef1ef;">
+<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#eef1ef;padding:32px 0;margin:0;color:#0f1a14;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e2e8e4;border-radius:16px;overflow:hidden;">
+
+    <tr><td style="background:linear-gradient(135deg,#10b981 0%,#0a7d52 100%);padding:40px 32px;text-align:center;">
+      <div style="font-size:11px;letter-spacing:4px;color:#ffffff;text-transform:uppercase;font-weight:700;">FakeSmile</div>
+      <div style="font-size:32px;color:#ffffff;font-weight:800;margin-top:14px;line-height:1.2;">Your fit is<br/>locked in.</div>
+      <div style="font-size:14px;color:#e4fbef;margin-top:14px;">Built On The Bricks &middot; Wear The Story</div>
+    </td></tr>
+
+    <tr><td style="padding:32px 32px 8px;">
+      <div style="font-size:16px;color:#0f1a14;line-height:1.6;">Hey <strong style="color:#0a8f56;">{{customer_name}}</strong>,</div>
+      <div style="font-size:15px;color:#5a7a68;line-height:1.7;margin-top:12px;">Thanks for backing the brand. Your order is paid and we&rsquo;re getting it ready to ship. You&rsquo;ll get another email the moment it&rsquo;s on the road.</div>
+    </td></tr>
+
+    <tr><td style="padding:24px 32px 8px;">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f4f7f5;border:1px solid #e2e8e4;border-radius:12px;">
+        <tr><td style="padding:18px 20px;">
+          <div style="font-size:11px;letter-spacing:2px;color:#0a8f56;text-transform:uppercase;font-weight:700;">Order ID</div>
+          <div style="font-size:18px;color:#0f1a14;font-weight:600;font-family:monospace;margin-top:6px;">{{order_id}}</div>
+        </td></tr>
+      </table>
+    </td></tr>
+
+    <tr><td style="padding:24px 32px 8px;">
+      <div style="font-size:11px;letter-spacing:2px;color:#0a8f56;text-transform:uppercase;font-weight:700;margin-bottom:12px;">What you got</div>
+      <div style="background:#f4f7f5;border-left:3px solid #10b981;padding:14px 16px;border-radius:4px;font-size:14px;color:#1a2a22;white-space:pre-line;line-height:1.7;">{{items}}</div>
+    </td></tr>
+
+    <tr><td style="padding:24px 32px;">
+      <table cellpadding="6" cellspacing="0" border="0" width="100%">
+        <tr><td style="font-size:13px;color:#5a7a68;">Subtotal</td><td style="font-size:13px;color:#0f1a14;text-align:right;">{{subtotal}}</td></tr>
+        <tr><td style="font-size:13px;color:#5a7a68;">Discount</td><td style="font-size:13px;color:#0a8f56;text-align:right;">&minus;{{discount}}</td></tr>
+        <tr><td colspan="2" style="border-top:1px solid #e2e8e4;height:1px;font-size:0;line-height:0;padding-top:6px;">&nbsp;</td></tr>
+        <tr><td style="font-size:16px;color:#0f1a14;font-weight:700;">You paid</td><td style="font-size:22px;color:#0a8f56;font-weight:800;text-align:right;">{{total}}</td></tr>
+      </table>
+    </td></tr>
+
+    <tr><td style="padding:0 32px 28px;">
+      <div style="font-size:11px;letter-spacing:2px;color:#0a8f56;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Shipping to</div>
+      <div style="background:#f4f7f5;border:1px solid #e2e8e4;border-radius:8px;padding:14px 16px;font-size:14px;color:#1a2a22;line-height:1.6;white-space:pre-line;">{{shipping_address}}</div>
+    </td></tr>
+
+    <tr><td style="padding:0 32px 32px;text-align:center;">
+      <div style="font-size:13px;color:#7a948a;line-height:1.6;">Questions? Hit reply &mdash; we read every message.</div>
+    </td></tr>
+
+    <tr><td style="background:#f4f7f5;padding:24px 32px;text-align:center;border-top:1px solid #e2e8e4;">
+      <div style="font-size:14px;color:#0f1a14;font-weight:700;letter-spacing:1px;">FAKESMILE</div>
+      <div style="font-size:11px;color:#8a9a90;letter-spacing:2px;text-transform:uppercase;margin-top:6px;">Built On The Bricks</div>
+    </td></tr>
+
+  </table>
+</div>
+</body>
+</html>
