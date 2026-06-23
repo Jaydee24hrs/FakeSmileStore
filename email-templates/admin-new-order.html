@@ -3,82 +3,82 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="only light">
-<meta name="supported-color-schemes" content="light">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
 <title>FakeSmile · New Order</title>
 <style>
-  :root { color-scheme: only light; supported-color-schemes: light; }
-  body { margin:0; padding:0; background:#eef1ef; }
+  :root { color-scheme: dark; supported-color-schemes: dark; }
+  body { margin:0; padding:0; background:#0a0f0a; }
 </style>
 </head>
-<body style="margin:0;padding:0;background:#eef1ef;">
-<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#eef1ef;padding:32px 0;margin:0;color:#0f1a14;">
-  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e2e8e4;border-radius:16px;overflow:hidden;">
+<body style="margin:0;padding:0;background:#0a0f0a;">
+<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#0a0f0a;padding:32px 0;margin:0;color:#e8f5e9;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;margin:0 auto;background:#0f1a14;border:1px solid #1f3a2a;border-radius:16px;overflow:hidden;">
 
-    <tr><td style="background:linear-gradient(135deg,#eafaf2 0%,#d3f3e2 100%);padding:32px 32px 24px;border-bottom:2px solid #10b981;">
-      <div style="font-size:11px;letter-spacing:3px;color:#0a8f56;text-transform:uppercase;font-weight:700;">FakeSmile &middot; New Order</div>
-      <div style="font-size:28px;color:#0f1a14;font-weight:800;margin-top:8px;">Ka-ching &#128176;</div>
-      <div style="font-size:14px;color:#5a7a68;margin-top:6px;">Someone just placed an order. Time to ship.</div>
+    <tr><td style="background:linear-gradient(135deg,#0f1a14 0%,#1a3324 100%);padding:32px 32px 24px;border-bottom:2px solid #10b981;">
+      <div style="font-size:11px;letter-spacing:3px;color:#10b981;text-transform:uppercase;font-weight:600;">FakeSmile &middot; New Order</div>
+      <div style="font-size:28px;color:#fff;font-weight:700;margin-top:8px;">Ka-ching &#128176;</div>
+      <div style="font-size:14px;color:#9ccab0;margin-top:6px;">Someone just placed an order. Time to ship.</div>
     </td></tr>
 
     <tr><td style="padding:28px 32px 8px;">
       <table cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
-          <td style="font-size:12px;color:#7a948a;text-transform:uppercase;letter-spacing:2px;padding-bottom:4px;">Order ID</td>
-          <td style="font-size:12px;color:#7a948a;text-transform:uppercase;letter-spacing:2px;padding-bottom:4px;text-align:right;">Total</td>
+          <td style="font-size:12px;color:#7aa890;text-transform:uppercase;letter-spacing:2px;padding-bottom:4px;">Order ID</td>
+          <td style="font-size:12px;color:#7aa890;text-transform:uppercase;letter-spacing:2px;padding-bottom:4px;text-align:right;">Total</td>
         </tr>
         <tr>
-          <td style="font-size:18px;color:#0f1a14;font-weight:600;font-family:monospace;">{{order_id}}</td>
-          <td style="font-size:24px;color:#0a8f56;font-weight:700;text-align:right;">{{total}}</td>
+          <td style="font-size:18px;color:#fff;font-weight:600;font-family:monospace;">{{order_id}}</td>
+          <td style="font-size:24px;color:#10b981;font-weight:700;text-align:right;">{{total}}</td>
         </tr>
       </table>
     </td></tr>
 
     <tr><td style="padding:16px 32px;">
-      <table cellpadding="8" cellspacing="0" border="0" width="100%" style="background:#f4f7f5;border:1px solid #e2e8e4;border-radius:8px;">
+      <table cellpadding="8" cellspacing="0" border="0" width="100%" style="background:#0a1410;border-radius:8px;">
         <tr>
-          <td style="font-size:12px;color:#7a948a;width:35%;">Status</td>
-          <td style="font-size:13px;color:#0f1a14;font-weight:500;">{{status}}</td>
+          <td style="font-size:12px;color:#7aa890;width:35%;">Status</td>
+          <td style="font-size:13px;color:#fff;font-weight:500;">{{status}}</td>
         </tr>
         <tr>
-          <td style="font-size:12px;color:#7a948a;">Payment</td>
-          <td style="font-size:13px;color:#0f1a14;font-weight:500;">{{payment_method}}</td>
+          <td style="font-size:12px;color:#7aa890;">Payment</td>
+          <td style="font-size:13px;color:#fff;font-weight:500;">{{payment_method}}</td>
         </tr>
         <tr>
-          <td style="font-size:12px;color:#7a948a;">Nomba ref</td>
-          <td style="font-size:13px;color:#0f1a14;font-family:monospace;">{{nomba_reference}}</td>
+          <td style="font-size:12px;color:#7aa890;">Nomba ref</td>
+          <td style="font-size:13px;color:#fff;font-family:monospace;">{{nomba_reference}}</td>
         </tr>
       </table>
     </td></tr>
 
     <tr><td style="padding:24px 32px 8px;">
-      <div style="font-size:11px;letter-spacing:2px;color:#0a8f56;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Customer</div>
-      <div style="font-size:16px;color:#0f1a14;font-weight:600;">{{customer_name}}</div>
-      <div style="font-size:14px;color:#5a7a68;margin-top:4px;">{{customer_email}}</div>
-      <div style="font-size:14px;color:#5a7a68;margin-top:2px;">{{customer_phone}}</div>
+      <div style="font-size:11px;letter-spacing:2px;color:#10b981;text-transform:uppercase;font-weight:600;margin-bottom:12px;">Customer</div>
+      <div style="font-size:16px;color:#fff;font-weight:600;">{{customer_name}}</div>
+      <div style="font-size:14px;color:#9ccab0;margin-top:4px;">{{customer_email}}</div>
+      <div style="font-size:14px;color:#9ccab0;margin-top:2px;">{{customer_phone}}</div>
     </td></tr>
 
     <tr><td style="padding:24px 32px 8px;">
-      <div style="font-size:11px;letter-spacing:2px;color:#0a8f56;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Items</div>
-      <div style="background:#f4f7f5;border-left:3px solid #10b981;padding:14px 16px;border-radius:4px;font-size:14px;color:#1a2a22;white-space:pre-line;line-height:1.7;">{{items}}</div>
+      <div style="font-size:11px;letter-spacing:2px;color:#10b981;text-transform:uppercase;font-weight:600;margin-bottom:12px;">Items</div>
+      <div style="background:#0a1410;border-left:3px solid #10b981;padding:14px 16px;border-radius:4px;font-size:14px;color:#e8f5e9;white-space:pre-line;line-height:1.7;">{{items}}</div>
     </td></tr>
 
     <tr><td style="padding:24px 32px;">
       <table cellpadding="6" cellspacing="0" border="0" width="100%">
-        <tr><td style="font-size:13px;color:#5a7a68;">Subtotal</td><td style="font-size:13px;color:#0f1a14;text-align:right;">{{subtotal}}</td></tr>
-        <tr><td style="font-size:13px;color:#5a7a68;">Discount</td><td style="font-size:13px;color:#d23b3b;text-align:right;">&minus;{{discount}}</td></tr>
-        <tr><td colspan="2" style="border-top:1px solid #e2e8e4;height:1px;font-size:0;line-height:0;padding-top:6px;">&nbsp;</td></tr>
-        <tr><td style="font-size:15px;color:#0f1a14;font-weight:700;">Total</td><td style="font-size:18px;color:#0a8f56;font-weight:700;text-align:right;">{{total}}</td></tr>
+        <tr><td style="font-size:13px;color:#9ccab0;">Subtotal</td><td style="font-size:13px;color:#fff;text-align:right;">{{subtotal}}</td></tr>
+        <tr><td style="font-size:13px;color:#9ccab0;">Discount</td><td style="font-size:13px;color:#ef4444;text-align:right;">&minus;{{discount}}</td></tr>
+        <tr><td colspan="2" style="border-top:1px solid #1f3a2a;height:1px;font-size:0;line-height:0;padding-top:6px;">&nbsp;</td></tr>
+        <tr><td style="font-size:15px;color:#fff;font-weight:700;">Total</td><td style="font-size:18px;color:#10b981;font-weight:700;text-align:right;">{{total}}</td></tr>
       </table>
     </td></tr>
 
     <tr><td style="padding:0 32px 28px;">
-      <div style="font-size:11px;letter-spacing:2px;color:#0a8f56;text-transform:uppercase;font-weight:700;margin-bottom:12px;">Ship to</div>
-      <div style="background:#f4f7f5;border:1px solid #e2e8e4;border-radius:8px;padding:14px 16px;font-size:14px;color:#1a2a22;line-height:1.6;white-space:pre-line;">{{shipping_address}}</div>
+      <div style="font-size:11px;letter-spacing:2px;color:#10b981;text-transform:uppercase;font-weight:600;margin-bottom:12px;">Ship to</div>
+      <div style="background:#0a1410;border-radius:8px;padding:14px 16px;font-size:14px;color:#e8f5e9;line-height:1.6;white-space:pre-line;">{{shipping_address}}</div>
     </td></tr>
 
-    <tr><td style="background:#f4f7f5;padding:20px 32px;text-align:center;border-top:1px solid #e2e8e4;">
-      <div style="font-size:11px;color:#8a9a90;letter-spacing:2px;text-transform:uppercase;">FakeSmile &middot; Wear The Story</div>
+    <tr><td style="background:#080d08;padding:20px 32px;text-align:center;border-top:1px solid #1f3a2a;">
+      <div style="font-size:11px;color:#5a7a68;letter-spacing:2px;text-transform:uppercase;">FakeSmile &middot; Wear The Story</div>
     </td></tr>
 
   </table>
