@@ -1009,6 +1009,9 @@ Object.keys(OUTFIT_PRICE).forEach((topId) => {
 const PRICE_OVERRIDE = {
     'twin-faces-tank': 60000,
     'cream-faces-tank': 60000,
+    'forest-two-tone-long-sleeve': 60000,
+    'onyx-two-tone-long-sleeve': 60000,
+    'ivory-two-tone-long-sleeve': 60000,
 };
 Object.keys(PRICE_OVERRIDE).forEach((id) => {
     const p = PRODUCTS[id];

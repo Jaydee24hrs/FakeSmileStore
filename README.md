@@ -356,6 +356,9 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- Long Sleeves (Forest / Onyx / Ivory Two-Tone) now **active at ₦60k** (via
+  `PRICE_OVERRIDE`). Checkout **Postal / ZIP code is now optional** (label,
+  `required` attr, and JS validation all relaxed).
 - **Accurate category labels.** A jersey no longer reads "Tops & Hoodies".
   Categories are now assigned centrally by garment type (`CATEGORY_BY_TAG` in
   `products.js`): Hoodies → *Tops & Hoodies*; Tees/Crewnecks, Tanks & Long

@@ -244,7 +244,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         if (!s.city)                                  return err('City is required.', 'ck-city');
         if (!s.state)                                 return err('State / region is required.', 'ck-state');
         if (!s.country)                               return err('Select your country.', 'ck-country');
-        if (!s.postal)                                return err('Postal / ZIP code is required.', 'ck-postal');
+        // Postal / ZIP code is optional.
         hint.classList.remove('error');
         hint.textContent = '';
         return true;
@@ -496,7 +496,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         const shipAddr = [
             order.shipping.address1,
             order.shipping.address2,
-            `${order.shipping.city}, ${order.shipping.state} ${order.shipping.postal}`,
+            `${order.shipping.city}, ${order.shipping.state}${order.shipping.postal ? ' ' + order.shipping.postal : ''}`,
             order.shipping.country,
         ].filter(Boolean).join('\n');
 
