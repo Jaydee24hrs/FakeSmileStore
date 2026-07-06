@@ -322,25 +322,28 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         try { pending = JSON.parse(pendingRaw); }
         catch (_) { localStorage.removeItem(PENDING_ORDER_KEY); return false; }
 
-        // Nomba appends ?orderReference=<id> to the callbackUrl on redirect
-        // (older links used orderRef). On mobile the query string is sometimes
-        // dropped when returning from a banking app, so fall back to the
-        // pending order we stored before redirecting.
+        // Nomba appends its own reference to the callbackUrl on redirect (param
+        // name has varied: orderReference / orderRef / reference). On mobile the
+        // query string is sometimes dropped, so we also treat a FRESH pending
+        // order as a return.
         const params = new URLSearchParams(window.location.search);
-        const returnedRef = params.get('orderReference') || params.get('orderRef');
+        const returnedRef = params.get('orderReference') || params.get('orderRef') || params.get('reference');
+        const hasReturnSignal = !!returnedRef || params.has('status') ||
+            params.has('transactionId') || params.has('nombaTransactionId');
 
         // Guard against a stale pending order from an abandoned attempt: only
-        // auto-verify when Nomba sent a ref back, or the pending order is fresh.
+        // auto-verify when Nomba sent us back with a param, or the pending order
+        // is fresh (< 30 min).
         const isRecent = pending.placedAt && (Date.now() - pending.placedAt) < 30 * 60 * 1000;
-        if (!returnedRef && !isRecent) { localStorage.removeItem(PENDING_ORDER_KEY); return false; }
+        if (!hasReturnSignal && !isRecent) { localStorage.removeItem(PENDING_ORDER_KEY); return false; }
 
-        // Verify with NOMBA's orderReference (the UUID it generated — see
-        // processNombaPayment). Nomba appends that same ref to the return URL, so
-        // if a ref came back it must match what we stored. If the query string was
-        // dropped (common on mobile) we fall back to the stored Nomba ref.
-        const nombaRef = pending.nombaRef || null;
-        if (returnedRef && nombaRef && returnedRef !== nombaRef) return false; // not our order
-        const orderRef = nombaRef || returnedRef || pending.id;
+        // Verify with the reference Nomba appended on RETURN (the authoritative
+        // one for its transaction lookup); fall back to the ref captured at
+        // create-checkout, then our own order id. NOTE: we intentionally do NOT
+        // bail on a ref "mismatch" — in sandbox the returned ref can differ from
+        // the create-checkout ref, and bailing left the customer stuck bouncing
+        // back to the checkout form after a successful payment.
+        const orderRef = returnedRef || pending.nombaRef || pending.id;
 
         // Show "Verifying payment…" while we check with Nomba
         layout.style.display = 'none';
@@ -457,9 +460,13 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             const data = await res.json();
             if (!res.ok) return null;
             const status = String(data.status || data.transactionStatus || data.paymentStatus || '').toUpperCase();
-            const isSuccess = ['SUCCESS', 'COMPLETED', 'PAID', 'SUCCESSFUL'].includes(status);
+            const SUCCESS = ['SUCCESS', 'COMPLETED', 'PAID', 'SUCCESSFUL', 'APPROVED'];
+            const FAILED = ['FAILED', 'DECLINED', 'CANCELLED', 'CANCELED', 'EXPIRED', 'REVERSED', 'ERROR'];
+            // Anything not clearly success/failure is "unknown" → the return flow
+            // records a "processing" order and still goes to Orders (never a
+            // false "failed" that bounces a paying customer back to the form).
             return {
-                status: isSuccess ? 'paid' : (status ? 'failed' : 'unknown'),
+                status: SUCCESS.includes(status) ? 'paid' : (FAILED.includes(status) ? 'failed' : 'unknown'),
                 emailed: false, // legacy → browser sends the emails
                 nombaReference: data.reference || data.transactionId || orderRef,
             };
@@ -475,13 +482,18 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     }
 
     function showFailure(message) {
-        if (heroSubEl) heroSubEl.textContent = message;
+        // The cart is never cleared on a failed attempt, so re-render the
+        // checkout with all the customer's products intact and let them retry.
+        renderSummary();
         layout.style.display = '';
         if (emptyEl) emptyEl.hidden = true;
+        if (successEl) successEl.hidden = true;
+        if (heroSubEl) heroSubEl.textContent = message;
         hint.classList.add('error');
         hint.textContent = message;
         resetPlaceBtn();
-        // Strip query params
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Strip query params so a refresh doesn't re-run verify.
         if (history.replaceState) {
             history.replaceState({}, document.title, window.location.pathname);
         }

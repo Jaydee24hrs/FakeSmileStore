@@ -356,6 +356,13 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Post-payment bounce-back fixed.** Removed the ref "mismatch" guard that
+  bailed out of the return flow (in sandbox Nomba's returned ref differs from the
+  create-checkout ref), which left successful payers stuck cycling back to the
+  checkout form. Verify status mapping now only treats explicit failures
+  (FAILED/DECLINED/CANCELLED/…) as failed — anything else proceeds to Orders. On
+  a genuine failure the checkout form is restored **with all the products intact**
+  (cart is never cleared on a failed attempt) so the customer can retry.
 - **Post-payment flow fixed.** After Nomba returns, the order is recorded and
   the customer is **redirected to `orders.html?new=<id>`** (desktop + mobile),
   where the just-placed order is expanded/highlighted. A paying customer is only
