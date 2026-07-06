@@ -379,7 +379,7 @@ function buildEmailParams(order, nombaReference) {
         discount: formatNGN(order.discount || 0),
         total: formatNGN(order.total || 0),
         shipping_address: shipAddr,
-        payment_method: (order.payment && order.payment.method) === 'nomba' ? 'Nomba' : 'Bank Transfer',
+        payment_method: 'Nomba',
         status: 'paid',
         nomba_reference: nombaReference || '',
     };

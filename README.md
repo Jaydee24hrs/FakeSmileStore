@@ -356,6 +356,19 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Payment is now Nomba-only.** The bank-transfer option is commented out in
+  `checkout.html`; `checkout.js` dropped the bank note + bank-transfer branch;
+  `worker.js` and the checkout always report `payment_method: 'Nomba'`.
+- **Physical address added site-wide.** "16 Iyabo Arole Street, Ikorodu Grammar
+  School, Lagos, Nigeria" now shows in every page footer (`.footer-address`) and
+  as the Studio address on the contact page (links to Google Maps).
+- **Customer gallery** ("Worn By The Real Ones") on the About and Contact pages:
+  a staggered mosaic that shows a **random 6** shots from `images/PNGIMG/gallery/`
+  on each load, with a brand divider and verified-fit badges (`gallery.css` +
+  `gallery.js`). All 30 gallery photos optimized and converted to WebP.
+- **Email templates** now declare `color-scheme: light dark` so clients don't
+  re-tint them in dark/light mode; admin header text set to white for max
+  contrast. Payment method reads "Nomba".
 - Long Sleeves (Forest / Onyx / Ivory Two-Tone) now **active at ₦60k** (via
   `PRICE_OVERRIDE`). Checkout **Postal / ZIP code is now optional** (label,
   `required` attr, and JS validation all relaxed).

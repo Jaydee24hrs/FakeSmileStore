@@ -14,7 +14,7 @@
  *  7. On page load we detect the pending order + ref, POST to Worker /verify-payment
  *  8. If verified: save order to localStorage.fs_orders, send EmailJS x 2,
  *     clear cart, show success card
- *  9. Bank-transfer branch skips Nomba and goes straight to success.
+ *     (Nomba is the only payment method — no bank-transfer branch.)
  *
  *  See DEPLOY-WORKER.md for setup steps and where to paste keys.
  */
@@ -137,7 +137,6 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     /* ============================================= */
     const paymentNotes = {
         nomba: 'You\'ll be redirected to <strong>Nomba</strong> to complete payment. Card · Bank · USSD · Transfer — all in one secure flow.',
-        bank:  'Bank account details will be sent to your email after placing the order. Order ships once payment is confirmed.',
     };
 
     function updatePaymentUI() {
@@ -510,7 +509,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             discount: formatPrice(order.discount).replace(/<[^>]+>/g, ''),
             total: formatPrice(order.total).replace(/<[^>]+>/g, ''),
             shipping_address: shipAddr,
-            payment_method: order.payment.method === 'nomba' ? 'Nomba' : 'Bank Transfer',
+            payment_method: 'Nomba',
             status: order.status,
             nomba_reference: order.nombaReference || '',
         };
@@ -552,24 +551,8 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         placeBtn.disabled = true;
         placeBtn.classList.add('is-loading');
 
-        if (order.payment.method === 'nomba') {
-            await processNombaPayment(order);
-            return;
-        }
-
-        // ===== Bank-transfer branch — instant success, manual confirmation =====
-        order.status = 'pending';
-        persistOrder(order);
-        sendOrderEmails(order).catch((e) => console.warn('EmailJS:', e));
-
-        setTimeout(() => {
-            clearCart();
-            localStorage.removeItem(PROMO_KEY);
-            showSuccess(order);
-            if (span) span.textContent = original;
-            placeBtn.disabled = false;
-            placeBtn.classList.remove('is-loading');
-        }, 700);
+        // Nomba is the only payment method.
+        await processNombaPayment(order);
     });
 
     /* ============================================= */

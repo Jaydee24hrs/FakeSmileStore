@@ -574,7 +574,23 @@ html, body {
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.6);
     max-width: 380px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+}
+
+.footer-address {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.55);
+    max-width: 320px;
+    margin-bottom: 22px;
+}
+.footer-address svg {
+    flex: 0 0 auto;
+    margin-top: 2px;
+    color: #00d957;
 }
 
 .footer-socials {

@@ -3,11 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="dark">
-<meta name="supported-color-schemes" content="dark">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <title>FakeSmile · Order Confirmed</title>
 <style>
-  :root { color-scheme: dark; supported-color-schemes: dark; }
+  /* Declaring both schemes opts the email OUT of forced dark/light
+     re-tinting — every element already carries explicit colors, so the
+     design renders identically on any device theme. */
+  :root { color-scheme: light dark; supported-color-schemes: light dark; }
   body { margin:0; padding:0; background:#0a0f0a; }
 </style>
 </head>

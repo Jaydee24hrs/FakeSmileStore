@@ -1,0 +1,199 @@
+/* ============================================= */
+/* === CUSTOMER GALLERY (about + contact) ====== */
+/* === "Worn by the real ones" — random 6 ====== */
+/* ============================================= */
+
+.fs-gallery {
+    position: relative;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 80px 40px;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Ambient brand glow */
+.fs-gallery::before,
+.fs-gallery::after {
+    content: '';
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    z-index: -1;
+    pointer-events: none;
+}
+.fs-gallery::before { background: radial-gradient(circle, rgba(0, 217, 87, 0.30), transparent 60%); top: -120px; left: -60px; }
+.fs-gallery::after  { background: radial-gradient(circle, rgba(0, 179, 71, 0.22), transparent 60%); bottom: -120px; right: -60px; }
+
+/* ===== Header ===== */
+.fs-gallery-head {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 48px;
+}
+.fs-gallery-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(0, 217, 87, 0.18), rgba(0, 179, 71, 0.06));
+    border: 1px solid rgba(0, 217, 87, 0.40);
+    color: #00ff7a;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+}
+.fs-gallery-tag-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #00ff7a;
+    box-shadow: 0 0 10px rgba(0, 255, 122, 0.85);
+    animation: fsGalleryPulse 1.6s ease-in-out infinite;
+}
+@keyframes fsGalleryPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.5); opacity: 0.5; }
+}
+.fs-gallery-title {
+    font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+}
+.fs-gallery-title .accent {
+    background: linear-gradient(135deg, #00ff7a 0%, #00b347 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    font-style: italic;
+}
+.fs-gallery-sub {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+/* ===== Decorative divider under the header ===== */
+.fs-gallery-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 0 auto 44px;
+    max-width: 320px;
+    color: #00ff7a;
+}
+.fs-gallery-divider::before,
+.fs-gallery-divider::after {
+    content: '';
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 87, 0.55));
+}
+.fs-gallery-divider::after { transform: scaleX(-1); }
+.fs-gallery-divider svg { flex: 0 0 auto; }
+
+/* ===== Grid — staggered mosaic ===== */
+.fs-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+/* Stagger the middle column for a classic editorial rhythm */
+.fs-gallery-item:nth-child(2),
+.fs-gallery-item:nth-child(5) { transform: translateY(34px); }
+
+.fs-gallery-item {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 4 / 5;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(155deg, rgba(255,255,255,0.06), rgba(8,22,18,0.6));
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 20px 46px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.12);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease, border-color 0.5s ease;
+}
+.fs-gallery-item:hover {
+    border-color: rgba(0, 217, 87, 0.55);
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 217, 87, 0.3), inset 0 1px 1px rgba(255,255,255,0.16);
+}
+.fs-gallery-item:nth-child(2):hover,
+.fs-gallery-item:nth-child(5):hover { transform: translateY(28px) scale(1.015); }
+.fs-gallery-item:hover:not(:nth-child(2)):not(:nth-child(5)) { transform: translateY(-6px) scale(1.015); }
+
+.fs-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 28%;
+    display: block;
+    filter: brightness(0.92) saturate(1.05);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease;
+}
+.fs-gallery-item:hover img { transform: scale(1.06); filter: brightness(1) saturate(1.1); }
+
+/* Diagonal shine sweep */
+.fs-gallery-shine {
+    position: absolute;
+    top: -60%; left: -60%;
+    width: 45%; height: 220%;
+    background: linear-gradient(115deg, transparent, rgba(255,255,255,0.16), transparent);
+    transform: rotate(10deg);
+    pointer-events: none;
+    opacity: 0;
+    transition: left 0.75s ease, opacity 0.4s ease;
+    z-index: 2;
+}
+.fs-gallery-item:hover .fs-gallery-shine { left: 130%; opacity: 1; }
+
+/* Caption / verified badge */
+.fs-gallery-cap {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 40px 16px 16px;
+    background: linear-gradient(180deg, transparent, rgba(4, 10, 7, 0.82));
+    z-index: 3;
+}
+.fs-gallery-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0, 217, 87, 0.16);
+    border: 1px solid rgba(0, 217, 87, 0.45);
+    backdrop-filter: blur(8px);
+    color: #d7ffe9;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transform: translateY(6px);
+    opacity: 0.85;
+    transition: transform 0.45s ease, opacity 0.45s ease;
+}
+.fs-gallery-item:hover .fs-gallery-badge { transform: translateY(0); opacity: 1; }
+.fs-gallery-badge svg { color: #00ff7a; }
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+    .fs-gallery { padding: 60px 24px; }
+    .fs-gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .fs-gallery-item:nth-child(2),
+    .fs-gallery-item:nth-child(5) { transform: none; }
+    .fs-gallery-item:nth-child(2):hover,
+    .fs-gallery-item:nth-child(5):hover { transform: translateY(-6px) scale(1.015); }
+}
+@media (max-width: 520px) {
+    .fs-gallery { padding: 48px 16px; }
+    .fs-gallery-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .fs-gallery-item { border-radius: 16px; }
+}
