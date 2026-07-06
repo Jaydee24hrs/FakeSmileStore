@@ -14,7 +14,7 @@
         'IMG_6429.webp', 'IMG_6430.webp', 'IMG_6431.webp', 'IMG_6432.webp',
         'IMG_6433.webp', 'IMG_6434.webp', 'IMG_6435.webp', 'IMG_6436.webp',
         'IMG_6437.webp', 'IMG_6438.webp', 'IMG_6439.webp', 'IMG_6440.webp',
-        'IMG_6443.webp', 'IMG_6444.webp',
+        'IMG_6443.webp', 'IMG_6444.webp', 'caappy.webp',
     ];
 
     const CHECK = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
