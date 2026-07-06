@@ -373,19 +373,19 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             // browser could not confirm (a "processing" order flips to paid there).
             const confirmed = !!(outcome && outcome.status === 'paid');
             const emailedByServer = !!(outcome && outcome.emailed);
-            completeAndGoToOrders(pending, orderRef, confirmed, emailedByServer);
+            await completeAndGoToOrders(pending, orderRef, confirmed, emailedByServer);
         } catch (err) {
             // Unexpected error, but the customer has already paid on Nomba —
             // record what we have and take them to Orders, not back to the form.
-            completeAndGoToOrders(pending, orderRef, false, false);
+            await completeAndGoToOrders(pending, orderRef, false, false);
         }
         return true;
     }
 
-    // Persist the completed order, clear the cart, and hand off to the Orders
-    // page. `confirmed` = Nomba/Worker verified it as paid; otherwise it is
-    // recorded as "processing" pending the server webhook.
-    function completeAndGoToOrders(pending, orderRef, confirmed, emailedByServer) {
+    // Persist the completed order, clear the cart, send the confirmation emails,
+    // then hand off to the Orders page. `confirmed` = Nomba/Worker verified it as
+    // paid; otherwise it is recorded as "processing" pending the server webhook.
+    async function completeAndGoToOrders(pending, orderRef, confirmed, emailedByServer) {
         pending.status = confirmed ? 'paid' : 'processing';
         pending.paidAt = Date.now();
         pending.nombaReference = orderRef;
@@ -395,10 +395,23 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         clearCart();
         localStorage.removeItem(PROMO_KEY);
 
-        // Email from the browser only when confirmed paid and the server didn't
-        // already send them (avoids duplicate emails vs. the webhook).
-        if (confirmed && !emailedByServer) {
-            sendOrderEmails(pending).catch((e) => console.warn('EmailJS:', e));
+        // Hold the "confirmed" state visible while we send the emails.
+        if (layout) layout.style.display = 'none';
+        if (emptyEl) emptyEl.hidden = true;
+        if (successEl) successEl.hidden = true;
+        if (heroSubEl) heroSubEl.textContent = 'Payment confirmed — sending your confirmation…';
+
+        // Send the seller + customer emails from the browser UNLESS the server
+        // already did (webhook, once live keys are in). We AWAIT them (capped at
+        // 6s) so the redirect below can't abort the in-flight request — that was
+        // why no emails were arriving.
+        if (!emailedByServer) {
+            try {
+                await Promise.race([
+                    sendOrderEmails(pending),
+                    new Promise((resolve) => setTimeout(resolve, 6000)),
+                ]);
+            } catch (e) { console.warn('EmailJS:', e); }
         }
 
         goToOrders(pending.id);
@@ -411,12 +424,12 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         if (layout) layout.style.display = 'none';
         if (emptyEl) emptyEl.hidden = true;
         if (successEl) successEl.hidden = true;
-        if (heroSubEl) heroSubEl.textContent = 'Payment confirmed — taking you to your orders…';
+        if (heroSubEl) heroSubEl.textContent = 'Order confirmed — taking you to your orders…';
         if (history.replaceState) {
             history.replaceState({}, document.title, window.location.pathname);
         }
         const url = 'orders.html?new=' + encodeURIComponent(orderId || '');
-        setTimeout(() => { window.location.replace(url); }, 700);
+        setTimeout(() => { window.location.replace(url); }, 200);
     }
 
     // fetch() with a hard timeout so a slow/unreachable Worker can never leave
@@ -598,8 +611,17 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     });
 
     updatePaymentUI();
-    renderSummary();
 
-    // If the user just got bounced back from Nomba, run the verify flow
-    handleReturnFromNomba();
+    // If a payment round-trip is in progress (a pending order is stored), show
+    // the "Verifying…" state IMMEDIATELY so the checkout form never flashes
+    // before we redirect to Orders. Otherwise render the cart as normal.
+    if (localStorage.getItem(PENDING_ORDER_KEY)) {
+        if (layout) layout.style.display = 'none';
+        if (emptyEl) emptyEl.hidden = true;
+        if (successEl) successEl.hidden = true;
+        if (heroSubEl) heroSubEl.textContent = 'Verifying payment with Nomba…';
+        handleReturnFromNomba().then((handled) => { if (!handled) renderSummary(); });
+    } else {
+        renderSummary();
+    }
 })();

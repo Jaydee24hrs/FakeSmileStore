@@ -356,6 +356,12 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **No checkout flash + emails now send.** On return from Nomba the page shows
+  "Verifying…" immediately (the checkout form no longer flashes before the Orders
+  redirect). Confirmation emails are sent on every successful return (not only a
+  confirmed "paid") and are **awaited before the redirect** (capped 6s) so the
+  navigation can't abort the in-flight EmailJS request — that was why no emails
+  arrived. Skipped only if the server already emailed (webhook, once live).
 - **Post-payment bounce-back fixed.** Removed the ref "mismatch" guard that
   bailed out of the return flow (in sandbox Nomba's returned ref differs from the
   create-checkout ref), which left successful payers stuck cycling back to the
