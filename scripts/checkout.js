@@ -12,8 +12,11 @@
  *  5. User pays on Nomba (card / USSD / transfer)
  *  6. Nomba redirects back to the clean callbackUrl, appending ?orderReference=FS-XXX
  *  7. On page load we detect the pending order + ref, POST to Worker /verify-payment
- *  8. If verified: save order to localStorage.fs_orders, send EmailJS x 2,
- *     clear cart, show success card
+ *  8. On return: save order to localStorage.fs_orders, clear cart, then
+ *     REDIRECT to orders.html?new=<id> (works on desktop + mobile). A paying
+ *     customer is only ever sent back to the form on an explicit "failed";
+ *     an inconclusive check records a "processing" order and still goes to
+ *     Orders (the Worker webhook confirms + emails server-side).
  *     (Nomba is the only payment method — no bank-transfer branch.)
  *
  *  See DEPLOY-WORKER.md for setup steps and where to paste keys.
@@ -352,47 +355,86 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             let outcome = await finalizeViaWorker(orderRef);
             if (!outcome) outcome = await verifyViaWorker(orderRef);
 
-            if (!outcome || outcome.status !== 'paid') {
-                if (outcome && outcome.status === 'failed') {
-                    localStorage.removeItem(PENDING_ORDER_KEY);
-                    showFailure('Payment did not complete. Your bag is still saved — try again when ready.');
-                    return true;
-                }
-                throw new Error('Could not confirm payment status');
+            // Only an EXPLICIT "failed" sends the customer back to the form.
+            if (outcome && outcome.status === 'failed') {
+                localStorage.removeItem(PENDING_ORDER_KEY);
+                showFailure('Payment did not complete. Your bag is still saved — try again when ready.');
+                return true;
             }
 
-            // Mark paid + persist locally (Orders page reads localStorage)
-            pending.status = 'paid';
-            pending.paidAt = Date.now();
-            pending.nombaReference = outcome.nombaReference || orderRef;
-            persistOrder(pending);
-
-            // Clear cart + promo + pending
-            localStorage.removeItem(PENDING_ORDER_KEY);
-            clearCart();
-            localStorage.removeItem(PROMO_KEY);
-
-            // Only email from the browser if the server did NOT already (no dupes).
-            if (!outcome.emailed) {
-                sendOrderEmails(pending).catch((e) => console.warn('EmailJS:', e));
-            }
-
-            showSuccess(pending);
+            // Confirmed paid, OR an inconclusive/unavailable check after the
+            // customer has completed Nomba and returned to our callback. Either
+            // way we record the order and move on to the Orders page — a paying
+            // customer is never stranded on the checkout form. The Worker webhook
+            // is the server-side source of truth and finalises + emails if the
+            // browser could not confirm (a "processing" order flips to paid there).
+            const confirmed = !!(outcome && outcome.status === 'paid');
+            const emailedByServer = !!(outcome && outcome.emailed);
+            completeAndGoToOrders(pending, orderRef, confirmed, emailedByServer);
         } catch (err) {
-            showFailure('Could not verify payment: ' + (err.message || 'Unknown error'));
+            // Unexpected error, but the customer has already paid on Nomba —
+            // record what we have and take them to Orders, not back to the form.
+            completeAndGoToOrders(pending, orderRef, false, false);
         }
         return true;
+    }
+
+    // Persist the completed order, clear the cart, and hand off to the Orders
+    // page. `confirmed` = Nomba/Worker verified it as paid; otherwise it is
+    // recorded as "processing" pending the server webhook.
+    function completeAndGoToOrders(pending, orderRef, confirmed, emailedByServer) {
+        pending.status = confirmed ? 'paid' : 'processing';
+        pending.paidAt = Date.now();
+        pending.nombaReference = orderRef;
+        persistOrder(pending);
+
+        localStorage.removeItem(PENDING_ORDER_KEY);
+        clearCart();
+        localStorage.removeItem(PROMO_KEY);
+
+        // Email from the browser only when confirmed paid and the server didn't
+        // already send them (avoids duplicate emails vs. the webhook).
+        if (confirmed && !emailedByServer) {
+            sendOrderEmails(pending).catch((e) => console.warn('EmailJS:', e));
+        }
+
+        goToOrders(pending.id);
+    }
+
+    // Redirect to the Orders page (works the same on desktop + mobile). Uses
+    // location.replace so Back doesn't return to the stale checkout, and strips
+    // the Nomba query params first so nothing re-runs verify.
+    function goToOrders(orderId) {
+        if (layout) layout.style.display = 'none';
+        if (emptyEl) emptyEl.hidden = true;
+        if (successEl) successEl.hidden = true;
+        if (heroSubEl) heroSubEl.textContent = 'Payment confirmed — taking you to your orders…';
+        if (history.replaceState) {
+            history.replaceState({}, document.title, window.location.pathname);
+        }
+        const url = 'orders.html?new=' + encodeURIComponent(orderId || '');
+        setTimeout(() => { window.location.replace(url); }, 700);
+    }
+
+    // fetch() with a hard timeout so a slow/unreachable Worker can never leave
+    // the customer stuck on "Verifying payment…". On timeout it rejects and the
+    // caller returns null → the return flow records "processing" and moves on.
+    function fetchWithTimeout(url, opts, ms) {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), ms || 12000);
+        return fetch(url, Object.assign({ signal: ctrl.signal }, opts))
+            .finally(() => clearTimeout(t));
     }
 
     // POST /finalize — returns { status, emailed, nombaReference } or null if the
     // endpoint is unavailable (e.g. Worker not yet redeployed with /finalize).
     async function finalizeViaWorker(orderRef) {
         try {
-            const res = await fetch(`${NOMBA_WORKER_URL}/finalize`, {
+            const res = await fetchWithTimeout(`${NOMBA_WORKER_URL}/finalize`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ orderReference: orderRef }),
-            });
+            }, 12000);
             if (res.status === 404) return null; // old Worker — use legacy path
             const data = await res.json();
             if (!res.ok) return null;
@@ -407,11 +449,11 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     // Legacy fallback: POST /verify-payment, client emails afterwards.
     async function verifyViaWorker(orderRef) {
         try {
-            const res = await fetch(`${NOMBA_WORKER_URL}/verify-payment`, {
+            const res = await fetchWithTimeout(`${NOMBA_WORKER_URL}/verify-payment`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ orderReference: orderRef }),
-            });
+            }, 12000);
             const data = await res.json();
             if (!res.ok) return null;
             const status = String(data.status || data.transactionStatus || data.paymentStatus || '').toUpperCase();
@@ -430,27 +472,6 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             orders.push(order);
             localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
         } catch (_) {}
-    }
-
-    function showSuccess(order) {
-        layout.style.display = 'none';
-        if (emptyEl) emptyEl.hidden = true;
-        successEl.hidden = false;
-
-        const idEl = document.getElementById('success-orderid');
-        const emailEl = document.getElementById('success-email');
-        const totalElSuccess = document.getElementById('success-total');
-        if (idEl) idEl.textContent = order.id;
-        if (emailEl) emailEl.textContent = order.customer.email;
-        if (totalElSuccess) totalElSuccess.innerHTML = formatPrice(order.total);
-
-        if (heroSubEl) heroSubEl.textContent = 'Order locked in. Welcome to the movement.';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        // Strip the query params so a refresh doesn't re-trigger verify
-        if (history.replaceState) {
-            history.replaceState({}, document.title, window.location.pathname);
-        }
     }
 
     function showFailure(message) {

@@ -356,6 +356,13 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Post-payment flow fixed.** After Nomba returns, the order is recorded and
+  the customer is **redirected to `orders.html?new=<id>`** (desktop + mobile),
+  where the just-placed order is expanded/highlighted. A paying customer is only
+  sent back to the form on an EXPLICIT "failed"; an inconclusive/timed-out
+  verification records a "processing" order and still lands on Orders (the Worker
+  webhook confirms + emails server-side). Worker verify calls now have a 12s
+  timeout so a slow Worker can't strand the user on "Verifying…".
 - Mobile polish: single Nomba payment option now spans full width (was
   squished in a 3-column grid); shop filter row constrained to the viewport so
   the 6 pills wrap cleanly. Verified about/contact/shop/checkout at phone width

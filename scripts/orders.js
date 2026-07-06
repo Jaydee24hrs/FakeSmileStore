@@ -246,4 +246,21 @@
     });
 
     render();
+
+    // ===== Highlight the order the customer just placed (?new=<id> from checkout)
+    (function highlightNewOrder() {
+        const id = new URLSearchParams(location.search).get('new');
+        if (!id || !listEl) return;
+        const card = Array.from(listEl.querySelectorAll('.order-card'))
+            .find((c) => c.getAttribute('data-id') === id);
+        // Clean the URL either way so a refresh doesn't re-highlight.
+        if (history.replaceState) history.replaceState({}, document.title, location.pathname);
+        if (!card) return;
+        card.classList.remove('is-collapsed');
+        const head = card.querySelector('.order-card-head');
+        if (head) head.setAttribute('aria-expanded', 'true');
+        card.classList.add('order-card-new');
+        setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
+        setTimeout(() => card.classList.remove('order-card-new'), 3000);
+    })();
 })();

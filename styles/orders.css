@@ -73,6 +73,16 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Just-placed order (arrived from checkout ?new=<id>) — green ring pulse */
+.order-card.order-card-new {
+    border-color: rgba(0, 217, 87, 0.65);
+    animation: orderFadeIn 0.45s ease both, orderNewPulse 1.1s ease-in-out 3;
+}
+@keyframes orderNewPulse {
+    0%, 100% { box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 0 0 rgba(0,217,87,0.0), inset 0 1px 1px rgba(255,255,255,0.08); }
+    50%      { box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 0 4px rgba(0,217,87,0.35), inset 0 1px 1px rgba(255,255,255,0.08); }
+}
+
 /* ===== Card header (clickable toggle) ===== */
 .order-card-head {
     display: flex;
