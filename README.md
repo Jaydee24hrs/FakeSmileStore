@@ -356,6 +356,10 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- Mobile polish: single Nomba payment option now spans full width (was
+  squished in a 3-column grid); shop filter row constrained to the viewport so
+  the 6 pills wrap cleanly. Verified about/contact/shop/checkout at phone width
+  (no horizontal overflow).
 - **Payment is now Nomba-only.** The bank-transfer option is commented out in
   `checkout.html`; `checkout.js` dropped the bank note + bank-transfer branch;
   `worker.js` and the checkout always report `payment_method: 'Nomba'`.

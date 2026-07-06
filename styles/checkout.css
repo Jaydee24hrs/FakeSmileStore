@@ -170,6 +170,10 @@
 .payment-methods.payment-methods-2 {
     grid-template-columns: repeat(2, 1fr);
 }
+/* Single payment method (Nomba only) — full width, not squished to a column */
+.payment-methods.payment-methods-single {
+    grid-template-columns: 1fr;
+}
 
 .payment-method {
     position: relative;
