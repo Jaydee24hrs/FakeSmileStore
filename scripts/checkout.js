@@ -562,6 +562,16 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
 
         console.log('[EmailJS] Sending with params:', params);
 
+        // The customer confirmation needs a recipient the template can resolve.
+        // Different EmailJS templates reference the "To Email" via different
+        // variable names, so populate the common ones all at once for the
+        // customer send (the seller template's recipient is already configured).
+        const customerParams = Object.assign({}, params, {
+            to_email: order.customer.email,
+            email: order.customer.email,
+            user_email: order.customer.email,
+        });
+
         const tasks = [];
         if (EMAILJS_TEMPLATE_SELLER && !EMAILJS_TEMPLATE_SELLER.startsWith('YOUR_')) {
             tasks.push(
@@ -572,7 +582,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         }
         if (EMAILJS_TEMPLATE_CUSTOMER && !EMAILJS_TEMPLATE_CUSTOMER.startsWith('YOUR_')) {
             tasks.push(
-                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, params)
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_CUSTOMER, customerParams)
                     .then((r) => console.log('[EmailJS] Customer email OK:', r))
                     .catch((e) => console.error('[EmailJS] Customer email FAILED:', e))
             );
