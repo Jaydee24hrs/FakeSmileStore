@@ -133,6 +133,20 @@ function unitChargeNgn(baseNgn) {
     return Math.round((n / ngnPerGbp + MARKUP_GBP) * ngnPerGbp);
 }
 
+// ===== VAT (flat, per order) =====
+// Business rule: a flat £0.90 VAT is added to EVERY order — shown on the cart
+// & checkout summary and included in the amount charged via Nomba. Expressed in
+// GBP; converted to NGN for Naira shoppers and for the NGN-only Nomba charge.
+const VAT_GBP = 0.9;
+// VAT as a NUMBER in the active display currency.
+function vatDisplayAmount() {
+    return currentCurrency === 'NGN' ? VAT_GBP * ngnPerGbp : VAT_GBP;
+}
+// VAT expressed in NGN — what actually gets added to the Nomba charge.
+function vatChargeNgn() {
+    return Math.round(VAT_GBP * ngnPerGbp);
+}
+
 async function fetchExchangeRate() {
     // Skip network if cache is still fresh
     try {

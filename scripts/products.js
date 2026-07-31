@@ -1012,7 +1012,8 @@ const PRICE_OVERRIDE = {
     'forest-two-tone-long-sleeve': 60000,
     'onyx-two-tone-long-sleeve': 60000,
     'ivory-two-tone-long-sleeve': 60000,
-    'olive-globe-cap': 45000,
+    'olive-globe-cap': 40000,
+    'voltage-globe-cap': 40000,
 };
 Object.keys(PRICE_OVERRIDE).forEach((id) => {
     const p = PRODUCTS[id];

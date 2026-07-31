@@ -12,6 +12,7 @@
     const itemsCountEl = document.getElementById('cart-items-count');
     const subtotalEl = document.getElementById('sum-subtotal');
     const totalEl = document.getElementById('sum-total');
+    const vatEl = document.getElementById('sum-vat');
     const discountLineEl = document.getElementById('sum-discount-line');
     const discountAmountEl = document.getElementById('sum-discount');
     const discountCodeEl = document.getElementById('sum-discount-code');
@@ -46,7 +47,8 @@
         // Totals in the DISPLAY currency, including the per-item markup.
         const subtotal = items.reduce((s, i) => s + unitDisplayAmount(i.price) * (i.qty || 0), 0);
         const discount = promo ? subtotal * promo.off : 0;
-        const total = Math.max(0, subtotal - discount);
+        const vat = vatDisplayAmount();
+        const total = Math.max(0, subtotal - discount) + vat;
 
         if (count === 0) {
             if (layoutEl) layoutEl.style.display = 'none';
@@ -96,6 +98,7 @@
         }).join('');
 
         if (subtotalEl) subtotalEl.innerHTML = formatMoney(subtotal);
+        if (vatEl) vatEl.innerHTML = formatMoney(vat);
         if (totalEl) totalEl.innerHTML = formatMoney(total);
 
         if (discountLineEl && discountAmountEl && discountCodeEl) {

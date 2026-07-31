@@ -47,6 +47,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     const itemsEl = document.getElementById('ck-items');
     const subtotalEl = document.getElementById('ck-subtotal');
     const totalEl = document.getElementById('ck-total');
+    const vatEl = document.getElementById('ck-vat');
     const discountLineEl = document.getElementById('ck-discount-line');
     const discountAmountEl = document.getElementById('ck-discount');
     const discountCodeEl = document.getElementById('ck-discount-code');
@@ -87,7 +88,8 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         // Display totals in the active currency, including the per-item markup.
         const subtotal = items.reduce((s, i) => s + unitDisplayAmount(i.price) * (i.qty || 0), 0);
         const discount = promo ? subtotal * promo.off : 0;
-        const total = Math.max(0, subtotal - discount);
+        const vat = vatDisplayAmount();
+        const total = Math.max(0, subtotal - discount) + vat;
 
         if (count === 0 && !localStorage.getItem(PENDING_ORDER_KEY)) {
             layout.style.display = 'none';
@@ -121,6 +123,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             }).join('');
 
             subtotalEl.innerHTML = formatMoney(subtotal);
+            if (vatEl) vatEl.innerHTML = formatMoney(vat);
             totalEl.innerHTML = formatMoney(total);
 
             if (promo) {
@@ -132,7 +135,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             }
         }
 
-        return { count, subtotal, discount, total };
+        return { count, subtotal, discount, vat, total };
     }
 
     /* ============================================= */
@@ -193,7 +196,8 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         const promo = getPromo();
         const subtotal = items.reduce((s, i) => s + unitChargeNgn(i.price) * (i.qty || 0), 0);
         const discount = promo ? Math.round(subtotal * promo.off) : 0;
-        const total = Math.max(0, subtotal - discount);
+        const vat = vatChargeNgn();
+        const total = Math.max(0, subtotal - discount) + vat;
 
         return {
             id: generateOrderId(),
@@ -217,7 +221,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
                 id: it.id, productId: it.productId, name: it.name, tag: it.tag,
                 size: it.size, price: unitChargeNgn(it.price), qty: it.qty, image: it.image,
             })),
-            subtotal, discount,
+            subtotal, discount, vat,
             promoCode: promo ? promo.code : null,
             total,
             currency: (typeof currentCurrency !== 'undefined' ? currentCurrency : 'NGN'),
@@ -553,6 +557,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             items: itemsText,
             subtotal: formatPrice(order.subtotal).replace(/<[^>]+>/g, ''),
             discount: formatPrice(order.discount).replace(/<[^>]+>/g, ''),
+            vat: formatPrice(order.vat || 0).replace(/<[^>]+>/g, ''),
             total: formatPrice(order.total).replace(/<[^>]+>/g, ''),
             shipping_address: shipAddr,
             payment_method: 'Nomba',

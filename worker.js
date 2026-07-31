@@ -392,6 +392,7 @@ function buildEmailParams(order, nombaReference) {
         items: itemsText,
         subtotal: formatNGN(order.subtotal || 0),
         discount: formatNGN(order.discount || 0),
+        vat: formatNGN(order.vat || 0),
         total: formatNGN(order.total || 0),
         shipping_address: shipAddr,
         payment_method: 'Nomba',

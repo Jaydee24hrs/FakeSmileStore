@@ -204,6 +204,10 @@ All prices in `products.js` and the cart are stored as **NGN integers**.
   prices in HTML are read once, stored as `data-price-ngn`, then reformatted.
 - A `currency:update` event fires when the rate or currency changes so cart /
   shop / product / checkout / orders pages re-render.
+- **Per-item markup** (`unitDisplayAmount` / `unitChargeNgn`): +₦5,000 (Naira) or
+  +£15 (Pounds) per unit. **Flat VAT** (`vatDisplayAmount` / `vatChargeNgn`):
+  £0.90 per order, converted to NGN for Naira shoppers and the NGN-only charge.
+  Both are baked into the totals shown on cart/checkout and the amount charged.
 
 ---
 
@@ -356,6 +360,18 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Flat VAT per order + cap repricing + live Nomba webhook.** (1) A flat
+  **£0.90 VAT** is now added to every order — shown as its own line on the cart
+  and checkout summaries and **included in the amount charged** via Nomba.
+  Helpers `vatDisplayAmount()` / `vatChargeNgn()` in `base.js` express it in the
+  active display currency and convert to NGN for the charge; the order stores
+  `vat` (NGN) and it's passed to both the client and Worker email params (add a
+  `{{vat}}` line to the EmailJS templates to show it). (2) Olive Globe + Voltage
+  Globe caps priced via `PRICE_OVERRIDE` at ₦40,000 base (display ₦45,000).
+  (3) Worker `/webhook` now answers GET/HEAD 200 and acknowledges Nomba's
+  unsigned validation ping with 200 (real events are still authenticated
+  end-to-end by the independent Nomba lookup in `finalizeOrder`), which is what
+  Nomba requires to save the webhook URL.
 - **No checkout flash + emails now send.** On return from Nomba the page shows
   "Verifying…" immediately (the checkout form no longer flashes before the Orders
   redirect). Confirmation emails are sent on every successful return (not only a
