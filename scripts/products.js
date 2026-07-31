@@ -1012,31 +1012,12 @@ const PRICE_OVERRIDE = {
     'forest-two-tone-long-sleeve': 60000,
     'onyx-two-tone-long-sleeve': 60000,
     'ivory-two-tone-long-sleeve': 60000,
+    'olive-globe-cap': 45000,
 };
 Object.keys(PRICE_OVERRIDE).forEach((id) => {
     const p = PRODUCTS[id];
     if (p) { p.price = PRICE_OVERRIDE[id]; p.comingSoon = false; }
 });
-
-/* =====================================================================
-   ⚠️ TEMP LIVE-PAYMENT TEST — DELETE THIS WHOLE BLOCK AFTER TESTING.
-   Turns ONE cap (Olive Globe) into a ~£2 / ₦4,000 live-payment test:
-   sets a tiny base price AND flags it to SKIP the per-item surcharge
-   (+₦5,000 / +£15) so the real charge stays ~£2 in either currency.
-   base.js reads window.FS_TEST_NOMARKUP_BASE to bypass the markup for
-   this exact base value only. Remove this block (and the matching check
-   in base.js) to restore normal pricing.
-   ===================================================================== */
-(function () {
-    const TEST_ID = 'olive-globe-cap';
-    const TEST_BASE_NGN = 4000; // ~£2 with no surcharge
-    const p = PRODUCTS[TEST_ID];
-    if (p) {
-        p.price = TEST_BASE_NGN;
-        p.comingSoon = false;
-        if (typeof window !== 'undefined') window.FS_TEST_NOMARKUP_BASE = TEST_BASE_NGN;
-    }
-})();
 
 /** Look up a product by id, returning null if not found. */
 function getProduct(id) {

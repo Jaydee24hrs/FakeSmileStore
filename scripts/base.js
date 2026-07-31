@@ -109,18 +109,9 @@ function formatPrice(ngnValue) {
 const MARKUP_NGN = 5000;
 const MARKUP_GBP = 15;
 
-// ⚠️ TEMP LIVE-PAYMENT TEST — remove alongside the block in products.js.
-// When a base price matches the flagged test product, skip the per-item
-// surcharge so the ~£2 test charge stays tiny.
-function isTestNoMarkup(n) {
-    return typeof window !== 'undefined' && window.FS_TEST_NOMARKUP_BASE != null &&
-        n === window.FS_TEST_NOMARKUP_BASE;
-}
-
 // Per-unit price as a NUMBER in the active display currency, incl. markup.
 function unitDisplayAmount(baseNgn) {
     const n = Number(baseNgn) || 0;
-    if (isTestNoMarkup(n)) return currentCurrency === 'NGN' ? n : n / ngnPerGbp;
     if (currentCurrency === 'NGN') return n + MARKUP_NGN;
     return n / ngnPerGbp + MARKUP_GBP;
 }
@@ -138,7 +129,6 @@ function formatMarked(baseNgn, qty) {
 // NGN view: base + ₦5,000. GBP view: the GBP unit price converted back to NGN.
 function unitChargeNgn(baseNgn) {
     const n = Number(baseNgn) || 0;
-    if (isTestNoMarkup(n)) return Math.round(n); // ⚠️ TEMP test — no surcharge
     if (currentCurrency === 'NGN') return Math.round(n + MARKUP_NGN);
     return Math.round((n / ngnPerGbp + MARKUP_GBP) * ngnPerGbp);
 }
