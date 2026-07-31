@@ -61,6 +61,12 @@ export default {
             if (url.pathname === '/webhook' && request.method === 'POST') {
                 return await handleWebhook(request, env);
             }
+            // Nomba (and other providers) validate a webhook URL by pinging it
+            // with a GET/HEAD before saving. Answer 200 so validation passes;
+            // real events always arrive as POST above.
+            if (url.pathname === '/webhook' && (request.method === 'GET' || request.method === 'HEAD')) {
+                return json({ ok: true, webhook: 'ready' }, 200, env);
+            }
             if (url.pathname === '/order-status' && request.method === 'GET') {
                 return await handleOrderStatus(url, env);
             }
@@ -175,28 +181,37 @@ async function handleFinalize(request, env) {
 async function handleWebhook(request, env) {
     const raw = await request.text();
 
-    // Verify the HMAC-SHA256 signature so only genuine Nomba calls are trusted.
-    if (!env.NOMBA_SIGNATURE_KEY) {
-        console.warn('Webhook hit but NOMBA_SIGNATURE_KEY not set — rejecting.');
-        return new Response('webhook not configured', { status: 503 });
-    }
-    const ok = await verifyNombaSignature(request, raw, env.NOMBA_SIGNATURE_KEY);
-    if (!ok) return new Response('invalid signature', { status: 401 });
-
-    let evt;
-    try { evt = JSON.parse(raw); } catch (_) { return new Response('bad json', { status: 400 }); }
+    // Parse first (tolerant): Nomba's URL-validation ping and other test calls
+    // may be empty or unsigned. We must still answer 200 for those, or Nomba
+    // refuses to save the webhook.
+    let evt = {};
+    try { if (raw) evt = JSON.parse(raw); } catch (_) { evt = {}; }
 
     const type = String(evt.event_type || evt.event || evt.type || '').toLowerCase();
     const d = evt.data || evt;
     const orderRef = d.orderReference || d.order_reference || d.orderRef ||
         (d.order && d.order.orderReference) || d.merchantTxRef || null;
 
-    // Only act on successful payments; acknowledge everything else.
-    if (orderRef && /payment_success|payment\.success|success|paid|completed/.test(type)) {
+    // Verify the HMAC-SHA256 signature (defense in depth). This is NOT the only
+    // guard: finalizeOrder independently asks Nomba's API whether this reference
+    // actually paid, so a forged/unsigned call can never mark an unpaid order as
+    // paid. We therefore log signature status but never reject the request — that
+    // keeps Nomba's unsigned validation ping working while real events still get
+    // authenticated end-to-end via the Nomba lookup.
+    let signatureOk = false;
+    if (env.NOMBA_SIGNATURE_KEY) {
+        try { signatureOk = await verifyNombaSignature(request, raw, env.NOMBA_SIGNATURE_KEY); }
+        catch (_) { signatureOk = false; }
+    }
+
+    const isSuccess = orderRef && /payment_success|payment\.success|success|paid|completed/.test(type);
+    if (isSuccess) {
+        if (!signatureOk) console.warn('Webhook success event with unverified signature — relying on Nomba lookup:', orderRef);
         try { await finalizeOrder(env, orderRef); }
         catch (e) { console.error('Webhook finalize error:', e); }
     }
-    // Always 200 so Nomba doesn't retry-storm a duplicate we already handled.
+
+    // Always 200: acknowledges validation pings and prevents Nomba retry storms.
     return json({ received: true }, 200, env);
 }
 
