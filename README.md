@@ -360,6 +360,17 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Performance pass (mobile crash / slow-load fix).** No framework change —
+  the site stays pure-static, zero-build. (1) **All page scripts now `defer`** so
+  ~4,000 lines of JS no longer block first paint (verified deferred scripts still
+  execute + render: gallery and shop grids populate correctly). (2) **Removed
+  `background-attachment: fixed`** from the home hero (`home.css`) — combined with
+  `center/cover` it forced a full-viewport repaint on every scroll frame, the top
+  cause of mobile scroll-jank / tab crashes; same look, no per-frame cost.
+  (3) **LCP hero image preloaded** in `index.html` `<head>` for faster first paint.
+  (4) **Lazy-loading added** to the JS-generated cart + orders list images
+  (`cart.js`, `orders.js`); home page already lazy-loaded 56/60 images (logo +
+  3 heroes stay eager). Done on branch `perf-optimization`.
 - **Flat VAT per order + cap repricing + live Nomba webhook.** (1) A flat
   **£0.90 VAT** is now added to every order — shown as its own line on the cart
   and checkout summaries and **included in the amount charged** via Nomba.

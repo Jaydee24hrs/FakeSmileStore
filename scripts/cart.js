@@ -78,7 +78,7 @@
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                     <a class="cart-item-img" href="${productHref}" aria-label="View ${safeName}">
-                        <img src="${safeImg}" alt="${safeName}" onerror="this.onerror=null;this.src='images/Fakesmile-1.webp'">
+                        <img loading="lazy" decoding="async" src="${safeImg}" alt="${safeName}" onerror="this.onerror=null;this.src='images/Fakesmile-1.webp'">
                     </a>
                     <div class="cart-item-body">
                         ${safeTag ? `<span class="cart-item-tag">${safeTag}</span>` : ''}

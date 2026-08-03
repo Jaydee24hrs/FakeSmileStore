@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FakeSmile - Smile Even If It's Fake</title>
+    <!-- Preload the LCP hero image so it paints as early as possible. -->
+    <link rel="preload" as="image" href="images/PNGIMG/IMG_6438.JPG.webp" fetchpriority="high">
     <link rel="stylesheet" href="styles/base.css">
     <link rel="stylesheet" href="styles/home.css">
     <link rel="stylesheet" href="styles/tops-fb.css">
@@ -1370,8 +1372,8 @@
         </div>
     </footer>
 
-    <script src="scripts/products.js"></script>
-    <script src="scripts/base.js"></script>
-    <script src="scripts/home.js"></script>
+    <script defer src="scripts/products.js"></script>
+    <script defer src="scripts/base.js"></script>
+    <script defer src="scripts/home.js"></script>
 </body>
 </html>

@@ -1,0 +1,6 @@
+<!doctype html><meta charset=utf-8><script>
+var order={id:"FS-TEST123",placedAt:Date.now(),customer:{firstName:"Test",lastName:"Buyer",email:"t@example.com",phone:"+2348000000000"},shipping:{address1:"16 Iyabo Arole St",city:"Ikorodu",state:"Lagos",country:"NG",postal:""},payment:{method:"nomba"},items:[{id:"onyx-anthem-tee",name:"Onyx Anthem",tag:"Tee",size:"M",price:43000,qty:1,image:"images/Tops F&B/1.webp"}],subtotal:43000,discount:0,total:43000,currency:"NGN"};
+localStorage.setItem("fs_pending_order",JSON.stringify(order));
+localStorage.setItem("fs_cart_items",JSON.stringify(order.items));
+location.replace("checkout.html");
+</script>

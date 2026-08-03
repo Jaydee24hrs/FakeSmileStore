@@ -91,7 +91,7 @@
             return `
                 <div class="order-item">
                     <span class="order-item-thumb">
-                        <img src="${img}" alt="" onerror="this.onerror=null;this.src='images/Fakesmile-1.webp'">
+                        <img loading="lazy" decoding="async" src="${img}" alt="" onerror="this.onerror=null;this.src='images/Fakesmile-1.webp'">
                         <span class="order-item-qty">${it.qty || 1}</span>
                     </span>
                     <div class="order-item-info">

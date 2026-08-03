@@ -8,9 +8,13 @@
     position: relative;
     width: 100%;
     min-height: 100vh;
+    /* NOTE: background-attachment:fixed removed — combined with center/cover it
+       forces a full-viewport repaint on every scroll frame, the top cause of
+       mobile scroll-jank / tab crashes. Default (scroll) keeps the same look
+       without the per-frame repaint cost. */
     background:
         linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%),
-        url('../images/brick-bg.webp') center/cover no-repeat fixed,
+        url('../images/brick-bg.webp') center/cover no-repeat,
         #0a0a0a;
     background-blend-mode: normal;
     padding-bottom: 60px;
