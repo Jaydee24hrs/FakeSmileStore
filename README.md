@@ -360,6 +360,17 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Image downscale (root-cause mobile-crash fix).** The real cause of the
+  iPhone/Safari tab crash was **image _pixel_ dimensions**, not file size: ~130
+  images were 2233×2560px (~22MB of decoded RAM _each_) but displayed in cards a
+  few hundred px wide. The home page alone tried to hold **1,192MB** of decoded
+  image memory — well past Safari's ~200–300MB ceiling → tab kill. Fixed by
+  **downscaling every image to a 1200px long-edge cap** (LANCZOS resample +
+  light UnsharpMask, WebP quality 90 — stays retina-crisp). Result: home-page
+  worst-case decoded RAM **1,192MB → 270MB (4.4×)**, whole `images/` folder
+  27MB → 14MB, no image over 15MB decoded. A Next.js rewrite was considered and
+  rejected — it would not fix this without the same resize, which we did directly.
+  Originals preserved in git history and on branch `mainbackup`.
 - **Performance pass (mobile crash / slow-load fix).** No framework change —
   the site stays pure-static, zero-build. (1) **All page scripts now `defer`** so
   ~4,000 lines of JS no longer block first paint (verified deferred scripts still
