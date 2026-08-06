@@ -666,6 +666,14 @@
     min-width: 0;
     transform-style: preserve-3d;
     perspective: 1200px;
+    /* Off-screen cards skip render + image decode entirely and the browser
+       reclaims their memory while scrolling — the key fix for the mobile
+       Safari tab-crash on this long, image-heavy page. Only the handful of
+       on-screen cards ever hold decoded images or run the F/B animation.
+       `auto 460px` is a first-paint placeholder height; the browser then
+       remembers each card's real size so the scrollbar stays stable. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 460px;
 }
 
 .product-glass {

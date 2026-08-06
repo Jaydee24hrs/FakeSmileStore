@@ -360,6 +360,16 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **`content-visibility` memory containment (second mobile-crash pass).** After
+  the image downscale, the home page still nudged Safari's memory ceiling because
+  scrolling the full page progressively decodes all ~60 images and the browser
+  holds them. Added `content-visibility: auto` + `contain-intrinsic-size: auto Npx`
+  to `.product-card` (home + shop grids) and `.fs-gallery-item` — off-screen cards
+  skip render/paint **and image decode**, pause their off-screen F/B animations,
+  and the browser reclaims that memory while scrolling; only the 2–4 on-screen
+  cards ever cost anything. CSS-only, graceful-degrading (ignored where
+  unsupported). Note: iOS Safari supports this from **v18+**; older iOS ignores it
+  and would need the thumbnail/`srcset` fallback if a crash persists there.
 - **Image downscale (root-cause mobile-crash fix).** The real cause of the
   iPhone/Safari tab crash was **image _pixel_ dimensions**, not file size: ~130
   images were 2233×2560px (~22MB of decoded RAM _each_) but displayed in cards a

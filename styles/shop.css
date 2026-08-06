@@ -169,6 +169,10 @@
     opacity: 1 !important;
     transform: none !important;
     transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    /* Same memory guard as the home grid: off-screen shop cards skip render +
+       image decode so the (larger) shop catalog can't exhaust mobile memory. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 460px;
 }
 .shop-grid .product-card:hover { transform: translateY(-4px) !important; }
 
