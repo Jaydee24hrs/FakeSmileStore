@@ -415,6 +415,11 @@ renderHeaderCart();
 detectCurrencyByIP();
 fetchExchangeRate();
 
+// Single source of truth: EVERY cart change dispatches `cart:update`, so the
+// header cart count/total re-renders from it too — guaranteeing the top-bar
+// count and the bottom tab-bar badge always show the same number.
+document.addEventListener('cart:update', renderHeaderCart);
+
 // Sync header across tabs/windows
 window.addEventListener('storage', (e) => {
     if (e.key === CART_KEY) renderHeaderCart();

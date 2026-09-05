@@ -1362,17 +1362,22 @@ html, body {
     /* Stop the fixed bar from covering the last of the page (footer, buttons). */
     body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 
-    /* Slim, sticky, app-like top bar — logo + cart only. */
-    .liquid-glass-header {
+    /* Top glass header appears on HOME ONLY (brand presence). Every other page
+       relies on the bottom tab bar — so a page never shows two cart buttons. */
+    .liquid-glass-header { display: none; }
+
+    .page-home .liquid-glass-header {
+        display: block;
         position: sticky;
         top: calc(6px + env(safe-area-inset-top, 0px));
         width: calc(100% - 24px);
         margin-top: 12px;
-        padding: 6px 14px;
-        border-radius: 22px;
+        padding: 8px 18px;
+        border-radius: 26px;
     }
-    .header-inner { gap: 12px; }
-    .logo img { width: 44px; height: 44px; }
-    .cart-link { padding: 8px 14px; }
+    /* Centered logo, and NO top cart — the cart lives in the bottom bar. */
+    .page-home .header-inner { justify-content: center; gap: 0; }
+    .page-home .cart-wrapper { display: none; }
+    .page-home .logo img { width: 46px; height: 46px; }
 }
 

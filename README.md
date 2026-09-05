@@ -360,6 +360,15 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Mobile header refinement — one cart per page.** With the bottom tab bar now
+  carrying nav + cart, the top glass header on phones only appears on **Home**
+  (logo centered, no cart) for brand presence; on every other page it's hidden
+  (`display:none` ≤768px, shown again only for `.page-home`, which `index.html`'s
+  body now carries). This removes the duplicate cart button that appeared when
+  both the top bar and the bottom Cart tab showed. Also **fixed cart-count
+  consistency**: `renderHeaderCart` is now subscribed to the same `cart:update`
+  event as the tab-bar badge, so the header count and the bottom badge can never
+  disagree.
 - **Mobile app-shell — bottom tab bar.** On phones the site now reads like a
   native app: the cramped inline top nav (four shrinking text links) is hidden
   ≤768px and replaced by a fixed, glass-styled **bottom tab bar** (Home / Shop /
