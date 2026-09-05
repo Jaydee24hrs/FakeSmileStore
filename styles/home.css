@@ -544,7 +544,15 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .showcase-grid { grid-template-columns: repeat(2, 1fr); }
+    /* 2-up grid. The featured card spans full width; `dense` backfills the hole
+       its mid-order placement would otherwise leave, so the two small cards
+       share the top row and the featured card runs full-width beneath them —
+       no empty cells / lopsided gaps. */
+    .showcase-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-flow: dense;
+        align-items: stretch;
+    }
     .showcase-card-featured {
         grid-column: 1 / -1;
         aspect-ratio: 16/9;
