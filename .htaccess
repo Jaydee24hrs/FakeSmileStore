@@ -1,0 +1,80 @@
+# ============================================================================
+#  FAKESMILE — Apache / LiteSpeed site config  (cPanel / Spaceship hosting)
+#  Upload this file to the SAME folder as index.html (your web root).
+#  It gives you: clean URLs (no .html), no directory listing, blocked
+#  backend/dev files, forced HTTPS, and security headers.
+#  (If your host runs nginx instead, .htaccess is ignored — tell me and
+#   I'll give you the nginx equivalent.)
+# ============================================================================
+
+# ---- Base behaviour --------------------------------------------------------
+# Serve index.html for "/". Turn OFF directory listings and content
+# negotiation (MultiViews) so URL handling is fully deterministic below.
+DirectoryIndex index.html
+Options -Indexes -MultiViews
+
+# Don't leak the tech stack in response headers where we can help it.
+ServerSignature Off
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # ---- 1. Force HTTPS ------------------------------------------------------
+  # (LiteSpeed/cPanel usually terminate TLS upstream, so also check the
+  #  forwarded-proto header before redirecting — avoids a redirect loop.)
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # ---- 2. Block sensitive paths (return 403, don't hint they exist) --------
+  # Dotfiles / dot-dirs: .git, .gitignore, .htaccess, .claude, .env, ...
+  RewriteRule (^|/)\.(?!well-known/) - [F]
+  # Internal folders that must never be public.
+  RewriteRule ^(email-templates|scripts/.*\.map)(/|$) - [F]
+
+  # ---- 3. Clean URLs -------------------------------------------------------
+  # 3a. Bounce any direct .html request to its extension-less URL (301) so the
+  #     address bar shows /contact, not /contact.html. Query string is kept.
+  RewriteCond %{THE_REQUEST} \s/+([^.\s?]+)\.html[\s?] [NC]
+  RewriteRule ^ /%1 [R=301,L,NE]
+  # 3b. /index -> /  (never show a bare /index)
+  RewriteRule ^index/?$ / [R=301,L]
+  # 3c. Internally map the clean URL back to the real .html file.
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}\.html -f
+  RewriteRule ^(.+?)/?$ $1.html [L]
+</IfModule>
+
+# ---- 4. Block backend / docs / dev files by name -----------------------------
+# Belt-and-braces in case any of these get uploaded to the web root.
+<FilesMatch "(?i)\.(md|txt|py|sh|yml|yaml|lock|log|bak|ini|gitignore|gitattributes)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "(?i)^(worker\.js|seed_flow\.html|wrangler\.toml)$">
+  Require all denied
+</FilesMatch>
+
+# ---- 5. Security headers -----------------------------------------------------
+<IfModule mod_headers.c>
+  # Only load this site over HTTPS for the next year (and subdomains).
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" "expr=%{HTTPS} == 'on'"
+  # Stop MIME-type sniffing.
+  Header always set X-Content-Type-Options "nosniff"
+  # Disallow being embedded in a frame anywhere (clickjacking).
+  Header always set X-Frame-Options "DENY"
+  # Trim the referrer sent to other sites.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Deny powerful browser features the site never uses.
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=()"
+  # Drop the framework fingerprint header if the host added one.
+  Header always unset X-Powered-By
+
+  # Content-Security-Policy — allows exactly the external services in use:
+  #   scripts : self + inline (the site inlines scripts) + jsDelivr (EmailJS SDK)
+  #   styles  : self + inline + Google Fonts stylesheet
+  #   fonts   : self + Google Fonts files
+  #   images  : self + data: URIs + any https image
+  #   connect : self + Nomba worker + EmailJS API + currency API + geo API
+  #   frames  : none can embed us; we embed nothing
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://fakesmile-nomba.josephnwach11.workers.dev https://api.emailjs.com https://latest.currency-api.pages.dev https://ipapi.co; upgrade-insecure-requests"
+</IfModule>
