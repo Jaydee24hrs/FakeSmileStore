@@ -473,3 +473,72 @@ if (header) {
 // wrapping the image (see .product-image-wrap in index.html). No JS needed —
 // the anchor's href works in every browser, even when other listeners call
 // preventDefault on mousedown.
+
+// ===== MOBILE APP-STYLE BOTTOM TAB BAR =====
+// Injected on every page so the phone experience reads like a native app: a
+// fixed glass tab bar (Home / Shop / Cart / Orders / Contact) with icons,
+// labels, an active state and a live cart badge. Hidden on desktop via CSS
+// (.fs-tabbar defaults to display:none; only shown ≤768px). The inline top
+// nav is hidden at the same breakpoint so the two never coexist.
+(function mobileTabBar() {
+    // Map the current page (filename or clean URL) to the tab it belongs under.
+    function currentKey() {
+        const file = (window.location.pathname.split('/').pop() || '')
+            .replace(/\.html$/i, '').toLowerCase();
+        if (file === '' || file === 'index') return 'home';
+        if (file === 'product') return 'shop';      // product detail sits under Shop
+        if (file === 'checkout') return 'cart';      // checkout sits under Cart
+        if (file === 'about') return 'contact';      // About grouped with the Contact tab
+        return file;
+    }
+
+    const TABS = [
+        { key: 'home', href: 'index.html', label: 'Home',
+          icon: '<path d="M3 9.5 12 3l9 6.5"/><path d="M5 9v11a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9"/>' },
+        { key: 'shop', href: 'shop.html', label: 'Shop',
+          icon: '<path d="M6 2 3 6v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>' },
+        { key: 'cart', href: 'cart.html', label: 'Cart', badge: true,
+          icon: '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>' },
+        { key: 'orders', href: 'orders.html', label: 'Orders',
+          icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>' },
+        { key: 'contact', href: 'contact.html', label: 'Contact',
+          icon: '<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/>' },
+    ];
+
+    function updateBadge() {
+        const badge = document.querySelector('.fs-tab-badge');
+        if (!badge) return;
+        const count = (typeof getCartCount === 'function') ? getCartCount() : 0;
+        badge.textContent = count > 99 ? '99+' : String(count);
+        badge.hidden = count <= 0;
+    }
+
+    function build() {
+        if (document.querySelector('.fs-tabbar')) return;
+        const active = currentKey();
+        const nav = document.createElement('nav');
+        nav.className = 'fs-tabbar';
+        nav.setAttribute('aria-label', 'Primary');
+        nav.innerHTML = TABS.map((t) =>
+            '<a class="fs-tab' + (t.key === active ? ' is-active' : '') + '" href="' + t.href + '"' +
+            (t.key === active ? ' aria-current="page"' : '') + '>' +
+                '<span class="fs-tab-ico" aria-hidden="true">' +
+                    '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" ' +
+                    'stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">' + t.icon + '</svg>' +
+                    (t.badge ? '<span class="fs-tab-badge" hidden>0</span>' : '') +
+                '</span>' +
+                '<span class="fs-tab-label">' + t.label + '</span>' +
+            '</a>'
+        ).join('');
+        document.body.appendChild(nav);
+        updateBadge();
+    }
+
+    document.addEventListener('cart:update', updateBadge);
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', build);
+    } else {
+        build();
+    }
+})();

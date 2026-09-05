@@ -1268,3 +1268,111 @@ html, body {
     .cart-toast .toast-name { font-size: 13px; max-width: 150px; }
 }
 
+/* ============================================= */
+/* === MOBILE APP SHELL (bottom tab bar) ======= */
+/* ============================================= */
+/* Injected by scripts/base.js on every page. Hidden on desktop; on phones it
+   replaces the cramped inline top nav with a native-app-style fixed tab bar
+   and slims the top bar to just logo + cart. */
+
+.fs-tabbar { display: none; }  /* desktop: no tab bar */
+
+@media (max-width: 768px) {
+    /* Bottom tab bar takes over navigation — hide the inline top links. */
+    .main-nav { display: none !important; }
+
+    .fs-tabbar {
+        display: flex;
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        z-index: 200;
+        justify-content: space-around;
+        align-items: stretch;
+        gap: 2px;
+        padding: 8px 6px;
+        border-radius: 26px;
+        background: linear-gradient(135deg,
+            rgba(20, 60, 50, 0.72) 0%,
+            rgba(10, 30, 25, 0.82) 50%,
+            rgba(20, 60, 50, 0.72) 100%);
+        backdrop-filter: blur(22px) saturate(180%);
+        -webkit-backdrop-filter: blur(22px) saturate(180%);
+        border: 1px solid rgba(80, 200, 120, 0.22);
+        box-shadow:
+            0 10px 34px rgba(0, 0, 0, 0.55),
+            inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    }
+
+    .fs-tab {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        padding: 5px 2px;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.60);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        border-radius: 16px;
+        transition: color 0.25s ease, transform 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .fs-tab-ico {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+    }
+
+    .fs-tab-label { line-height: 1; }
+
+    .fs-tab.is-active { color: #00ff7a; }
+    .fs-tab.is-active .fs-tab-ico {
+        transform: translateY(-1px);
+        filter: drop-shadow(0 3px 8px rgba(0, 255, 122, 0.45));
+    }
+    .fs-tab:active { transform: scale(0.9); }
+
+    /* Live cart count on the Cart tab */
+    .fs-tab-badge {
+        position: absolute;
+        top: -5px;
+        right: -8px;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 4px;
+        box-sizing: border-box;
+        border-radius: 999px;
+        background: #00d957;
+        color: #04240f;
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 16px;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Stop the fixed bar from covering the last of the page (footer, buttons). */
+    body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+
+    /* Slim, sticky, app-like top bar — logo + cart only. */
+    .liquid-glass-header {
+        position: sticky;
+        top: calc(6px + env(safe-area-inset-top, 0px));
+        width: calc(100% - 24px);
+        margin-top: 12px;
+        padding: 6px 14px;
+        border-radius: 22px;
+    }
+    .header-inner { gap: 12px; }
+    .logo img { width: 44px; height: 44px; }
+    .cart-link { padding: 8px 14px; }
+}
+

@@ -360,6 +360,17 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Mobile app-shell — bottom tab bar.** On phones the site now reads like a
+  native app: the cramped inline top nav (four shrinking text links) is hidden
+  ≤768px and replaced by a fixed, glass-styled **bottom tab bar** (Home / Shop /
+  Cart / Orders / Contact) with icons, labels, an active state, and a live cart
+  badge; the top bar slims to logo + cart and goes sticky. Injected once by
+  `scripts/base.js` (so it's consistent on all pages and stays in sync via the
+  existing `cart:update` event) and styled in `styles/base.css` under the
+  `MOBILE APP SHELL` section. Uses `env(safe-area-inset-*)` so it clears the
+  iPhone home indicator/notch. Desktop is unchanged (`.fs-tabbar` is
+  `display:none` above 768px; the normal top nav stays).
+
 - **`content-visibility` memory containment (second mobile-crash pass).** After
   the image downscale, the home page still nudged Safari's memory ceiling because
   scrolling the full page progressively decodes all ~60 images and the browser
