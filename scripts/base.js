@@ -514,8 +514,17 @@ if (header) {
         const badge = document.querySelector('.fs-tab-badge');
         if (!badge) return;
         const count = (typeof getCartCount === 'function') ? getCartCount() : 0;
-        badge.textContent = count > 99 ? '99+' : String(count);
-        badge.hidden = count <= 0;
+        const text = count > 99 ? '99+' : String(count);
+        // Always visible so the count is always on screen and its increment is
+        // obvious; the "empty" (0) state is styled muted, non-zero glows green.
+        badge.hidden = false;
+        badge.classList.toggle('is-zero', count <= 0);
+        if (badge.textContent !== text) {
+            badge.textContent = text;
+            badge.classList.remove('is-pop');
+            void badge.offsetWidth;      // restart the pop animation
+            badge.classList.add('is-pop');
+        }
     }
 
     function build() {
@@ -530,7 +539,7 @@ if (header) {
                 '<span class="fs-tab-ico" aria-hidden="true">' +
                     '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" ' +
                     'stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">' + t.icon + '</svg>' +
-                    (t.badge ? '<span class="fs-tab-badge" hidden>0</span>' : '') +
+                    (t.badge ? '<span class="fs-tab-badge is-zero">0</span>' : '') +
                 '</span>' +
                 '<span class="fs-tab-label">' + t.label + '</span>' +
             '</a>'
