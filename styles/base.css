@@ -1412,3 +1412,33 @@ html, body {
     100% { transform: scale(1); }
 }
 
+/* ============================================= */
+/* === TABLET TIER (769px – 1024px) ============ */
+/* ============================================= */
+/* iPad portrait & landscape keep the desktop top nav (there's room for it) but
+   get their own tuning so the site reads as a proper tablet experience — not a
+   stretched phone or a squeezed desktop. Phones (<=768px) use the app shell;
+   desktops (>1024px) are unchanged. */
+@media (min-width: 769px) and (max-width: 1024px) {
+    /* Inner-page heroes: the base 200px top padding leaves a huge empty band on
+       a tablet — trim it to a comfortable, intentional height. */
+    .page-hero { padding: 118px 34px 74px; }
+
+    /* Home hero: fill most of the screen without an over-tall empty void.
+       (.page-home prefix so these beat home.css's base rules regardless of
+       stylesheet load order.) */
+    .page-home .hero-section { min-height: 82vh; padding-bottom: 36px; }
+    .page-home .hero-content { padding: 80px 28px 52px; }
+    .page-home .hero-tagline { max-width: 640px; }
+    .page-home .hero-pretitle { font-size: 22px; }
+
+    /* Header: a touch more side breathing room and comfortable nav rhythm. */
+    .liquid-glass-header { width: calc(100% - 48px); padding: 6px 26px; }
+    .main-nav ul { gap: 32px; }
+    .main-nav a { font-size: 16px; }
+    .logo img { width: 64px; height: 64px; }
+
+    /* Bigger, finger-friendly primary buttons on touch tablets. */
+    .btn { padding: 14px 28px; font-size: 15px; }
+}
+

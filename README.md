@@ -360,6 +360,16 @@ found stale, 30 min after `placedAt`.)
 
 ## 14. Change Log
 
+- **Dedicated tablet tier (769–1024px).** iPads previously fell back to the
+  desktop layout, which read as squeezed: the shop grid dropped to 2 columns in
+  portrait and inner-page heroes kept their 200px desktop top-padding (huge empty
+  band). Added a proper tablet tier: shop grid stays **3-up** across tablets
+  (2-up only ≤768px, the app-shell boundary), `.page-hero` padding trimmed, the
+  home hero right-sized (82vh, constrained readable tagline), and comfortable
+  header/nav rhythm + larger touch targets. Home-hero overrides use a
+  `.page-home` prefix so they win over `home.css` regardless of stylesheet order.
+  Phones (≤768) and desktop (>1024) are unchanged. Clean tier boundaries: ≤768
+  phone app-shell · 769–1024 tablet · >1024 desktop.
 - **Mobile header refinement — one cart per page.** With the bottom tab bar now
   carrying nav + cart, the top glass header on phones only appears on **Home**
   (logo centered, no cart) for brand presence; on every other page it's hidden
