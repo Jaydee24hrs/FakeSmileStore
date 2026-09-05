@@ -1276,6 +1276,7 @@ html, body {
    and slims the top bar to just logo + cart. */
 
 .fs-tabbar { display: none; }  /* desktop: no tab bar */
+.header-profile { display: none; }  /* only shown on the mobile home header */
 
 @media (max-width: 768px) {
     /* Bottom tab bar takes over navigation — hide the inline top links. */
@@ -1373,22 +1374,36 @@ html, body {
        relies on the bottom tab bar — so a page never shows two cart buttons. */
     .liquid-glass-header { display: none; }
 
-    /* HOME: a compact centered logo "chip" that hugs the mark — not a wide,
-       mostly-empty bar. NO top cart (the single cart lives in the bottom bar). */
+    /* HOME: a balanced app-style top bar — logo on the LEFT, an inactive
+       profile icon on the RIGHT. NO top cart (single cart is in the bottom bar). */
     .page-home .liquid-glass-header {
         display: block;
         position: sticky;
         top: calc(8px + env(safe-area-inset-top, 0px));
-        width: max-content;
-        max-width: calc(100% - 24px);
+        width: calc(100% - 24px);
         margin: 12px auto 0;
-        padding: 7px 30px;
-        border-radius: 999px;
+        padding: 7px 16px;
+        border-radius: 30px;
     }
-    .page-home .liquid-glass-header::before { border-radius: 999px; }
-    .page-home .header-inner { justify-content: center; gap: 0; }
+    .page-home .liquid-glass-header::before { border-radius: 30px; }
+    .page-home .header-inner { justify-content: space-between; gap: 10px; }
     .page-home .cart-wrapper { display: none; }
-    .page-home .logo img { width: 52px; height: 52px; }
+    .page-home .logo img { width: 48px; height: 48px; }
+
+    /* Inactive account placeholder — visible only on the mobile home header. */
+    .page-home .header-profile {
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: rgba(255, 255, 255, 0.55);
+        cursor: default;
+        padding: 0;
+    }
 }
 
 @keyframes fsBadgePop {
