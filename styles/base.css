@@ -593,6 +593,26 @@ html, body {
     color: #00d957;
 }
 
+/* Site-wide "real brand" line: the name is a statement, not a warning. */
+.footer-real {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: -6px 0 18px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.5);
+    max-width: 380px;
+}
+.footer-real svg { flex-shrink: 0; margin-top: 3px; color: #00d957; }
+.footer-real a {
+    color: rgba(0, 255, 122, 0.85);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 255, 122, 0.25);
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+.footer-real a:hover { color: #00ff7a; border-bottom-color: #00ff7a; }
+
 .footer-socials {
     display: flex;
     gap: 10px;

@@ -35,8 +35,18 @@ fakesmile33/
 ├── cart.html           Shopping cart
 ├── checkout.html       Checkout — contact/shipping/payment form + order summary
 ├── orders.html         Order history with delivery tracker + reorder
-├── about.html          Brand story
+├── about.html          Brand story (+ "Real brand" disambiguation block, #real)
 ├── contact.html        Contact form
+├── faq.html            FAQ (FAQPage schema) — incl. "Is FakeSmile a real brand?"
+├── shipping.html       Shipping & Delivery policy
+├── returns.html        Returns & Exchanges policy
+├── size-guide.html     Size guide (cm / in tables per garment type)
+├── privacy.html        Privacy Policy
+├── terms.html          Terms & Conditions
+├── cookies.html        Cookie Policy (site uses localStorage, no tracking cookies)
+├── robots.txt          Crawl rules + sitemap pointer (cart/checkout/orders disallowed)
+├── sitemap.xml         Static pages + every live /product?id= URL
+├── .htaccess           Clean URLs, HTTPS, security headers, blocks backend files
 ├── README.md           This file
 ├── worker.js           Cloudflare Worker (deployed separately) — Nomba payment proxy
 │                        + webhook / idempotent order completion (KV-backed)
@@ -63,6 +73,7 @@ fakesmile33/
 │   ├── orders.css      Orders
 │   ├── about.css       About
 │   ├── contact.css     Contact
+│   ├── policy.css      Support/legal pages (faq, shipping, returns, size-guide, privacy, terms, cookies)
 │   ├── tops-fb.css     Front/Back image hover-swap (shared by home + shop)
 │   └── lifestyle-banner.css   Lifestyle banner on home
 │
@@ -93,12 +104,26 @@ fakesmile33/
 | `cart.html` | Cart items, qty steppers, promo code, totals, "Proceed To Checkout" | base, cart |
 | `checkout.html` | 3-step form (Contact, Shipping, Payment), sticky order summary, success state | products, base, checkout |
 | `orders.html` | Order history cards, delivery tracker, "Buy Again", clear history | products, base, orders |
-| `about.html` | Brand story, pillars, crafted-in-Lagos section | base |
-| `contact.html` | Contact form + info cards | base, contact |
+| `about.html` | Brand story, "Real brand" block (`#real`), pillars, crafted-in-Lagos section | base, gallery |
+| `contact.html` | Contact form + info cards + FAQ teaser | base, contact, gallery |
+| `faq.html` | Grouped FAQ accordion (About · Orders & Payment · Shipping · Returns & Sizing); `#wholesale` anchor | base |
+| `shipping.html` | Shipping & Delivery policy — free shipping, processing + delivery-time table, customs | base |
+| `returns.html` | Returns & Exchanges — 14 days, eligibility, 4-step process, refunds | base |
+| `size-guide.html` | Garment measurement tables (hoodies, tees, jerseys, joggers, shorts, headwear) | base |
+| `privacy.html` | Privacy Policy (NDPA 2023 / UK GDPR), third-party provider table | base |
+| `terms.html` | Terms & Conditions of sale | base |
+| `cookies.html` | Cookie Policy — documents every localStorage key | base |
 
 **Nav** (all pages): About · Shop · Contact · Orders, plus a persistent cart pill (top-right).
 Cart-flow pages (cart/product/checkout) show "Cart" instead of "Orders" in the nav.
-The brand logo links home.
+The brand logo links home. The 7 support/legal pages share `styles/policy.css`
+(sticky TOC + article layout) and sit under the **Contact** tab on the mobile tab bar.
+
+**Footer links** (all pages) — Shop: Tops & Hoodies · Joggers & Shorts · Headwear ·
+Statement Tops · All Products. Support: FAQ · Shipping & Delivery · Returns &
+Exchanges · Size Guide · Contact Us. Company: Our Story · Wholesale (`faq.html#wholesale`).
+Legal: Privacy · Terms · Cookies. Payment chips reflect what Nomba actually
+accepts (Visa · Mastercard · Verve · USSD · Bank Transfer).
 
 ---
 
@@ -340,15 +365,59 @@ found stale, 30 min after `placedAt`.)
 
 ---
 
-## 13. Known Stubs / Not Yet Built
+## 13. SEO & Trust Signals
+
+Built to counter a Google AI Overview that labelled the domain "suspicious"
+(the word *fake* in the name + dead policy links + no structured data). Every
+page now carries:
+
+- `<meta name="description">`, `<link rel="canonical">` (clean URL, e.g.
+  `https://fakesmilestore.com/about`), Open Graph + Twitter card tags.
+- **JSON-LD** `Organization`/`OnlineStore` + `WebSite` graph (name, alternate
+  names, Lagos address, email, socials, hours, 14-day `MerchantReturnPolicy`
+  at `#returns`). Page-specific extras: `CollectionPage` (shop), `AboutPage`,
+  `ContactPage`, `FAQPage` (faq — mirrors the visible Q&A text exactly).
+- `product.js` injects **`Product`** (images, SKU, brand, NGN price incl.
+  markup, `InStock`, free `OfferShippingDetails`, return-policy link) and
+  **`BreadcrumbList`** JSON-LD per product, and rewrites canonical / meta
+  description / OG tags for the `?id=` in the URL. Coming-Soon products get
+  no `offers`. The not-found state adds `noindex`.
+- `cart` / `checkout` / `orders` are `noindex` and disallowed in `robots.txt`.
+- A site-wide footer line ("An independent streetwear label, est. Lagos 2023.
+  The name is a statement — not a warning.") links to `about.html#real`, a
+  plain-language block stating the brand is real, Lagos-based, sells original
+  designs, and that fakesmilestore.com is the only official store. `faq.html`
+  opens on the same question so it's the first thing crawlers read.
+- `.htaccess` explicitly allows `robots.txt` (the generic `.txt` block would
+  otherwise 403 it).
+
+**Maintenance:** when you add/remove a product, add/remove its
+`https://fakesmilestore.com/product?id=<id>` entry in `sitemap.xml`. When a
+policy changes, update the page **and** the matching FAQ answer + the
+`hasMerchantReturnPolicy` block in each page's Organization JSON-LD (it's the
+same text in every `<head>` — search-and-replace). Bump the "Last updated"
+date on the page you changed.
+
+**Off-site steps (not code):** verify the domain in Google Search Console and
+submit `sitemap.xml`; use the AI Overview's feedback control to flag the
+inaccurate summary; create a Google Business Profile for the studio address.
+
+---
+
+## 14. Known Stubs / Not Yet Built
 
 - ~~**Payment processing**~~ — **DONE**: Nomba via Cloudflare Worker. Needs the
   Worker deployed (see `DEPLOY-WORKER.md`) and 3 Nomba keys + 4 EmailJS values
   pasted into the config block at the top of `scripts/checkout.js`.
 - Newsletter & contact forms validate + show a message but don't send anywhere
   (could be wired through the same EmailJS account easily).
-- Footer links (FAQ, Shipping, Returns, Size Guide, Wholesale, Privacy/Terms/Cookies)
-  are placeholders (`#`).
+- ~~Footer links (FAQ, Shipping, Returns, Size Guide, Wholesale, Privacy/Terms/Cookies)
+  are placeholders (`#`).~~ **DONE** — all real pages now (see §3 / §13).
+- Product page reviews ("4.9 · 218 reviews", three named reviewers) are
+  **static placeholder copy** in `product.html`, identical on every product.
+  They are deliberately *not* marked up as `AggregateRating`/`Review` schema
+  (fabricated review markup is a Google policy violation). Replace with real
+  reviews or remove — it's the biggest remaining trust risk.
 - "Orders" status is **time-simulated for visual progression**. Once Nomba is live,
   the `status` field on each order reflects real payment state (`paid`/`pending`),
   but ship/deliver stages still come from `orders.js`'s age-based heuristic
@@ -358,8 +427,32 @@ found stale, 30 min after `placedAt`.)
 
 ---
 
-## 14. Change Log
+## 15. Change Log
 
+- **Trust / SEO pass (dead policy links, structured data, robots + sitemap,
+  "real brand" disambiguation).** Triggered by a Google AI Overview calling
+  fakesmilestore.com a "suspicious e-commerce domain". (1) **Seven real
+  pages** replace the `#` footer placeholders — `faq`, `shipping`, `returns`,
+  `size-guide`, `privacy`, `terms`, `cookies` — on a shared `policy.css`
+  layout (sticky TOC, glass article, tables, steps, accordion). Policies are
+  consistent with what the code does: shipping included on every order (checkout
+  charges none), 14-day returns, Nomba-only payment, localStorage-only
+  storage. Footer "Accessories"/"Gift Cards" (non-existent) became "Statement
+  Tops"/"All Products"; "Wholesale" → `faq.html#wholesale`; payment chips
+  corrected from VISA/MC/AMEX/PAYPAL/PSTACK to what Nomba takes. (2)
+  **Structured data + meta** on every page: description, canonical, OG,
+  `Organization`/`OnlineStore` + `WebSite` JSON-LD; `FAQPage`, `AboutPage`,
+  `ContactPage`, `CollectionPage` where relevant; dynamic `Product` +
+  `BreadcrumbList` from `product.js`. Home `<title>` now describes the
+  business. (3) **`robots.txt`** (disallows cart/checkout/orders/seed_flow)
+  + **`sitemap.xml`** (11 static + 41 product URLs); `.htaccess` gained an
+  explicit allow for `robots.txt`. cart/checkout/orders are `noindex`. (4)
+  **Name disambiguation:** `about.html#real` block ("Yes — FakeSmile is a
+  real, independent streetwear label…"), a site-wide footer line linking to
+  it, the FAQ opening on "Is FakeSmile a real brand?", and descriptions that
+  say "independent Lagos streetwear brand, est. 2023" everywhere. Contact-page
+  FAQ answers aligned with the new policies. Mobile tab bar maps the new pages
+  to the Contact tab. See §13.
 - **Dedicated tablet tier (769–1024px).** iPads previously fell back to the
   desktop layout, which read as squeezed: the shop grid dropped to 2 columns in
   portrait and inner-page heroes kept their 200px desktop top-padding (huge empty

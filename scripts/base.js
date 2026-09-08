@@ -494,6 +494,8 @@ if (header) {
         if (file === 'product') return 'shop';      // product detail sits under Shop
         if (file === 'checkout') return 'cart';      // checkout sits under Cart
         if (file === 'about') return 'contact';      // About grouped with the Contact tab
+        // Support + legal pages live under the Contact tab too.
+        if (['faq', 'shipping', 'returns', 'size-guide', 'privacy', 'terms', 'cookies'].includes(file)) return 'contact';
         return file;
     }
 

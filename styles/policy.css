@@ -1,0 +1,490 @@
+/* ============================================= */
+/* ===== SUPPORT / LEGAL PAGES (policy.css) ====== */
+/* faq · shipping · returns · size-guide · privacy · */
+/* terms · cookies — shared layout + components.   */
+/* ============================================= */
+
+.page-policy { background: #050505; }
+.page-policy .liquid-glass-header { z-index: 50; }
+
+/* ===== Two-column shell: sticky TOC + article ===== */
+.policy {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 70px 40px 120px;
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
+}
+
+.policy-side {
+    position: sticky;
+    top: 110px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.policy-toc {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 20px 18px;
+    border-radius: 20px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,60,30,0.16) 100%);
+    border: 1px solid rgba(0, 217, 87, 0.18);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.policy-toc-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #00ff7a;
+    margin-bottom: 10px;
+}
+
+.policy-toc a {
+    display: block;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: color 0.25s ease, background 0.25s ease, padding-left 0.25s ease;
+}
+
+.policy-toc a:hover,
+.policy-toc a.is-active {
+    color: #fff;
+    background: rgba(0, 217, 87, 0.1);
+    padding-left: 16px;
+}
+
+.policy-help {
+    padding: 20px 18px;
+    border-radius: 20px;
+    background:
+        radial-gradient(ellipse at 20% 0%, rgba(0, 217, 87, 0.22), transparent 60%),
+        linear-gradient(160deg, rgba(20,60,50,0.4) 0%, rgba(10,30,25,0.6) 100%);
+    border: 1px solid rgba(0, 217, 87, 0.28);
+}
+
+.policy-help strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.policy-help p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 14px;
+}
+
+.policy-help .page-btn {
+    width: 100%;
+    padding: 12px 18px;
+    font-size: 13px;
+}
+
+.policy-help .page-btn + .page-btn { margin-top: 8px; }
+
+/* ===== Article ===== */
+.policy-body {
+    min-width: 0;
+    padding: 48px 52px;
+    border-radius: 28px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.035) 0%, rgba(0,60,30,0.14) 100%);
+    border: 1px solid rgba(0, 217, 87, 0.16);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255,255,255,0.08);
+}
+
+.policy-related {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+}
+
+.policy-related a {
+    padding: 7px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.policy-related a:hover,
+.policy-related a[aria-current="page"] {
+    color: #00ff7a;
+    border-color: rgba(0, 217, 87, 0.5);
+    background: rgba(0, 217, 87, 0.1);
+}
+
+.policy-updated {
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 28px;
+}
+
+.policy-intro {
+    font-size: 17px;
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.78);
+    margin-bottom: 36px;
+}
+
+.policy-body section {
+    scroll-margin-top: 110px;
+    padding-top: 8px;
+    margin-bottom: 44px;
+}
+
+.policy-body section:last-child { margin-bottom: 0; }
+
+.policy-body h2 {
+    font-size: clamp(22px, 2.4vw, 28px);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 217, 87, 0.18);
+}
+
+.policy-body h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin: 22px 0 10px;
+}
+
+.policy-body p,
+.policy-body li {
+    font-size: 15px;
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.policy-body p { margin-bottom: 14px; }
+
+.policy-body ul,
+.policy-body ol {
+    margin: 0 0 16px 22px;
+}
+
+.policy-body li { margin-bottom: 8px; }
+.policy-body li::marker { color: #00d957; }
+
+.policy-body a {
+    color: #00ff7a;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 255, 122, 0.3);
+    transition: border-color 0.25s ease;
+}
+
+.policy-body a:hover { border-bottom-color: #00ff7a; }
+
+.policy-body strong { color: #fff; font-weight: 700; }
+
+/* Callout */
+.policy-note {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 18px 20px;
+    margin: 18px 0 22px;
+    border-radius: 16px;
+    background: rgba(0, 217, 87, 0.07);
+    border: 1px solid rgba(0, 217, 87, 0.3);
+}
+
+.policy-note svg {
+    flex-shrink: 0;
+    color: #00ff7a;
+    margin-top: 3px;
+}
+
+.policy-note p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.policy-note-warn {
+    background: rgba(255, 176, 0, 0.07);
+    border-color: rgba(255, 176, 0, 0.35);
+}
+.policy-note-warn svg { color: #ffb000; }
+
+/* Stat / fact tiles */
+.policy-facts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 4px 0 28px;
+}
+
+.policy-fact {
+    padding: 18px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 217, 87, 0.18);
+}
+
+.policy-fact strong {
+    display: block;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, #00ff7a 0%, #00b347 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+}
+
+.policy-fact span {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Tables (size guide, shipping times) */
+.policy-table-wrap {
+    overflow-x: auto;
+    margin: 6px 0 22px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 217, 87, 0.18);
+    -webkit-overflow-scrolling: touch;
+}
+
+.policy-table {
+    width: 100%;
+    min-width: 520px;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.policy-table th,
+.policy-table td {
+    padding: 13px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    white-space: nowrap;
+}
+
+.policy-table thead th {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #00ff7a;
+    background: rgba(0, 217, 87, 0.08);
+}
+
+.policy-table tbody th {
+    font-weight: 700;
+    color: #fff;
+}
+
+.policy-table td { color: rgba(255, 255, 255, 0.72); }
+.policy-table tbody tr:last-child th,
+.policy-table tbody tr:last-child td { border-bottom: none; }
+.policy-table tbody tr:hover td,
+.policy-table tbody tr:hover th { background: rgba(255, 255, 255, 0.025); }
+
+/* Definition rows (privacy "what we collect") */
+.policy-defs {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 10px 20px;
+    margin: 6px 0 22px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.policy-defs dt {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    padding-top: 2px;
+}
+
+.policy-defs dd {
+    font-size: 14px;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.68);
+    margin: 0;
+}
+
+/* Steps (returns process) */
+.policy-steps {
+    list-style: none;
+    margin: 6px 0 24px;
+    counter-reset: step;
+    display: grid;
+    gap: 12px;
+}
+
+.policy-steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 16px 18px 16px 62px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 217, 87, 0.16);
+    margin: 0;
+}
+
+.policy-steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: #001d0c;
+    background: linear-gradient(135deg, #00ff7a 0%, #00b347 100%);
+    box-shadow: 0 8px 18px rgba(0, 217, 87, 0.35);
+}
+
+.policy-steps li strong {
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* ===== FAQ accordion (mirrors contact.css .faq-item) ===== */
+.faq-group { margin-bottom: 40px; }
+.faq-group:last-child { margin-bottom: 0; }
+
+.faq-list { display: flex; flex-direction: column; gap: 14px; }
+
+.faq-item {
+    background: linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(0,60,30,0.16) 100%);
+    border: 1px solid rgba(0, 217, 87, 0.18);
+    border-radius: 18px;
+    backdrop-filter: blur(14px);
+    overflow: hidden;
+    transition: border-color 0.4s ease, background 0.4s ease;
+    scroll-margin-top: 110px;
+}
+
+.faq-item[open] {
+    border-color: rgba(0, 217, 87, 0.45);
+    background: linear-gradient(160deg, rgba(0,217,87,0.08) 0%, rgba(0,60,30,0.28) 100%);
+}
+
+.faq-item summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+
+.faq-toggle {
+    flex-shrink: 0;
+    position: relative;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00ff7a 0%, #00b347 100%);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.faq-toggle::before,
+.faq-toggle::after {
+    content: "";
+    position: absolute;
+    background: #001d0c;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.faq-toggle::before { width: 10px; height: 2px; }
+.faq-toggle::after  { width: 2px; height: 10px; transition: transform 0.4s ease; }
+.faq-item[open] .faq-toggle { transform: rotate(90deg); }
+.faq-item[open] .faq-toggle::after { transform: translate(-50%, -50%) scaleY(0); }
+
+.faq-item .faq-answer {
+    padding: 0 24px 22px;
+}
+
+.faq-item .faq-answer p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.72);
+    margin-bottom: 10px;
+}
+.faq-item .faq-answer p:last-child { margin-bottom: 0; }
+.faq-item .faq-answer ul { margin: 6px 0 10px 20px; }
+.faq-item .faq-answer li { font-size: 14px; margin-bottom: 4px; }
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    .policy { grid-template-columns: 220px minmax(0, 1fr); gap: 32px; padding: 50px 28px 100px; }
+    .policy-body { padding: 36px 32px; }
+}
+
+@media (max-width: 860px) {
+    .policy { grid-template-columns: 1fr; gap: 24px; }
+    .policy-side { position: static; }
+    .policy-toc { flex-direction: row; flex-wrap: wrap; gap: 6px; padding: 14px; }
+    .policy-toc-title { width: 100%; margin-bottom: 4px; }
+    .policy-toc a { padding: 8px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 50px; font-size: 12px; }
+    .policy-toc a:hover, .policy-toc a.is-active { padding-left: 12px; }
+    .policy-help { display: none; }
+    .policy-facts { grid-template-columns: 1fr 1fr; }
+    .policy-defs { grid-template-columns: 1fr; gap: 4px 0; }
+    .policy-defs dd { margin-bottom: 12px; }
+}
+
+@media (max-width: 720px) {
+    .policy { padding: 30px 16px 90px; }
+    .policy-body { padding: 26px 20px; border-radius: 22px; }
+    .policy-body section { scroll-margin-top: 20px; }
+    .policy-body h2 { font-size: 21px; }
+    .policy-body p, .policy-body li { font-size: 14px; }
+    .policy-intro { font-size: 15px; }
+    .policy-facts { grid-template-columns: 1fr; }
+    .faq-item summary { padding: 16px 18px; font-size: 15px; }
+    .faq-item .faq-answer { padding: 0 18px 18px; }
+    .policy-steps li { padding-left: 58px; }
+}

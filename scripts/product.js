@@ -19,8 +19,95 @@
         if (tabsEl) tabsEl.hidden = true;
         if (relatedEl) relatedEl.hidden = true;
         if (notFoundEl) notFoundEl.hidden = false;
+        // Don't let search engines index a "not found" template.
+        const nf = document.createElement('meta');
+        nf.name = 'robots'; nf.content = 'noindex';
+        document.head.appendChild(nf);
         return;
     }
+
+    // ===== SEO: canonical + description + Product / Breadcrumb JSON-LD =====
+    // product.html is one template for every product (?id=), so per-product
+    // metadata has to be set here. Google renders JS and reads dynamically
+    // injected JSON-LD; sitemap.xml lists every /product?id= URL so each one
+    // gets crawled. Organization/WebSite JSON-LD is already static in <head>.
+    (function injectProductSeo() {
+        const SITE = 'https://fakesmilestore.com';
+        const abs = (p) => SITE + '/' + String(p || '').replace(/^\/+/, '').replace(/ /g, '%20');
+        const url = SITE + '/product?id=' + encodeURIComponent(product.id);
+        const fullName = product.name + ' ' + product.tag;
+        const desc = (product.description || '').slice(0, 155);
+
+        let canon = document.querySelector('link[rel="canonical"]');
+        if (!canon) { canon = document.createElement('link'); canon.rel = 'canonical'; document.head.appendChild(canon); }
+        canon.href = url;
+        const setMeta = (sel, val) => { const el = document.querySelector(sel); if (el && val) el.content = val; };
+        setMeta('meta[name="description"]', desc);
+        setMeta('meta[property="og:title"]', document.title);
+        setMeta('meta[property="og:description"]', desc);
+        setMeta('meta[property="og:url"]', url);
+        setMeta('meta[property="og:image"]', abs(product.image));
+
+        const productLd = {
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            '@id': url + '#product',
+            name: fullName,
+            url: url,
+            image: [product.image, product.backImage, product.completewear].filter(Boolean).map(abs),
+            description: product.description || '',
+            sku: 'FS-' + product.id.toUpperCase(),
+            brand: { '@type': 'Brand', name: 'FakeSmile' },
+            manufacturer: { '@id': SITE + '/#org' },
+            category: product.category,
+            material: product.details && product.details.Material,
+            countryOfOrigin: { '@type': 'Country', name: 'Nigeria' },
+        };
+        if (!product.comingSoon) {
+            // NGN price as shown to Naira shoppers (base + per-item markup) —
+            // this is the amount actually charged via Nomba.
+            const markup = (typeof MARKUP_NGN === 'number') ? MARKUP_NGN : 0;
+            const ngn = Math.round((Number(product.price) || 0) + markup);
+            productLd.offers = {
+                '@type': 'Offer',
+                url: url,
+                priceCurrency: 'NGN',
+                price: String(ngn),
+                availability: 'https://schema.org/InStock',
+                itemCondition: 'https://schema.org/NewCondition',
+                seller: { '@id': SITE + '/#org' },
+                shippingDetails: {
+                    '@type': 'OfferShippingDetails',
+                    shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'NGN' },
+                    shippingDestination: [
+                        { '@type': 'DefinedRegion', addressCountry: 'NG' },
+                        { '@type': 'DefinedRegion', addressCountry: 'GB' },
+                    ],
+                    deliveryTime: {
+                        '@type': 'ShippingDeliveryTime',
+                        handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
+                        transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 14, unitCode: 'DAY' },
+                    },
+                },
+                hasMerchantReturnPolicy: { '@id': SITE + '/#returns' },
+            };
+        }
+        const crumbLd = {
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+                { '@type': 'ListItem', position: 2, name: 'Shop', item: SITE + '/shop' },
+                { '@type': 'ListItem', position: 3, name: fullName, item: url },
+            ],
+        };
+        [productLd, crumbLd].forEach((obj) => {
+            const s = document.createElement('script');
+            s.type = 'application/ld+json';
+            s.textContent = JSON.stringify(obj);
+            document.head.appendChild(s);
+        });
+    })();
 
     // ===== Populate hero strip =====
     document.title = `${product.name} ${product.tag} — FakeSmile`;

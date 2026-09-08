@@ -53,6 +53,12 @@ ServerSignature Off
 <FilesMatch "(?i)^(worker\.js|seed_flow\.html|wrangler\.toml)$">
   Require all denied
 </FilesMatch>
+# robots.txt MUST stay public — the .txt rule above would otherwise 403 it and
+# search engines would treat the site as un-crawlable. (sitemap.xml is .xml,
+# so it is not affected by the block list.)
+<Files "robots.txt">
+  Require all granted
+</Files>
 
 # ---- 5. Security headers -----------------------------------------------------
 <IfModule mod_headers.c>

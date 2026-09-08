@@ -1,0 +1,15 @@
+# fakesmilestore.com
+User-agent: *
+Allow: /
+# Account-style pages hold per-visitor data and have no search value.
+Disallow: /cart
+Disallow: /cart.html
+Disallow: /checkout
+Disallow: /checkout.html
+Disallow: /orders
+Disallow: /orders.html
+Disallow: /seed_flow
+Disallow: /seed_flow.html
+Disallow: /email-templates/
+
+Sitemap: https://fakesmilestore.com/sitemap.xml
