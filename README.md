@@ -23,6 +23,26 @@ brick/streetwear vibe. Tagline: _"Smile Even If It's Fake" · "Wear The Story" �
 - Font: Google Fonts **Poppins**.
 - Live exchange-rate data fetched from a public FX API (see §7).
 
+### Hosting / deploy — GitHub Pages (domain → this repo directly)
+The live site is served by **GitHub Pages** straight from the `main` branch
+root: **`git push origin main` = deployed** (~1 min). No file uploads.
+
+- `CNAME` (contains `fakesmilestore.com`) tells GitHub which domain serves
+  the repo — never delete it. `.nojekyll` stops GitHub's Jekyll pass so every
+  file is served exactly as committed.
+- Spaceship Advanced DNS for fakesmilestore.com: four `A` records on `@`
+  → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`,
+  `185.199.111.153`; `CNAME www` → `jaydee24hrs.github.io`. HTTPS is issued
+  by GitHub automatically ("Enforce HTTPS" in repo Settings → Pages).
+- GitHub Pages serves extension-less URLs natively (`/about` → `about.html`,
+  `/products/<id>` → `products/<id>.html`), so the clean URLs in the sitemap
+  work unchanged. It has **no server config**: `.htaccess` is ignored there
+  (kept only for an Apache host), so there are no custom security headers and
+  the `product?id=X` legacy URL is handled client-side by `product.js`
+  instead of a 301 (canonical still points at `/products/X`).
+- The repo is public, so nothing in it is secret — `worker.js` holds no keys
+  (they live in Cloudflare env vars).
+
 ### Testing
 Test in a **real browser** with a hard refresh (`Ctrl + F5`). The VSCode Live
 Preview serves over `file://` and hits navigation/security limits — avoid it for
