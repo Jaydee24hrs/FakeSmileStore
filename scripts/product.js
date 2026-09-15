@@ -9,10 +9,23 @@
     const tabsEl = detailEl ? detailEl.querySelector('.pd-tabs') : null;
     const relatedEl = detailEl ? detailEl.querySelector('.pd-related') : null;
 
-    // ===== Resolve product from URL =====
+    // ===== Resolve product =====
+    // Static product pages (products/<id>.html, built by tools/build-products.py)
+    // carry <body data-product-id>; the legacy product.html template reads ?id=.
+    // Static pages arrive fully rendered — this script simply re-hydrates the
+    // same DOM (idempotent) and wires up the interactions.
     const params = new URLSearchParams(window.location.search);
-    const id = (params.get('id') || '').trim();
+    const isStatic = !!document.body.dataset.productId;
+    const id = (document.body.dataset.productId || params.get('id') || '').trim();
     const product = typeof getProduct === 'function' ? getProduct(id) : null;
+
+    // Human-readable, unique alt text per view (Image Search + accessibility).
+    const altFor = (p, view) => {
+        const base = p.name + ' ' + p.tag;
+        if (view === 'back') return base + ' — back view, FakeSmile streetwear';
+        if (view === 'outfit') return base + ' worn as a full FakeSmile outfit';
+        return base + ' — front view, FakeSmile streetwear';
+    };
 
     if (!product) {
         if (layoutEl) layoutEl.hidden = true;
@@ -26,15 +39,15 @@
         return;
     }
 
-    // ===== SEO: canonical + description + Product / Breadcrumb JSON-LD =====
-    // product.html is one template for every product (?id=), so per-product
-    // metadata has to be set here. Google renders JS and reads dynamically
-    // injected JSON-LD; sitemap.xml lists every /product?id= URL so each one
-    // gets crawled. Organization/WebSite JSON-LD is already static in <head>.
-    (function injectProductSeo() {
+    // ===== SEO (legacy product.html?id= route only) =====
+    // Static pages already ship canonical/meta/JSON-LD in their <head>. The
+    // legacy template is 301'd to /products/<id> by .htaccess on the live
+    // server; if it's ever reached directly, point canonical at the static page
+    // and inject the same Product / Breadcrumb JSON-LD so nothing is lost.
+    if (!isStatic) (function injectProductSeo() {
         const SITE = 'https://fakesmilestore.com';
         const abs = (p) => SITE + '/' + String(p || '').replace(/^\/+/, '').replace(/ /g, '%20');
-        const url = SITE + '/product?id=' + encodeURIComponent(product.id);
+        const url = SITE + '/products/' + encodeURIComponent(product.id);
         const fullName = product.name + ' ' + product.tag;
         const desc = (product.description || '').slice(0, 155);
 
@@ -121,7 +134,7 @@
     const crumbName = document.getElementById('crumb-name');
     if (crumbCat) {
         crumbCat.textContent = product.category;
-        crumbCat.href = 'index.html#' + (product.categoryHash || 'products');
+        crumbCat.href = fsUrl('index.html#' + (product.categoryHash || 'products'));
     }
     if (crumbName) crumbName.textContent = `${product.name} ${product.tag}`;
     const heroAccent = document.getElementById('hero-title-accent');
@@ -147,8 +160,16 @@
 
     const imgEl = document.getElementById('pd-image');
     if (imgEl) {
-        imgEl.src = product.image;
-        imgEl.alt = `${product.name} ${product.tag}`;
+        imgEl.src = fsImg(product.image);
+        imgEl.alt = altFor(product, 'front');
+    }
+
+    // Review CTA: pre-fill the email subject with this product's name.
+    const reviewMail = document.getElementById('pd-review-mail');
+    if (reviewMail) {
+        reviewMail.href = 'mailto:fakeasmile29@gmail.com?subject=' +
+            encodeURIComponent('Review: ' + product.name + ' ' + product.tag) +
+            '&body=' + encodeURIComponent('Order number (FS-...): \nHow does it fit? \nA few words: \n(Attach a photo if you like!)');
     }
     // Match the shop card: dim the gallery for coming-soon products so the
     // inactive state reads the same on the listing and the preview page.
@@ -232,30 +253,31 @@
     const imageFrame = document.getElementById('pd-image-frame');
     if (thumbsEl) {
         thumbsEl.innerHTML = '';
-        const sources = [];
-        sources.push(product.image);
-        if (product.backImage) sources.push(product.backImage);
-        if (product.completewear) sources.push(product.completewear);
+        // Each entry: [site-relative src, alt text for the hero when selected]
+        const sources = [[product.image, altFor(product, 'front')]];
+        if (product.backImage) sources.push([product.backImage, altFor(product, 'back')]);
+        if (product.completewear) sources.push([product.completewear, altFor(product, 'outfit')]);
 
         // Add the matching partner item's front image (the joggers for a
         // hoodie, the shorts for a jersey, etc.)
         if (product.partner && typeof getProduct === 'function') {
             const partner = getProduct(product.partner);
             if (partner && partner.image) {
-                sources.push(partner.image);
+                sources.push([partner.image,
+                    partner.name + ' ' + partner.tag + ' — the matching piece for the ' + product.name + ' ' + product.tag]);
             }
         }
 
         const activeIndex = 0;
 
-        sources.forEach((src, i) => {
+        sources.forEach(([src, alt], i) => {
             const t = document.createElement('button');
             t.type = 'button';
             t.className = 'pd-thumb' + (i === activeIndex ? ' active' : '');
-            t.setAttribute('aria-label', `View image ${i + 1}`);
+            t.setAttribute('aria-label', 'View: ' + alt);
             const im = document.createElement('img');
-            im.src = src;
-            im.alt = '';
+            im.src = fsImg(src);
+            im.alt = alt;
             t.appendChild(im);
             t.addEventListener('click', () => {
                 thumbsEl.querySelectorAll('.pd-thumb').forEach((x) => x.classList.remove('active'));
@@ -263,7 +285,8 @@
                 if (imgEl) {
                     imgEl.style.opacity = '0';
                     setTimeout(() => {
-                        imgEl.src = src;
+                        imgEl.src = fsImg(src);
+                        imgEl.alt = alt;
                         imgEl.style.opacity = '';
                     }, 180);
                 }
@@ -381,13 +404,13 @@
         related.forEach((p) => {
             const a = document.createElement('a');
             a.className = 'pd-related-card';
-            a.href = 'product.html?id=' + encodeURIComponent(p.id);
+            a.href = productUrl(p.id);
             a.innerHTML = `
                 <div class="pd-related-img">
                     ${(p.comingSoon && p.badge !== 'Limited')
                         ? '<span class="pd-related-soon">Coming Soon</span>'
                         : (p.badge ? `<span class="pd-related-badge">${p.badge}</span>` : '')}
-                    <img loading="lazy" decoding="async" src="${p.image}" alt="${p.name} ${p.tag}">
+                    <img loading="lazy" decoding="async" src="${fsImg(p.image)}" alt="${altFor(p, 'front')}">
                 </div>
                 <div class="pd-related-info">
                     <span class="pd-related-tag">${p.tag}</span>

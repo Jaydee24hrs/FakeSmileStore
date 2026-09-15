@@ -7,9 +7,12 @@
 // card's link and reconcile it with products.js so prices (incl. the per-item
 // markup) and Coming-Soon state match the shop instead of drifting.
 function cardProductId(card) {
-    const link = card && card.querySelector('a[href*="product.html?id="]');
+    // Cards link to the static product page: products/<id>.html
+    // (legacy product.html?id=<id> links are still understood).
+    const link = card && card.querySelector('a[href*="products/"], a[href*="product.html?id="]');
     if (!link) return null;
-    const m = (link.getAttribute('href') || '').match(/[?&]id=([^&]+)/);
+    const href = link.getAttribute('href') || '';
+    const m = href.match(/products\/([a-z0-9-]+)\.html/i) || href.match(/[?&]id=([^&]+)/);
     return m ? decodeURIComponent(m[1]) : null;
 }
 function syncHomeCardsToCatalog() {

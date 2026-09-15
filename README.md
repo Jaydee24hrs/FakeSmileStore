@@ -12,8 +12,13 @@ brick/streetwear vibe. Tagline: _"Smile Even If It's Fake" · "Wear The Story" �
 
 ## 1. Tech Stack
 
-- **Pure static site** — HTML + vanilla CSS + vanilla JavaScript. No framework, no build step, no backend.
+- **Pure static site** — HTML + vanilla CSS + vanilla JavaScript. No framework, no backend.
 - Hosted as plain files; open `index.html` in a browser to run.
+- **One optional pre-render step** for SEO: `node tools/build-products.js` bakes
+  the 41 product pages (`products/<id>.html`), the shop grid and `sitemap.xml`
+  from `scripts/products.js`. Run it after editing the catalog or
+  `product.html` (see §4 and §13). Everything still works without it — the
+  JS renders the same content — but crawlers only see real HTML if you run it.
 - State persists in the browser via **`localStorage`** (cart, promo, currency, orders).
 - Font: Google Fonts **Poppins**.
 - Live exchange-rate data fetched from a public FX API (see §7).
@@ -31,7 +36,12 @@ flow testing (shop → product → cart → checkout → orders).
 fakesmile33/
 ├── index.html          Home — hero, category showcase, 4 product carousels, bento, CTA
 ├── shop.html           Full product grid with filters + sort
-├── product.html        Product detail page (reads ?id= from URL)
+├── product.html        Product detail TEMPLATE (legacy ?id= route; .htaccess 301s it
+│                        to /products/<id>) — edit THIS, then rebuild
+├── products/           GENERATED — 41 static product pages (products/<id>.html),
+│                        one per catalog entry, pre-rendered from product.html
+├── tools/
+│   └── build-products.js  Pre-render: products/*.html + shop grid + sitemap.xml
 ├── cart.html           Shopping cart
 ├── checkout.html       Checkout — contact/shipping/payment form + order summary
 ├── orders.html         Order history with delivery tracker + reorder
@@ -45,7 +55,7 @@ fakesmile33/
 ├── terms.html          Terms & Conditions
 ├── cookies.html        Cookie Policy (site uses localStorage, no tracking cookies)
 ├── robots.txt          Crawl rules + sitemap pointer (cart/checkout/orders disallowed)
-├── sitemap.xml         Static pages + every live /product?id= URL
+├── sitemap.xml         GENERATED — static pages + every /products/<id> URL
 ├── .htaccess           Clean URLs, HTTPS, security headers, blocks backend files
 ├── README.md           This file
 ├── worker.js           Cloudflare Worker (deployed separately) — Nomba payment proxy
@@ -100,7 +110,8 @@ fakesmile33/
 |---|---|---|
 | `index.html` | Home: hero + typewriter, category showcase, 4 carousels (Tops, Statement, Bottoms, Headwear), Full-Fit bridge banner, lifestyle banner, bento grid, contact CTA | products, base, home |
 | `shop.html` | All 45 products in a grid; filter pills (All / Tops & Hoodies / Statement Tops / Joggers & Shorts / Headwear); sort (Featured / Price / Name) | products, base, shop |
-| `product.html` | Single product detail via `?id=<slug>`; gallery + thumbs, size chips, qty, add-to-cart, tabs, randomized related products | products, base, product |
+| `products/<id>.html` | **Static** product detail (generated). Full HTML + Product/Breadcrumb JSON-LD in the page; `product.js` hydrates it (sizes, qty, add-to-cart, tabs, re-randomized related). Lives one folder down: `<html data-root="../">` + `<body data-product-id>` | products, base, product |
+| `product.html` | The template the above is generated from. Also still works as `?id=<slug>` (legacy); on the live server `.htaccess` 301s `product?id=X` → `/products/X` | products, base, product |
 | `cart.html` | Cart items, qty steppers, promo code, totals, "Proceed To Checkout" | base, cart |
 | `checkout.html` | 3-step form (Contact, Shipping, Payment), sticky order summary, success state | products, base, checkout |
 | `orders.html` | Order history cards, delivery tracker, "Buy Again", clear history | products, base, orders |
@@ -156,6 +167,16 @@ accepts (Visa · Mastercard · Verve · USSD · Bank Transfer).
     details: { Material, Fit, Sizes, Care, Origin },
 }
 ```
+
+### After editing the catalog — rebuild
+```
+node tools/build-products.js
+```
+Regenerates `products/*.html` (removes pages for deleted products), the
+pre-rendered grid in `shop.html` (between the `BUILD:SHOP-GRID` markers) and
+`sitemap.xml`. Product links everywhere are `products/<id>.html`
+(`productUrl(id)` in `base.js`); the home-page carousels are hand-authored,
+so add a card there manually if you want a new product featured on Home.
 
 ### Helper functions (in products.js)
 - `getProduct(id)` — returns the product object or `null`.
@@ -377,11 +398,26 @@ page now carries:
   names, Lagos address, email, socials, hours, 14-day `MerchantReturnPolicy`
   at `#returns`). Page-specific extras: `CollectionPage` (shop), `AboutPage`,
   `ContactPage`, `FAQPage` (faq — mirrors the visible Q&A text exactly).
-- `product.js` injects **`Product`** (images, SKU, brand, NGN price incl.
-  markup, `InStock`, free `OfferShippingDetails`, return-policy link) and
-  **`BreadcrumbList`** JSON-LD per product, and rewrites canonical / meta
-  description / OG tags for the `?id=` in the URL. Coming-Soon products get
-  no `offers`. The not-found state adds `noindex`.
+- **Static product pages** (`products/<id>.html`, built by
+  `tools/build-products.js`) ship **`Product`** (images, SKU, brand, NGN
+  price incl. markup, `InStock`, free `OfferShippingDetails`, return-policy
+  link) and **`BreadcrumbList`** JSON-LD, title, description, canonical and
+  OG tags as real HTML — no JS needed for crawlers. Coming-Soon products get
+  no `offers`. The legacy `product.html?id=` route injects the same via
+  `product.js` with canonical pointing at the static page, and `.htaccess`
+  301s it there on the live server. `shop.html` carries the full grid
+  pre-rendered so every product link is crawlable from one page.
+- **Alt text**: every product image has a unique, descriptive alt
+  (`"<Name> <Tag> — front view, FakeSmile streetwear"`, `— back view`,
+  `worn as a full FakeSmile outfit`, partner thumbs `the matching piece for…`)
+  — generated identically by `shop.js`, `product.js` and the build tool;
+  home-page cards and lifestyle photos were rewritten by hand. Only images
+  inside `aria-hidden` decorative figures keep `alt=""`.
+- **No fabricated reviews.** The old "4.9 · 218 reviews" rating and three
+  invented reviewers were removed from the product page. The Reviews tab is
+  an honest "verified orders only" panel with a Leave-a-Review mailto
+  (subject pre-filled per product) and an Instagram link. Add
+  `AggregateRating`/`Review` schema only once real reviews exist.
 - `cart` / `checkout` / `orders` are `noindex` and disallowed in `robots.txt`.
 - A site-wide footer line ("An independent streetwear label, est. Lagos 2023.
   The name is a statement — not a warning.") links to `about.html#real`, a
@@ -413,11 +449,10 @@ inaccurate summary; create a Google Business Profile for the studio address.
   (could be wired through the same EmailJS account easily).
 - ~~Footer links (FAQ, Shipping, Returns, Size Guide, Wholesale, Privacy/Terms/Cookies)
   are placeholders (`#`).~~ **DONE** — all real pages now (see §3 / §13).
-- Product page reviews ("4.9 · 218 reviews", three named reviewers) are
-  **static placeholder copy** in `product.html`, identical on every product.
-  They are deliberately *not* marked up as `AggregateRating`/`Review` schema
-  (fabricated review markup is a Google policy violation). Replace with real
-  reviews or remove — it's the biggest remaining trust risk.
+- ~~Product page reviews ("4.9 · 218 reviews", three named reviewers) are
+  static placeholder copy.~~ **REMOVED** — replaced by an honest verified-only
+  panel (§13). No review mechanism exists yet; reviews would be added by hand
+  from real customer emails.
 - "Orders" status is **time-simulated for visual progression**. Once Nomba is live,
   the `status` field on each order reflects real payment state (`paid`/`pending`),
   but ship/deliver stages still come from `orders.js`'s age-based heuristic
@@ -429,6 +464,29 @@ inaccurate summary; create a Google Business Profile for the studio address.
 
 ## 15. Change Log
 
+- **SEO pass 2 — static product pages, honest reviews, alt-text audit.**
+  (1) **Pre-rendered product pages**: new `tools/build-products.js` (Node, no
+  deps) executes `products.js` and bakes `products/<id>.html` for all 41
+  products from the `product.html` template — full HTML, per-product title /
+  description / canonical / OG, static `Product` + `BreadcrumbList` JSON-LD,
+  gallery with alt text, price, sizes, details and related links. Pages live
+  one folder down, so `base.js` gained `FS_ROOT` (from `<html data-root>`),
+  `fsUrl()`, `productUrl()` and split `fsImg()` (render, rooted) from
+  `fsImgPath()` (storage, never rooted) so cart/orders stay depth-agnostic;
+  tab bar, toast, resume banner and gallery use `fsUrl()`. `product.js`
+  hydrates a static page via `<body data-product-id>` and skips its JSON-LD
+  injection there. The shop grid is pre-rendered into `shop.html` between
+  `BUILD:SHOP-GRID` markers (shop.js still owns filtering/sorting). All
+  product links site-wide moved to `products/<id>.html`; `.htaccess` 301s
+  `product?id=X` → `/products/X` and `/products` → `/shop`. Sitemap now
+  lists the static URLs. (2) **Fake reviews removed** from `product.html`
+  (star rating, "218 reviews", three invented reviewers + their CSS);
+  replaced with an "Original FakeSmile design · Made in Lagos" line and a
+  verified-orders-only Reviews panel with a per-product mailto CTA.
+  (3) **Alt-text audit**: unique, descriptive alt on every product image
+  (front / back / outfit / matching-piece), home carousel cards and lifestyle
+  photos rewritten, gallery alt made specific; decorative `aria-hidden`
+  figures keep `alt=""`.
 - **Trust / SEO pass (dead policy links, structured data, robots + sitemap,
   "real brand" disambiguation).** Triggered by a Google AI Overview calling
   fakesmilestore.com a "suspicious e-commerce domain". (1) **Seven real

@@ -2,13 +2,39 @@
 /* === BASE SCRIPT (shared by every page) ====== */
 /* ============================================= */
 
+// ===== SITE ROOT (pages that live in a sub-folder) =====
+// Static product pages are served from /products/<id>, one level below the
+// root. Those pages declare <html data-root="../"> so every site-relative path
+// (images, scripts-generated links, tab bar hrefs) can be resolved from root.
+// Root-level pages leave data-root unset → FS_ROOT is '' and nothing changes.
+const FS_ROOT = document.documentElement.getAttribute('data-root') || '';
+
+// Resolve a site-relative URL ("images/x.webp", "cart.html") against FS_ROOT.
+// Absolute, protocol, anchor, mailto and data: URLs pass through untouched.
+function fsUrl(p) {
+    if (!p) return p;
+    const s = String(p);
+    if (/^(https?:|\/\/|\/|#|mailto:|tel:|data:|\.\.\/)/i.test(s)) return s;
+    return FS_ROOT + s;
+}
+
+// Canonical URL of a product's static detail page (site-relative, then rooted).
+function productUrl(id) {
+    return fsUrl('products/' + encodeURIComponent(String(id || '')) + '.html');
+}
+
 // ===== IMAGE PATH NORMALIZER =====
 // All images are WebP now. Orders/cart items saved in localStorage BEFORE the
 // WebP migration still hold .png/.jpg paths that no longer exist, so rewrite any
-// raster extension to .webp at render time. Falls back to the brand logo.
-function fsImg(path) {
+// raster extension to .webp. fsImgPath() is the STORAGE form (site-relative,
+// never prefixed — cart/orders are shared across pages at different depths);
+// fsImg() is the RENDER form (same path, resolved against FS_ROOT).
+function fsImgPath(path) {
     if (!path) return 'images/Fakesmile-1.webp';
     return String(path).replace(/\.(png|jpe?g)(\?.*)?$/i, '.webp$2');
+}
+function fsImg(path) {
+    return fsUrl(fsImgPath(path));
 }
 
 // ===== RESUME UNFINISHED PAYMENT =====
@@ -35,7 +61,7 @@ function fsImg(path) {
             bar.innerHTML =
                 '<span class="fs-resume-text">Payment started — finish your order ' +
                 (pending.id ? '<strong>' + pending.id + '</strong>' : '') + '</span>' +
-                '<a class="fs-resume-btn" href="checkout.html">Finish order</a>' +
+                '<a class="fs-resume-btn" href="' + fsUrl('checkout.html') + '">Finish order</a>' +
                 '<button class="fs-resume-close" aria-label="Dismiss">&times;</button>';
             document.body.appendChild(bar);
             bar.querySelector('.fs-resume-close').addEventListener('click', () => bar.remove());
@@ -279,13 +305,14 @@ function showCartToast(item) {
     toast.className = 'cart-toast';
     const safeName = (item && item.name ? item.name : 'Item').replace(/</g, '&lt;');
     const img = item && item.image ? fsImg(item.image) : '';
+    const fallback = fsImg('images/Fakesmile-1.webp');
     toast.innerHTML = `
-        ${img ? `<span class="toast-thumb"><img src="${img}" alt="" onerror="this.onerror=null;this.src='images/Fakesmile-1.webp'"></span>` : ''}
+        ${img ? `<span class="toast-thumb"><img src="${img}" alt="" onerror="this.onerror=null;this.src='${fallback}'"></span>` : ''}
         <span class="toast-body">
             <span class="toast-eyebrow">Added to bag</span>
             <strong class="toast-name">${safeName}</strong>
         </span>
-        <a href="cart.html" class="toast-cta" aria-label="View cart">
+        <a href="${fsUrl('cart.html')}" class="toast-cta" aria-label="View cart">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </a>
     `;
@@ -379,7 +406,7 @@ function addToCart(input) {
             tag: item.tag || '',
             size: item.size || '',
             price: item.price || 0,
-            image: item.image ? fsImg(item.image) : '',
+            image: item.image ? fsImgPath(item.image) : '', // storage form (never rooted)
             qty: item.qty || 1,
         });
     }
@@ -488,8 +515,9 @@ if (header) {
 (function mobileTabBar() {
     // Map the current page (filename or clean URL) to the tab it belongs under.
     function currentKey() {
-        const file = (window.location.pathname.split('/').pop() || '')
-            .replace(/\.html$/i, '').toLowerCase();
+        const path = window.location.pathname.toLowerCase();
+        if (/\/products\//.test(path)) return 'shop';   // static product pages
+        const file = (path.split('/').pop() || '').replace(/\.html$/i, '');
         if (file === '' || file === 'index') return 'home';
         if (file === 'product') return 'shop';      // product detail sits under Shop
         if (file === 'checkout') return 'cart';      // checkout sits under Cart
@@ -536,7 +564,7 @@ if (header) {
         nav.className = 'fs-tabbar';
         nav.setAttribute('aria-label', 'Primary');
         nav.innerHTML = TABS.map((t) =>
-            '<a class="fs-tab' + (t.key === active ? ' is-active' : '') + '" href="' + t.href + '"' +
+            '<a class="fs-tab' + (t.key === active ? ' is-active' : '') + '" href="' + fsUrl(t.href) + '"' +
             (t.key === active ? ' aria-current="page"' : '') + '>' +
                 '<span class="fs-tab-ico" aria-hidden="true">' +
                     '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" ' +

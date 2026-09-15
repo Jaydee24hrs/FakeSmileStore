@@ -32,11 +32,14 @@
             ? 'product-image-wrap product-image-fb'
             : 'product-image-wrap';
 
+        // Descriptive, per-view alt text (Image Search + screen readers).
+        const altFront = safeAttr(p.name + ' ' + p.tag + ' — front view, FakeSmile streetwear');
+        const altBack  = safeAttr(p.name + ' ' + p.tag + ' — back view, FakeSmile streetwear');
         const imgs = hasBack
-            ? '<img loading="lazy" decoding="async" class="fb-front" src="' + safeAttr(p.image) + '" alt="' + safeAttr(p.name + ' ' + p.tag) + '">' +
-              '<img loading="lazy" decoding="async" class="fb-back" src="' + safeAttr(p.backImage) + '" alt="' + safeAttr(p.name + ' ' + p.tag + ' back') + '">' +
+            ? '<img loading="lazy" decoding="async" class="fb-front" src="' + safeAttr(p.image) + '" alt="' + altFront + '">' +
+              '<img loading="lazy" decoding="async" class="fb-back" src="' + safeAttr(p.backImage) + '" alt="' + altBack + '">' +
               '<span class="fb-hint">F &middot; B</span>'
-            : '<img loading="lazy" decoding="async" src="' + safeAttr(p.image) + '" alt="' + safeAttr(p.name + ' ' + p.tag) + '">';
+            : '<img loading="lazy" decoding="async" src="' + safeAttr(p.image) + '" alt="' + altFront + '">';
 
         const cs = !!p.comingSoon;
 
@@ -66,7 +69,7 @@
         return '<article class="product-card shop-card' + (cs ? ' coming-soon' : '') + '" data-category="' + safeAttr(p.category) + '">' +
                  '<div class="product-glass">' +
                    badge +
-                   '<a class="' + wrapClass + '" href="product.html?id=' + encodeURIComponent(p.id) + '" aria-label="View ' + ariaName + '">' +
+                   '<a class="' + wrapClass + '" href="' + productUrl(p.id) + '" aria-label="View ' + ariaName + '">' +
                      '<div class="product-glow"></div>' +
                      imgs +
                    '</a>' +

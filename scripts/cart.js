@@ -71,7 +71,7 @@
             // like "cloud-brick-hoodie-set"; strip the suffix so we land on
             // the canonical hoodie/jersey product page.
             const baseProductId = (it.productId || '').replace(/-set$/, '');
-            const productHref = baseProductId ? `product.html?id=${encodeURIComponent(baseProductId)}` : '#';
+            const productHref = baseProductId ? productUrl(baseProductId) : 'shop.html';
             return `
                 <article class="cart-item" data-id="${it.id}">
                     <button class="cart-item-remove" data-action="remove" aria-label="Remove ${safeName}">

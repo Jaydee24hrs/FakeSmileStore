@@ -33,6 +33,13 @@ ServerSignature Off
   RewriteRule ^(email-templates|scripts/.*\.map)(/|$) - [F]
 
   # ---- 3. Clean URLs -------------------------------------------------------
+  # 3-pre. Legacy product URLs (product.html?id=X / product?id=X) -> the static
+  #        per-product page /products/X (301, query dropped). Must run before
+  #        3a so an old link doesn't bounce twice.
+  RewriteCond %{QUERY_STRING} ^id=([a-z0-9-]+)$ [NC]
+  RewriteRule ^product(\.html)?$ /products/%1? [R=301,L,NE]
+  # /products (the folder itself has no index) -> the shop.
+  RewriteRule ^products/?$ /shop [R=301,L]
   # 3a. Bounce any direct .html request to its extension-less URL (301) so the
   #     address bar shows /contact, not /contact.html. Query string is kept.
   RewriteCond %{THE_REQUEST} \s/+([^.\s?]+)\.html[\s?] [NC]

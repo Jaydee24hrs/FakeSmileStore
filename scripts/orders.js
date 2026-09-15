@@ -213,7 +213,7 @@
                 tag: it.tag,
                 size: it.size,
                 price: it.price,
-                image: fsImg(it.image),
+                image: fsImgPath(it.image),
                 qty: it.qty || 1,
             });
         });
