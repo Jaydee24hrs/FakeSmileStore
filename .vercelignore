@@ -1,0 +1,13 @@
+# Files that live in the repo but must NEVER be published to the website.
+# (Equivalent of the block lists in .htaccess.)
+worker.js
+DEPLOY-WORKER.md
+README.md
+WEBSITE-COMPLETION-ANALYSIS.txt
+seed_flow.html
+email-templates/
+tools/
+.htaccess
+.claude/
+.gitignore
+.vercelignore

@@ -23,6 +23,22 @@ brick/streetwear vibe. Tagline: _"Smile Even If It's Fake" · "Wear The Story" �
 - Font: Google Fonts **Poppins**.
 - Live exchange-rate data fetched from a public FX API (see §7).
 
+### Hosting / deploy
+Two supported targets — pick one, the site files are identical:
+
+- **Vercel (Git-connected, recommended)** — `vercel.json` + `.vercelignore`.
+  Import the GitHub repo on vercel.com (framework *Other*, no build command,
+  output dir `.`), add `fakesmilestore.com` + `www` under Project → Domains,
+  and point Spaceship DNS at it (`A @ 76.76.21.21`, `CNAME www
+  cname.vercel-dns.com`). Every `git push` to `main` goes live in ~30 s.
+  `vercel.json` mirrors the `.htaccess` rules (clean URLs, `product?id=X →
+  /products/X`, security headers) — **change both when you change one**.
+  Note: preview deploys on `*.vercel.app` can't call the Nomba worker (its
+  CORS is pinned to `https://fakesmilestore.com`); test checkout on the real
+  domain only.
+- **Apache/LiteSpeed (cPanel) manual upload** — upload everything except
+  the files listed in `.vercelignore`; `.htaccess` does the routing.
+
 ### Testing
 Test in a **real browser** with a hard refresh (`Ctrl + F5`). The VSCode Live
 Preview serves over `file://` and hits navigation/security limits — avoid it for

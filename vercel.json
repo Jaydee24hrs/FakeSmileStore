@@ -1,0 +1,50 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "_comment": "Vercel equivalent of .htaccess (which Apache-only hosting used). Keep the two in sync: clean URLs, legacy product redirects, security headers.",
+
+  "cleanUrls": true,
+  "trailingSlash": false,
+
+  "redirects": [
+    {
+      "source": "/product",
+      "has": [{ "type": "query", "key": "id", "value": "(?<id>[a-z0-9-]+)" }],
+      "destination": "/products/:id",
+      "permanent": true
+    },
+    {
+      "source": "/product.html",
+      "has": [{ "type": "query", "key": "id", "value": "(?<id>[a-z0-9-]+)" }],
+      "destination": "/products/:id",
+      "permanent": true
+    },
+    { "source": "/products", "destination": "/shop", "permanent": true },
+    { "source": "/index", "destination": "/", "permanent": true },
+    { "source": "/index.html", "destination": "/", "permanent": true }
+  ],
+
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=()" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://fakesmile-nomba.josephnwach11.workers.dev https://api.emailjs.com https://latest.currency-api.pages.dev https://cdn.jsdelivr.net https://ipapi.co; upgrade-insecure-requests"
+        }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/(styles|scripts)/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    }
+  ]
+}
