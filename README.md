@@ -61,7 +61,9 @@ fakesmile33/
 ├── products/           GENERATED — 41 static product pages (products/<id>.html),
 │                        one per catalog entry, pre-rendered from product.html
 ├── tools/
-│   └── build-products.js  Pre-render: products/*.html + shop grid + sitemap.xml
+│   ├── build-products.js  Pre-render: products/*.html + shop grid + sitemap.xml
+│   └── make-favicons.py   Regenerates favicon.ico + images/favicon-*/apple-touch-icon/
+│                           android-chrome-* from images/Fakesmile-1.webp (needs Pillow)
 ├── cart.html           Shopping cart
 ├── checkout.html       Checkout — contact/shipping/payment form + order summary
 ├── orders.html         Order history with delivery tracker + reorder
@@ -76,6 +78,8 @@ fakesmile33/
 ├── cookies.html        Cookie Policy (site uses localStorage, no tracking cookies)
 ├── robots.txt          Crawl rules + sitemap pointer (cart/checkout/orders disallowed)
 ├── sitemap.xml         GENERATED — static pages + every /products/<id> URL
+├── favicon.ico         GENERATED — multi-size (16-256px) browser/Google-Search icon
+├── site.webmanifest    PWA/Android icon manifest (theme #050505)
 ├── .htaccess           Clean URLs, HTTPS, security headers, blocks backend files
 ├── README.md           This file
 ├── worker.js           Cloudflare Worker (deployed separately) — Nomba payment proxy
@@ -458,6 +462,21 @@ date on the page you changed.
 submit `sitemap.xml`; use the AI Overview's feedback control to flag the
 inaccurate summary; create a Google Business Profile for the studio address.
 
+**Favicon.** Every page carries a full icon set generated from the brick
+"smile" arc of `images/Fakesmile-1.webp` (the full logo, with its "FAKE
+SMILE" text banner, turns to mush at 16-32px — only the bottom smile arc was
+cropped in): `favicon.ico` (16-256px, what Google Search/old browsers
+auto-request), `images/favicon-{16,32,48}x{16,32,48}.png`,
+`images/apple-touch-icon.png` (180px, flattened onto `#050505` since iOS
+doesn't render transparency cleanly), `images/android-chrome-{192,512}.png`
+and `site.webmanifest`. All linked with root-absolute paths (`/favicon.ico`
+etc.), which resolve identically for root pages and `/products/<id>.html`.
+Regenerate with `python tools/make-favicons.py` (needs Pillow) if the logo
+changes, then re-run the favicon `<link>` insertion by hand on any new page
+(copy the 6-line block from `product.html`'s `<head>`). A changed favicon can
+take days to refresh in Google's cached search-result icon — no code fixes
+that faster.
+
 ---
 
 ## 14. Known Stubs / Not Yet Built
@@ -484,6 +503,17 @@ inaccurate summary; create a Google Business Profile for the studio address.
 
 ## 15. Change Log
 
+- **Favicon added (was missing entirely — Google Search showed a generic
+  fallback icon).** Cropped just the bottom "smile" arc out of
+  `images/Fakesmile-1.webp` (the full logo's text banner is illegible at
+  favicon sizes) via new `tools/make-favicons.py`, producing `favicon.ico`
+  (16-256px multi-size), `images/favicon-16x16.png` / `-32x32.png` /
+  `-48x48.png`, `images/apple-touch-icon.png` (flattened on `#050505`),
+  `images/android-chrome-192x192.png` / `-512x512.png`, and
+  `site.webmanifest`. `<link rel="icon">` / `apple-touch-icon` / `manifest` /
+  `theme-color` inserted into every page's `<head>` (root-absolute paths, so
+  they work unchanged for both root pages and `/products/<id>.html`) and into
+  `product.html` so `tools/build-products.js` carries it into every rebuild.
 - **SEO pass 2 — static product pages, honest reviews, alt-text audit.**
   (1) **Pre-rendered product pages**: new `tools/build-products.js` (Node, no
   deps) executes `products.js` and bakes `products/<id>.html` for all 41
