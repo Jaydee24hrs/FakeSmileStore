@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
-"""Generate the full favicon set from the FakeSmile brick-smile logo.
+"""Generate the full favicon set from the complete FakeSmile logo.
 
 Source: images/mainfav.webp — a cleaner, higher-res re-export of the brand
 mark (opaque, white background) supplied specifically for icon generation.
 This is DIFFERENT from images/Fakesmile-1.webp (the header/footer logo,
 already transparent) — mainfav has a flat white background that must be
-removed first, and different crop coordinates since its canvas differs.
+removed first.
+
+NOTE: the full mark (circular badge + "FAKE SMILE" text banner) reads as
+mostly a green/black blob at 16-32px — the text isn't legible that small in
+ANY favicon of this kind of detailed logo. An earlier version of this script
+cropped to just the bottom "smile" arc for a cleaner tiny icon, but the brand
+owner asked for the complete logo, so this uses the whole mark. If legibility
+at 16px becomes a problem later, revisit that crop (see git history).
 
 Run: python tools/make-favicons.py   (needs Pillow: pip install Pillow)
 Re-run this whenever mainfav.webp changes; nothing else needs updating —
@@ -18,42 +25,36 @@ ROOT = r"C:\Users\user.DESKTOP-VOKI26B\Downloads\fakesmilestore"
 SRC = os.path.join(ROOT, "images", "mainfav.webp")
 DARK_BG = (5, 5, 5, 255)  # site's #050505 background — matches the logo's own black ring
 
-# The full logo (circular badge + "FAKE SMILE" text banner) turns to
-# illegible mush at 16-32px favicon sizes. Use just the bottom "smile" arc
-# instead — a brick-textured half-circle with two eye-notches and a smiling
-# curve, which reads clearly as a green smiley mark even at 16px.
-CROP_BOX = (140, 500, 890, 890)  # found by overlaying a grid on the 1024x1024 source
-
 im = Image.open(SRC).convert("RGB")
 
 # mainfav.webp has a flat white background (no alpha) — remove it via
-# flood-fill BEFORE cropping. Flood-filling from the FULL image's corners
-# works because the outer ring there is a solid, unbroken ~15-20px black
-# circle; flood-filling from a crop's own corners instead breaches the ring
-# wherever the crop boundary cuts across a thin/anti-aliased transition
-# (this bit us once — the top of CROP_BOX sits right where the text banner's
-# bottom edge meets the circle rim, which is JPEG-softened, not solid black).
+# flood-fill from the image's corners. The outer ring is a solid, unbroken
+# ~15-20px black circle, so a generous threshold can't leak into the artwork.
 work = im.copy()
 SENTINEL = (255, 0, 255)  # not present anywhere in the real artwork
 for seed in [(0, 0), (im.width - 1, 0), (0, im.height - 1), (im.width - 1, im.height - 1)]:
     ImageDraw.floodfill(work, seed, SENTINEL, thresh=40)
 
-crop = im.crop(CROP_BOX)
-work = work.crop(CROP_BOX)
-w, h = crop.size
-rgba = crop.convert("RGBA")
+rgba = im.convert("RGBA")
 px_rgba = rgba.load()
 px_work = work.load()
-for y in range(h):
-    for x in range(w):
+for y in range(im.height):
+    for x in range(im.width):
         if px_work[x, y] == SENTINEL:
             r, g, b, _ = px_rgba[x, y]
             px_rgba[x, y] = (r, g, b, 0)
 
-# Pad to a square canvas (transparent) so the round mark isn't stretched.
+# Trim the now-transparent margin (empty space, not logo content) and pad
+# back out to a square with a small breathing margin, so the complete mark
+# fills the favicon frame instead of sitting tiny in the middle.
+bbox = rgba.getbbox()
+trimmed = rgba.crop(bbox)
+w, h = trimmed.size
 side = max(w, h)
-square = Image.new("RGBA", (side, side), (0, 0, 0, 0))
-square.paste(rgba, ((side - w) // 2, (side - h) // 2), rgba)
+margin = int(side * 0.04)
+canvas_size = side + margin * 2
+square = Image.new("RGBA", (canvas_size, canvas_size), (0, 0, 0, 0))
+square.paste(trimmed, ((canvas_size - w) // 2, (canvas_size - h) // 2), trimmed)
 
 
 def save_png(size, path, flatten_bg=None):
