@@ -85,6 +85,8 @@ fakesmile33/
 ├── worker.js           Cloudflare Worker (deployed separately) — Nomba payment proxy
 │                        + webhook / idempotent order completion (KV-backed)
 ├── DEPLOY-WORKER.md    Step-by-step setup for Nomba + EmailJS (one-time, ~25 min)
+├── GOOGLE-SIGNIN-SETUP.md  Step-by-step setup for the account button's Google
+│                        Sign-In (one-time, ~10 min) — see §14
 │
 ├── scripts/
 │   ├── products.js     PRODUCTS database (45 products) + getProduct / getRelatedProducts
@@ -95,7 +97,8 @@ fakesmile33/
 │   ├── cart.js         cart.html — cart render, qty, promo, checkout nav
 │   ├── checkout.js     checkout.html — summary, validation, place order
 │   ├── orders.js       orders.html — order history render, tracker, reorder
-│   └── contact.js      contact.html — contact form validation
+│   ├── contact.js      contact.html — contact form validation
+│   └── auth.js         Google Sign-In for the header account button — see §14
 │
 ├── styles/
 │   ├── base.css        Shared — header, footer, page-hero, buttons, cart toast, currency
@@ -488,7 +491,52 @@ search-result icon — no code fixes that faster.
 
 ---
 
-## 14. Known Stubs / Not Yet Built
+## 14. Customer Account (Google Sign-In)
+
+The header account button (mobile Home only — the circular icon top-right,
+next to the logo) opens a Google Sign-In panel via `scripts/auth.js`. Setup
+(one-time, needs a Google Cloud OAuth Client ID) is in
+`GOOGLE-SIGNIN-SETUP.md`; until that's done, the button shows a "not switched
+on yet" message instead of a broken sign-in flow.
+
+**What it is:** a client-only identity layer, no backend, no password.
+Google hands back a signed ID token via [Google Identity
+Services](https://developers.google.com/identity/gsi/web); `auth.js` decodes
+it (without verifying the signature — there's no server to verify against)
+to read the customer's name, email and photo, and keeps that in
+`localStorage.fs_user` so the header can greet them. `google.accounts.id.renderButton`
+draws the actual "Sign in with Google" button inside a glass modal
+(`.fs-account-overlay` / `.fs-account-panel` in `base.css`) that opens on
+click; signed-in state shows the avatar (or initials) in the header button
+itself and a small panel with a "My Orders" link and Sign Out.
+
+**What it deliberately does NOT do:**
+- **No cross-device order sync.** "My Orders" still reads
+  `localStorage.fs_orders`, unchanged — same per-browser history as before
+  sign-in existed. A real account system needs a backend (e.g. extending
+  the Cloudflare Worker + KV used for Nomba orders to key records by the
+  signed-in email) — not built; a natural next step if wanted.
+- **Not a security boundary.** Never gate a paid action or reveal private
+  data based on `fs_user` alone — it's decoded client-side and could be
+  forged by anyone editing their own localStorage. Fine for a greeting,
+  not for anything that matters.
+- Signing out clears the local state and calls `disableAutoSelect()` (so
+  Google won't silently resume the session next visit) but doesn't revoke
+  anything on Google's side.
+
+**Where it's wired up:** only `index.html` today (the one place the button
+existed, previously disabled). To add the same button elsewhere, copy the
+`<button class="header-profile">` markup and load `scripts/auth.js` after
+`scripts/base.js` — it finds any `.header-profile` button automatically.
+
+**Privacy/cookies:** disclosed in `privacy.html` (§2, §4) and `cookies.html`
+(§3, §4) — Google Identity Services may set its own `g_state` cookie when
+the button is used, and `fs_user` is a new localStorage key. Update both
+pages if this feature's scope changes.
+
+---
+
+## 15. Known Stubs / Not Yet Built
 
 - ~~**Payment processing**~~ — **DONE**: Nomba via Cloudflare Worker. Needs the
   Worker deployed (see `DEPLOY-WORKER.md`) and 3 Nomba keys + 4 EmailJS values
@@ -507,10 +555,29 @@ search-result icon — no code fixes that faster.
   (no real fulfilment integration).
 - Unused `Completewear` images `64` and `67` are not yet mapped to a product;
   images `95`/`96` (a green/white tank pair) are also unmapped.
+- **Google Sign-In needs a one-time setup step** (`GOOGLE-SIGNIN-SETUP.md`) —
+  `scripts/auth.js` still has the placeholder `GOOGLE_CLIENT_ID` until then.
+  See §14.
+- Google Business Profile and Trustpilot accounts exist for the brand but
+  aren't yet linked into the site's `Organization` JSON-LD `sameAs` array
+  (see §13) — add their URLs there once available; it strengthens the
+  "this is a real business" signal search engines use.
 
 ---
 
-## 15. Change Log
+## 16. Change Log
+
+- **Customer account button wired to Google Sign-In.** The previously
+  disabled mobile-home header account icon now opens a glass modal with a
+  real Google Sign-In button (`scripts/auth.js` + Google Identity
+  Services). Client-only: no backend, decoded ID token stored in
+  `localStorage.fs_user`, no cross-device order sync (see §14 for the full
+  honesty section on what this does and doesn't do). New
+  `GOOGLE-SIGNIN-SETUP.md` walks through creating the OAuth Client ID.
+  Updated `privacy.html` / `cookies.html` to disclose the new data flow
+  and the `g_state` cookie Google's button may set; `.htaccess` CSP
+  updated to allow `accounts.google.com` (inert on GitHub Pages, kept
+  accurate for any future Apache host).
 
 - **Favicon: use the complete logo, not the cropped smile arc.** Brand-owner
   call, overriding the earlier crop-for-legibility choice.

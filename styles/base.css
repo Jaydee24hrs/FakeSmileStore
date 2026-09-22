@@ -1410,7 +1410,7 @@ html, body {
     .page-home .cart-wrapper { display: none; }
     .page-home .logo img { width: 48px; height: 48px; }
 
-    /* Inactive account placeholder — visible only on the mobile home header. */
+    /* Account button — visible only on the mobile home header. */
     .page-home .header-profile {
         display: grid;
         place-items: center;
@@ -1421,9 +1421,140 @@ html, body {
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.14);
         color: rgba(255, 255, 255, 0.55);
-        cursor: default;
+        cursor: pointer;
         padding: 0;
+        overflow: hidden;
+        transition: border-color 0.25s ease, background 0.25s ease, transform 0.15s ease;
     }
+    .page-home .header-profile:hover { border-color: rgba(0, 217, 87, 0.5); color: #00ff7a; }
+    .page-home .header-profile:active { transform: scale(0.92); }
+    .page-home .header-profile.is-signed-in {
+        border-color: rgba(0, 217, 87, 0.6);
+        background: rgba(0, 217, 87, 0.1);
+        color: #00ff7a;
+    }
+    .header-profile img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .header-profile-initials { font-size: 14px; font-weight: 800; letter-spacing: 0.02em; }
+}
+
+/* ============================================= */
+/* === ACCOUNT PANEL (Google Sign-In) =========== */
+/* ============================================= */
+.fs-account-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 90px 16px 16px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    animation: fsAccountFadeIn 0.2s ease;
+}
+
+@keyframes fsAccountFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.fs-account-panel {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    padding: 30px 26px 26px;
+    border-radius: 26px;
+    background: linear-gradient(160deg, rgba(20, 60, 50, 0.5) 0%, rgba(8, 20, 16, 0.92) 100%);
+    border: 1px solid rgba(0, 217, 87, 0.28);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    animation: fsAccountPop 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fsAccountPop {
+    from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.fs-account-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.fs-account-close:hover { background: rgba(255, 255, 255, 0.14); color: #fff; }
+
+.fs-account-head { text-align: center; margin-bottom: 20px; }
+.fs-account-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 14px;
+    border-radius: 50%;
+    background: rgba(0, 217, 87, 0.1);
+    border: 1px solid rgba(0, 217, 87, 0.3);
+    color: #00ff7a;
+}
+.fs-account-head h3 { font-size: 18px; font-weight: 800; color: #fff; margin: 0 0 8px; }
+.fs-account-head p { font-size: 13px; line-height: 1.6; color: rgba(255, 255, 255, 0.62); margin: 0; }
+
+.fs-account-avatar {
+    display: block;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(0, 217, 87, 0.4);
+}
+.fs-account-avatar-fallback {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #00ff7a 0%, #00b347 100%);
+    color: #001d0c;
+    font-weight: 800;
+    font-size: 20px;
+}
+.fs-account-email { font-size: 13px; color: rgba(255, 255, 255, 0.55); margin: 0; }
+
+.fs-gsi-btn { display: flex; justify-content: center; margin-bottom: 14px; min-height: 44px; }
+
+.fs-account-note {
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255, 176, 0, 0.9);
+    background: rgba(255, 176, 0, 0.08);
+    border: 1px solid rgba(255, 176, 0, 0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin: 0 0 14px;
+}
+
+.fs-account-fine {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0;
+}
+.fs-account-fine a { color: rgba(0, 255, 122, 0.75); text-decoration: none; }
+.fs-account-fine a:hover { color: #00ff7a; }
+
+.fs-account-links { margin-bottom: 12px; }
+.fs-account-links .page-btn { width: 100%; }
+.fs-account-signout { width: 100%; color: rgba(255, 120, 120, 0.85) !important; }
+.fs-account-signout:hover { border-color: rgba(255, 120, 120, 0.5) !important; background: rgba(255, 80, 80, 0.1) !important; color: #ff8080 !important; }
+
+@media (max-width: 420px) {
+    .fs-account-overlay { padding: 80px 12px 12px; align-items: center; }
+    .fs-account-panel { padding: 26px 20px 20px; }
 }
 
 @keyframes fsBadgePop {

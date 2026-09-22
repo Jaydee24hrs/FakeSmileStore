@@ -84,10 +84,12 @@ ServerSignature Off
 
   # Content-Security-Policy — allows exactly the external services in use:
   #   scripts : self + inline (the site inlines scripts) + jsDelivr (EmailJS SDK)
+  #             + accounts.google.com (Google Sign-In button, scripts/auth.js)
   #   styles  : self + inline + Google Fonts stylesheet
   #   fonts   : self + Google Fonts files
   #   images  : self + data: URIs + any https image
   #   connect : self + Nomba worker + EmailJS API + currency API + geo API
-  #   frames  : none can embed us; we embed nothing
-  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://fakesmile-nomba.josephnwach11.workers.dev https://api.emailjs.com https://latest.currency-api.pages.dev https://ipapi.co; upgrade-insecure-requests"
+  #             + accounts.google.com (Google Sign-In)
+  #   frames  : we embed only Google's Sign-In iframe/button; nothing can embed us
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; frame-src https://accounts.google.com; form-action 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://fakesmile-nomba.josephnwach11.workers.dev https://api.emailjs.com https://latest.currency-api.pages.dev https://ipapi.co https://accounts.google.com; upgrade-insecure-requests"
 </IfModule>
