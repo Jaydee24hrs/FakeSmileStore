@@ -461,6 +461,27 @@ window.addEventListener('storage', (e) => {
     }
 });
 
+// ===== SHARED WORKER ENDPOINT (Nomba orders + drop-alert subscribers) =====
+// Same Cloudflare Worker used by checkout.js (NOMBA_WORKER_URL there — kept
+// as a separate constant since base.js loads on every page, not just
+// checkout.html, and both files declare a top-level const of their own).
+const FS_WORKER_BASE = 'https://fakesmile-nomba.josephnwach11.workers.dev';
+
+// POST an email to the Worker's /subscribe endpoint (KV-backed, see
+// worker.js) so drop-alert signups are a real, exportable list — not a
+// decorative form. Shared by the footer newsletter form and the drop-alert
+// banner below. Returns { ok, alreadySubscribed } or throws.
+async function fsSubscribeEmail(email, source) {
+    const res = await fetch(FS_WORKER_BASE + '/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: source || 'unknown' }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Something went wrong');
+    return data;
+}
+
 // ===== FOOTER =====
 const footerYear = document.getElementById('footer-year');
 if (footerYear) footerYear.textContent = new Date().getFullYear();
@@ -469,10 +490,11 @@ const newsletterForm = document.getElementById('newsletter-form');
 if (newsletterForm) {
     const input = newsletterForm.querySelector('input[type="email"]');
     const hint = newsletterForm.querySelector('.newsletter-hint');
+    const submitBtn = newsletterForm.querySelector('.newsletter-submit');
     const submit = newsletterForm.querySelector('.newsletter-submit span');
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    newsletterForm.addEventListener('submit', (e) => {
+    newsletterForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const value = input.value.trim();
         if (!emailRegex.test(value)) {
@@ -482,10 +504,24 @@ if (newsletterForm) {
             return;
         }
         hint.classList.remove('error');
-        hint.textContent = `You're in. Welcome to the movement, ${value.split('@')[0]}.`;
-        submit.textContent = 'Subscribed';
-        input.value = '';
-        setTimeout(() => { submit.textContent = 'Subscribe'; }, 2500);
+        submit.textContent = 'Subscribing…';
+        submitBtn.disabled = true;
+        try {
+            const data = await fsSubscribeEmail(value, 'footer');
+            localStorage.setItem('fs_drop_alert_subscribed', '1');
+            hint.textContent = data.alreadySubscribed
+                ? "You're already in the movement — thanks!"
+                : `You're in. Welcome to the movement, ${value.split('@')[0]}.`;
+            submit.textContent = 'Subscribed';
+            input.value = '';
+        } catch (err) {
+            hint.classList.add('error');
+            hint.textContent = "Couldn't reach the server — try again in a moment.";
+            submit.textContent = 'Subscribe';
+        } finally {
+            submitBtn.disabled = false;
+            setTimeout(() => { if (submit.textContent !== 'Subscribed') submit.textContent = 'Subscribe'; }, 2500);
+        }
     });
 }
 
@@ -585,4 +621,138 @@ if (header) {
     } else {
         build();
     }
+})();
+
+// ===== DROP ALERT BANNER (email capture for new-drop notifications) =====
+// A time-of-day-aware banner, shown once per calendar day per visitor (and
+// again right after a Google sign-in — a natural signup moment), that
+// captures an email via fsSubscribeEmail() into the same Cloudflare Worker
+// used for Nomba orders (POST /subscribe → KV, prefix "sub:"), so drops can
+// actually be announced later — not a decorative form. See
+// DEPLOY-WORKER.md for the (optional) owner-notification email setup and
+// how to pull the subscriber list.
+(function dropAlertBanner() {
+    const SHOWN_KEY = 'fs_drop_alert_shown_date';
+    const SUBSCRIBED_KEY = 'fs_drop_alert_subscribed';
+
+    // Don't distract someone mid-payment.
+    if (/checkout\.html$/i.test(window.location.pathname)) return;
+
+    function todayStr() {
+        const d = new Date();
+        return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    }
+
+    function greeting() {
+        const h = new Date().getHours();
+        if (h < 12) return { part: 'morning', emoji: '☀️' };
+        if (h < 17) return { part: 'afternoon', emoji: '🌤️' };
+        return { part: 'evening', emoji: '🌙' };
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let bannerEl = null;
+
+    function closeBanner() {
+        if (!bannerEl) return;
+        const el = bannerEl;
+        bannerEl = null;
+        el.classList.remove('is-in');
+        setTimeout(() => el.remove(), 250);
+    }
+
+    function buildBanner(opts) {
+        // Replacing an already-open banner (e.g. sign-in fires while the daily
+        // one is still up) removes it INSTANTLY, not via closeBanner()'s fade —
+        // fading the old one out while fading the new one in at the same fixed
+        // position double-exposed both for ~250ms. closeBanner() (animated) is
+        // reserved for genuine dismiss/success-close, where there's no
+        // replacement banner competing for the same screen position.
+        if (bannerEl) { bannerEl.remove(); bannerEl = null; }
+        const g = greeting();
+        const firstName = opts && opts.name ? opts.name.split(' ')[0] : '';
+        const el = document.createElement('div');
+        el.className = 'fs-drop-banner';
+        el.setAttribute('role', 'complementary');
+        el.setAttribute('aria-label', 'New drop alerts sign-up');
+        el.innerHTML =
+            '<button type="button" class="fs-drop-close" aria-label="Dismiss">' +
+                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+            '</button>' +
+            '<div class="fs-drop-head">' +
+                '<span class="fs-drop-emoji" aria-hidden="true">' + g.emoji + '</span>' +
+                '<h4>Good ' + g.part + (firstName ? ', ' + firstName : '') + '!</h4>' +
+            '</div>' +
+            '<p class="fs-drop-sub">Be first to hear about new drops, restocks and colorways &mdash; straight to your inbox.</p>' +
+            '<form class="fs-drop-form" novalidate>' +
+                '<input type="email" class="fs-drop-input" placeholder="you@example.com" required>' +
+                '<button type="submit" class="fs-drop-submit"><span>Notify Me</span></button>' +
+            '</form>' +
+            '<p class="fs-drop-hint" aria-live="polite"></p>' +
+            '<p class="fs-drop-fine">No spam &mdash; just drop alerts. Unsubscribe anytime.</p>';
+
+        document.body.appendChild(el);
+        bannerEl = el;
+        requestAnimationFrame(() => el.classList.add('is-in'));
+
+        const input = el.querySelector('.fs-drop-input');
+        if (opts && opts.email) input.value = opts.email;
+
+        el.querySelector('.fs-drop-close').addEventListener('click', closeBanner);
+
+        const form = el.querySelector('.fs-drop-form');
+        const hint = el.querySelector('.fs-drop-hint');
+        const submitBtn = el.querySelector('.fs-drop-submit');
+        const submitLabel = submitBtn.querySelector('span');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const value = input.value.trim();
+            if (!emailRegex.test(value)) {
+                hint.classList.add('is-error');
+                hint.textContent = 'Drop a valid email so we can reach you.';
+                input.focus();
+                return;
+            }
+            hint.classList.remove('is-error');
+            hint.textContent = 'Adding you to the list…';
+            submitLabel.textContent = 'Sending…';
+            submitBtn.disabled = true;
+            try {
+                const data = await fsSubscribeEmail(value, opts && opts.source || 'banner');
+                localStorage.setItem(SUBSCRIBED_KEY, '1');
+                hint.classList.remove('is-error');
+                hint.textContent = data.alreadySubscribed
+                    ? "You're already on the list — thanks!"
+                    : "You're on the list! Watch your inbox.";
+                submitLabel.textContent = 'Added';
+                setTimeout(closeBanner, 2200);
+            } catch (err) {
+                hint.classList.add('is-error');
+                hint.textContent = "Couldn't reach the server — try again in a moment.";
+                submitLabel.textContent = 'Notify Me';
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    function run() {
+        if (localStorage.getItem(SUBSCRIBED_KEY) === '1') return;
+        if (localStorage.getItem(SHOWN_KEY) === todayStr()) return;
+        localStorage.setItem(SHOWN_KEY, todayStr());
+        setTimeout(() => buildBanner({ source: 'daily' }), 1400);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+    else run();
+
+    // Right after a successful Google sign-in (a natural signup moment),
+    // show it immediately — bypassing the once-a-day gate — prefilled with
+    // their Google email, unless they're already subscribed.
+    document.addEventListener('user:update', (e) => {
+        const user = e.detail && e.detail.user;
+        if (!user || localStorage.getItem(SUBSCRIBED_KEY) === '1') return;
+        localStorage.setItem(SHOWN_KEY, todayStr());
+        setTimeout(() => buildBanner({ name: user.name, email: user.email, source: 'signin' }), 500);
+    });
 })();

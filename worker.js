@@ -23,11 +23,25 @@
      EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID,
      EMAILJS_TEMPLATE_SELLER, EMAILJS_TEMPLATE_CUSTOMER
 
+     --- Drop-alert subscribers (optional) ---
+     EMAILJS_TEMPLATE_SUBSCRIBE — EmailJS template that notifies YOU when
+                           someone joins the drop-alert list. Only sent if
+                           this is set AND the EMAILJS_* values above are
+                           configured (same email setup as order emails).
+     SUBSCRIBERS_EXPORT_KEY — a long random secret you make up. Required to
+                           use GET /subscribers (see below) — without it,
+                           that endpoint is disabled (emails still save to
+                           KV, you just can't pull the list until you set
+                           this). Set it with `wrangler secret put`, same as
+                           the other secrets — never put it in this file.
+
    KV BINDING (optional but recommended):
      ORDERS — a KV namespace bound as `ORDERS`. Stores the draft order at
               create-checkout time so the webhook can finalize + email it
               even if the customer's browser never returns. Without it, the
               site falls back to browser-side completion (today's behavior).
+              ALSO doubles as the drop-alert subscriber list (keys prefixed
+              "sub:") — no second KV namespace needed.
 
    ENDPOINTS:
      POST /create-checkout  { amount, email, orderId, callbackUrl,
@@ -38,6 +52,14 @@
        -> { status:'paid'|'failed'|'pending', emailed:bool, order? }
      POST /webhook          (Nomba -> us; HMAC-signed) payment_success
      GET  /order-status?ref=<orderReference>     -> { status, order? }
+     POST /subscribe        { email, source? }   -> { ok, alreadySubscribed }
+       Called by the site's drop-alert banner (scripts/base.js) and footer
+       newsletter form. Stores the email in KV so it's a real, exportable
+       list — not just a decorative form.
+     GET  /subscribers?key=<SUBSCRIBERS_EXPORT_KEY>
+       -> { count, subscribers: [{ email, subscribedAt, source }] }
+       Pull the list to paste into whatever you send drop announcements
+       with. Example: curl "https://<your-worker>.workers.dev/subscribers?key=YOUR_SECRET"
    ============================================================== */
 
 export default {
@@ -69,6 +91,12 @@ export default {
             }
             if (url.pathname === '/order-status' && request.method === 'GET') {
                 return await handleOrderStatus(url, env);
+            }
+            if (url.pathname === '/subscribe' && request.method === 'POST') {
+                return await handleSubscribe(request, env);
+            }
+            if (url.pathname === '/subscribers' && request.method === 'GET') {
+                return await handleSubscribersExport(url, env);
             }
             if (url.pathname === '/' || url.pathname === '/health') {
                 return json({ ok: true, service: 'fakesmile-nomba-worker' }, 200, env);
@@ -222,6 +250,85 @@ async function handleOrderStatus(url, env) {
     const rec = await env.ORDERS.get('order:' + ref, 'json');
     if (!rec) return json({ status: 'unknown', stored: false }, 200, env);
     return json({ status: rec.status, emailed: !!rec.emailsSent, order: rec.order }, 200, env);
+}
+
+/* ============================================================== */
+/* === DROP-ALERT SUBSCRIBERS ==================================== */
+/* ============================================================== */
+// Reuses the ORDERS KV namespace with a "sub:" key prefix — no second KV
+// binding to set up. Stored indefinitely (no TTL): this is a marketing
+// list, not transient order data, so it doesn't expire like orders do.
+
+function isValidEmail(email) {
+    return typeof email === 'string' && email.length <= 254 &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function handleSubscribe(request, env) {
+    let body;
+    try { body = await request.json(); } catch (_) { return json({ error: 'Invalid JSON body' }, 400, env); }
+
+    const email = String((body && body.email) || '').trim().toLowerCase();
+    if (!isValidEmail(email)) {
+        return json({ error: 'Please enter a valid email address.' }, 400, env);
+    }
+    if (!env.ORDERS) {
+        return json({ error: 'Subscriber storage is not configured on this Worker (bind a KV namespace as ORDERS).' }, 503, env);
+    }
+
+    const key = 'sub:' + email;
+    const existing = await env.ORDERS.get(key, 'json');
+    if (existing) {
+        return json({ ok: true, alreadySubscribed: true }, 200, env);
+    }
+
+    const record = {
+        email,
+        subscribedAt: Date.now(),
+        source: (body && String(body.source || '').slice(0, 40)) || 'unknown',
+    };
+    await env.ORDERS.put(key, JSON.stringify(record)); // no expirationTtl — keep indefinitely
+
+    // Best-effort "you have a new subscriber" ping to the owner. Never blocks
+    // or fails the signup if email isn't configured or the send errors.
+    if (env.EMAILJS_TEMPLATE_SUBSCRIBE && emailConfigured(env)) {
+        try {
+            await sendEmailJS(env, env.EMAILJS_TEMPLATE_SUBSCRIBE, {
+                subscriber_email: email,
+                subscribed_at: new Date(record.subscribedAt).toISOString(),
+                source: record.source,
+            });
+        } catch (e) {
+            console.error('Subscriber notify email failed (continuing):', e);
+        }
+    }
+
+    return json({ ok: true, alreadySubscribed: false }, 200, env);
+}
+
+async function handleSubscribersExport(url, env) {
+    if (!env.SUBSCRIBERS_EXPORT_KEY) {
+        return json({ error: 'Export not enabled. Set SUBSCRIBERS_EXPORT_KEY as a Worker secret first.' }, 501, env);
+    }
+    const provided = url.searchParams.get('key') || '';
+    if (!timingSafeEqual(provided, env.SUBSCRIBERS_EXPORT_KEY)) {
+        return json({ error: 'Unauthorized' }, 401, env);
+    }
+    if (!env.ORDERS) return json({ error: 'KV not configured' }, 503, env);
+
+    const subscribers = [];
+    let cursor;
+    do {
+        const page = await env.ORDERS.list({ prefix: 'sub:', cursor, limit: 1000 });
+        for (const k of page.keys) {
+            const rec = await env.ORDERS.get(k.name, 'json');
+            if (rec) subscribers.push(rec);
+        }
+        cursor = page.list_complete ? undefined : page.cursor;
+    } while (cursor);
+
+    subscribers.sort((a, b) => (b.subscribedAt || 0) - (a.subscribedAt || 0));
+    return json({ count: subscribers.length, subscribers }, 200, env);
 }
 
 /* ============================================================== */

@@ -84,6 +84,7 @@ fakesmile33/
 ├── README.md           This file
 ├── worker.js           Cloudflare Worker (deployed separately) — Nomba payment proxy
 │                        + webhook / idempotent order completion (KV-backed)
+│                        + /subscribe + /subscribers (drop-alert list, same KV)
 ├── DEPLOY-WORKER.md    Step-by-step setup for Nomba + EmailJS (one-time, ~25 min)
 ├── GOOGLE-SIGNIN-SETUP.md  Step-by-step setup for the account button's Google
 │                        Sign-In (one-time, ~10 min) — see §14
@@ -387,6 +388,9 @@ Stored in `localStorage.fs_cart_promo`. The home bento grid copies `STREETS25` t
 | `fs_currency` | `NGN` or `GBP` |
 | `fs_fx_rate` | Cached FX rate `{ ratio, date, fetchedAt }` |
 | `fs_orders` | Placed orders (array) |
+| `fs_user` | Signed-in Google identity `{ sub, name, email, picture, signedInAt }` (§14) |
+| `fs_drop_alert_shown_date` | Date the drop-alert banner last showed — caps it at once/day (§14a) |
+| `fs_drop_alert_subscribed` | Set once the visitor joins the drop-alert list — banner stops showing |
 
 (`localStorage` also holds a short-lived `fs_pending_order` key during the
 Nomba round-trip — it lets checkout.js complete the order on return from
@@ -536,13 +540,53 @@ pages if this feature's scope changes.
 
 ---
 
+## 14a. Drop Alert Banner (email capture)
+
+A non-blocking corner banner (`.fs-drop-banner` in `base.css`, built by the
+`dropAlertBanner()` IIFE in `scripts/base.js`) that greets the visitor by
+time of day ("Good morning/afternoon/evening") and asks for an email so
+they can be notified about new drops. Unlike a typical placeholder popup,
+the email actually goes somewhere: `fsSubscribeEmail()` POSTs to the same
+Cloudflare Worker used for Nomba orders, `/subscribe`, which stores it in
+the `ORDERS` KV namespace (key `sub:<email>`, no expiry — a marketing list,
+not transient order data). See `DEPLOY-WORKER.md` §10 for the one-time setup
+(reuses the KV already bound in §9a; the owner-notification email and the
+`/subscribers` export endpoint are additional optional steps there).
+
+**When it shows:**
+- Once per calendar day per visitor, on any page except `checkout.html`
+  (`localStorage.fs_drop_alert_shown_date` gates this).
+- Immediately after a successful Google sign-in (§14) — a natural signup
+  moment — bypassing the once-a-day gate, prefilled with the Google email.
+- Never again once `localStorage.fs_drop_alert_subscribed` is set (they
+  joined the list; the footer newsletter form sets the same flag, so
+  subscribing either way silences both).
+
+**What it deliberately does NOT do:** send the actual drop announcements —
+that's still a manual step for the owner (pull the list via
+`GET /subscribers?key=...`, then email it via Gmail/Mailchimp/whatever).
+There's no bulk-sender built into the site.
+
+**The footer newsletter form** (`#newsletter-form`, on every page) was
+previously decorative — it validated an email and showed a fake success
+message but never sent anywhere. It now calls the same `fsSubscribeEmail()`
+helper, so both entry points feed the one real list.
+
+---
+
 ## 15. Known Stubs / Not Yet Built
 
 - ~~**Payment processing**~~ — **DONE**: Nomba via Cloudflare Worker. Needs the
   Worker deployed (see `DEPLOY-WORKER.md`) and 3 Nomba keys + 4 EmailJS values
   pasted into the config block at the top of `scripts/checkout.js`.
-- Newsletter & contact forms validate + show a message but don't send anywhere
-  (could be wired through the same EmailJS account easily).
+- ~~Newsletter & contact forms validate + show a message but don't send anywhere.~~
+  **DONE for the newsletter form** — see §14a; it now saves real subscribers.
+  The contact form (`contact.js`) still only validates client-side and
+  doesn't send anywhere — wiring it through EmailJS (like checkout does) is
+  the natural next step.
+- **Drop-alert subscribers need one setup step** to be pulled/used —
+  `SUBSCRIBERS_EXPORT_KEY` (see `DEPLOY-WORKER.md` §10b). Without it, emails
+  still save to KV, you just can't export them yet.
 - ~~Footer links (FAQ, Shipping, Returns, Size Guide, Wholesale, Privacy/Terms/Cookies)
   are placeholders (`#`).~~ **DONE** — all real pages now (see §3 / §13).
 - ~~Product page reviews ("4.9 · 218 reviews", three named reviewers) are
@@ -567,6 +611,21 @@ pages if this feature's scope changes.
 
 ## 16. Change Log
 
+- **Drop-alert banner: real email capture, not a decorative popup.** New
+  time-of-day-greeting corner banner (`dropAlertBanner()` in
+  `scripts/base.js`, `.fs-drop-banner` in `base.css`) shown once/day per
+  visitor and again right after Google sign-in (§14). Submits via the new
+  `fsSubscribeEmail()` helper to a new `POST /subscribe` endpoint on the
+  Nomba Worker (`worker.js`), which stores emails in the existing `ORDERS`
+  KV namespace (prefix `sub:`, no expiry) and optionally pings the owner
+  via EmailJS (`EMAILJS_TEMPLATE_SUBSCRIBE`). New `GET /subscribers?key=...`
+  (guarded by a new `SUBSCRIBERS_EXPORT_KEY` secret) lets the owner pull the
+  list to actually send drop announcements with. **Also fixed the footer
+  newsletter form**, which previously validated and showed a fake success
+  message but sent nowhere — it now calls the same `fsSubscribeEmail()` and
+  feeds the same list. `DEPLOY-WORKER.md` §10 documents setup (reuses the
+  KV from §9a — no new namespace); `privacy.html` / `cookies.html` updated.
+  See §14a.
 - **Customer account button wired to Google Sign-In.** The previously
   disabled mobile-home header account icon now opens a glass modal with a
   real Google Sign-In button (`scripts/auth.js` + Google Identity

@@ -1557,6 +1557,123 @@ html, body {
     .fs-account-panel { padding: 26px 20px 20px; }
 }
 
+/* ============================================= */
+/* === DROP ALERT BANNER (email capture) ======== */
+/* ============================================= */
+/* Non-blocking corner card (not a full-screen modal) — reads as a promo
+   banner, not an interruption. Injected by scripts/base.js. */
+.fs-drop-banner {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 480; /* below .fs-resume-banner (9999) — finishing a payment wins */
+    width: 100%;
+    max-width: 328px;
+    padding: 22px 22px 18px;
+    border-radius: 22px;
+    background: linear-gradient(160deg, rgba(20, 60, 50, 0.55) 0%, rgba(6, 16, 12, 0.94) 100%);
+    border: 1px solid rgba(0, 217, 87, 0.3);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+.fs-drop-banner.is-in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.fs-drop-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.65);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.fs-drop-close:hover { background: rgba(255, 255, 255, 0.14); color: #fff; }
+
+.fs-drop-head { display: flex; align-items: center; gap: 10px; margin: 0 26px 8px 0; }
+.fs-drop-emoji { font-size: 22px; line-height: 1; flex-shrink: 0; }
+.fs-drop-head h4 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; letter-spacing: -0.2px; }
+
+.fs-drop-sub {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0 0 16px;
+}
+
+.fs-drop-form { display: flex; gap: 8px; margin-bottom: 8px; }
+.fs-drop-input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+}
+.fs-drop-input::placeholder { color: rgba(255, 255, 255, 0.4); }
+.fs-drop-input:focus { outline: none; border-color: rgba(0, 217, 87, 0.6); background: rgba(0, 217, 87, 0.06); }
+
+.fs-drop-submit {
+    flex-shrink: 0;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #00d957, #00ff7a);
+    color: #001b0c;
+    font-weight: 700;
+    font-size: 12.5px;
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.fs-drop-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0, 217, 87, 0.4); }
+.fs-drop-submit:disabled { opacity: 0.7; cursor: default; }
+
+.fs-drop-hint {
+    min-height: 15px;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: #00ff7a;
+    margin: 0 0 6px;
+}
+.fs-drop-hint.is-error { color: #ff8080; }
+.fs-drop-hint:empty { margin: 0; }
+
+.fs-drop-fine {
+    font-size: 10.5px;
+    color: rgba(255, 255, 255, 0.38);
+    margin: 0;
+}
+
+@media (max-width: 640px) {
+    .fs-drop-banner {
+        left: 12px;
+        right: 12px;
+        bottom: calc(96px + env(safe-area-inset-bottom, 0px)); /* clear the bottom tab bar */
+        max-width: none;
+        width: auto;
+        padding: 20px 20px 16px;
+    }
+}
+
 @keyframes fsBadgePop {
     0%   { transform: scale(1); }
     45%  { transform: scale(1.45); }

@@ -253,6 +253,58 @@ In the Nomba dashboard → **Webhooks** (or Developers → Webhooks):
 
 ---
 
+## 10. Drop-alert subscribers (optional, ~5 minutes)
+
+The site's drop-alert banner (`scripts/base.js`) and footer newsletter form
+both POST to the same Worker at `/subscribe`, storing emails in the **same
+`ORDERS` KV namespace** from step 9a — no new KV to create. If you did step
+9, this already works: open your site, subscribe with a test email, then
+check Cloudflare → your Worker → **KV → (your namespace)** for a new key
+named `sub:you@example.com`.
+
+Two more things are optional on top of that:
+
+### 10a. Get pinged when someone subscribes
+
+1. In EmailJS, create one more template (like the seller/customer ones) —
+   e.g. a plain one that says *"New drop-alert subscriber: {{subscriber_email}}
+   (via {{source}}) at {{subscribed_at}}"*. Copy its template ID.
+2. Cloudflare → your Worker → **Settings → Variables and Secrets** → add:
+
+   | Variable name | Value |
+   |---|---|
+   | `EMAILJS_TEMPLATE_SUBSCRIBE` | the template ID from above |
+
+   (Needs the same `EMAILJS_PRIVATE_KEY` / `EMAILJS_PUBLIC_KEY` /
+   `EMAILJS_SERVICE_ID` already set in step 9b — if you skipped 9b, set
+   those three too.)
+3. Save & Deploy. Test by subscribing again with a new email.
+
+### 10b. Export the subscriber list (to actually email people about a drop)
+
+The site has no bulk-email sender built in — this just gets you the list to
+paste into whatever you send the announcement with (Gmail BCC, Mailchimp,
+etc.).
+
+1. Make up a long random secret (a password generator is fine) — this is
+   **not** a Nomba/EmailJS key, just a key you invent yourself.
+2. Cloudflare → your Worker → **Settings → Variables and Secrets** → add:
+
+   | Variable name | Value |
+   |---|---|
+   | `SUBSCRIBERS_EXPORT_KEY` | the random secret you just made up |
+
+3. Save & Deploy. Then visit (in a browser, or `curl`):
+
+   ```
+   https://<your-worker-subdomain>.workers.dev/subscribers?key=<your secret>
+   ```
+
+   Returns `{ count, subscribers: [{ email, subscribedAt, source }] }`.
+   **Keep that URL private** — anyone with the key can pull the whole list.
+
+---
+
 ## Troubleshooting
 
 | Problem | Fix |
@@ -266,6 +318,9 @@ In the Nomba dashboard → **Webhooks** (or Developers → Webhooks):
 | Webhook returns 503 "webhook not configured" | `NOMBA_SIGNATURE_KEY` isn't set on the Worker (step 9b). |
 | Duplicate order emails | Both browser and Worker emailed. Make sure the EmailJS server vars (step 9b) are set so the Worker is the single sender; the site auto-skips browser email when the server reports `emailed:true`. |
 | Webhook fires but no email / order | KV not bound as `ORDERS`, or EmailJS server vars missing. Without KV the Worker can confirm payment but can't store/email the order details. |
+| Drop-alert banner says "Couldn't reach the server" | `ORDERS` KV isn't bound (step 9a) — `/subscribe` needs it even if you never set up webhooks/EmailJS. |
+| `/subscribers` returns 501 "Export not enabled" | `SUBSCRIBERS_EXPORT_KEY` isn't set (step 10b). |
+| `/subscribers` returns 401 Unauthorized | The `?key=` in the URL doesn't match `SUBSCRIBERS_EXPORT_KEY` exactly. |
 
 ---
 
