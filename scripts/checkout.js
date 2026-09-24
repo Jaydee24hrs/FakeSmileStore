@@ -94,7 +94,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         if (count === 0 && !localStorage.getItem(PENDING_ORDER_KEY)) {
             layout.style.display = 'none';
             if (emptyEl) emptyEl.hidden = false;
-            if (heroSubEl) heroSubEl.textContent = 'Nothing to check out — add a fit first.';
+            if (heroSubEl) heroSubEl.textContent = 'Nothing to check out. Add a fit first.';
             return { count, subtotal, discount, total };
         }
 
@@ -142,7 +142,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
     /* === PAYMENT METHOD UI ========================= */
     /* ============================================= */
     const paymentNotes = {
-        nomba: 'You\'ll be redirected to <strong>Nomba</strong> to complete payment. Card · Bank · USSD · Transfer — all in one secure flow.',
+        nomba: 'You\'ll be redirected to <strong>Nomba</strong> to complete payment. Card · Bank · USSD · Transfer, all in one secure flow.',
     };
 
     function updatePaymentUI() {
@@ -365,7 +365,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             // Only an EXPLICIT "failed" sends the customer back to the form.
             if (outcome && outcome.status === 'failed') {
                 localStorage.removeItem(PENDING_ORDER_KEY);
-                showFailure('Payment did not complete. Your bag is still saved — try again when ready.');
+                showFailure('Payment did not complete. Your bag is still saved. Try again when ready.');
                 return true;
             }
 
@@ -403,7 +403,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         if (layout) layout.style.display = 'none';
         if (emptyEl) emptyEl.hidden = true;
         if (successEl) successEl.hidden = true;
-        if (heroSubEl) heroSubEl.textContent = 'Payment confirmed — sending your confirmation…';
+        if (heroSubEl) heroSubEl.textContent = 'Payment confirmed, sending your confirmation…';
 
         // Send the seller + customer emails from the browser UNLESS the server
         // already did (webhook, once live keys are in). We AWAIT them (capped at
@@ -428,7 +428,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         if (layout) layout.style.display = 'none';
         if (emptyEl) emptyEl.hidden = true;
         if (successEl) successEl.hidden = true;
-        if (heroSubEl) heroSubEl.textContent = 'Order confirmed — taking you to your orders…';
+        if (heroSubEl) heroSubEl.textContent = 'Order confirmed, taking you to your orders…';
         if (history.replaceState) {
             history.replaceState({}, document.title, window.location.pathname);
         }
@@ -539,7 +539,7 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
 
         const itemsText = (order.items || []).map((it) => {
             const sizeStr = it.size ? ` (Size ${it.size})` : '';
-            return `${it.qty} × ${it.name}${sizeStr} — ${formatPrice(it.price * it.qty)}`;
+            return `${it.qty} × ${it.name}${sizeStr}: ${formatPrice(it.price * it.qty)}`;
         }).join('\n');
 
         const shipAddr = [

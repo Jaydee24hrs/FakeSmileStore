@@ -160,7 +160,7 @@
             promoInput.value = saved.code;
             if (promoHint) {
                 promoHint.classList.remove('error');
-                promoHint.textContent = `${saved.label} applied — ${Math.round(saved.off * 100)}% off.`;
+                promoHint.textContent = `${saved.label} applied: ${Math.round(saved.off * 100)}% off.`;
             }
         }
         promoApply.addEventListener('click', () => {
@@ -175,7 +175,7 @@
                 setPromo(code);
                 if (promoHint) {
                     promoHint.classList.remove('error');
-                    promoHint.textContent = `${code} applied — ${Math.round(VALID_PROMOS[code].off * 100)}% off.`;
+                    promoHint.textContent = `${code} applied: ${Math.round(VALID_PROMOS[code].off * 100)}% off.`;
                 }
             } else {
                 setPromo(null);

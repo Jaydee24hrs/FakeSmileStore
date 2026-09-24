@@ -78,7 +78,7 @@
         const user = getUser();
         if (user) {
             btn.classList.add('is-signed-in');
-            btn.setAttribute('aria-label', 'Account — signed in as ' + (user.name || user.email));
+            btn.setAttribute('aria-label', 'Account: signed in as ' + (user.name || user.email));
             btn.title = user.name || user.email;
             btn.innerHTML = user.picture
                 ? '<img src="' + user.picture + '" alt="" referrerpolicy="no-referrer">'
@@ -105,7 +105,7 @@
             '<div class="fs-account-head">' +
                 '<span class="fs-account-icon">' + DEFAULT_ICON + '</span>' +
                 '<h3>Sign in to FakeSmile</h3>' +
-                '<p>Sign in with Google for a faster checkout and to see your name here. We only ever read your name, email and photo — never your Google password.</p>' +
+                '<p>Sign in with Google for a faster checkout and to see your name here. We only ever read your name, email and photo, never your Google password.</p>' +
             '</div>' +
             (configured
                 ? '<div class="fs-gsi-btn" id="fs-gsi-btn"></div>'
@@ -197,7 +197,7 @@
             // The GIS script (accounts.google.com/gsi/client) loads async and
             // may not be ready the instant the panel opens — poll briefly.
             attempt = (attempt || 0) + 1;
-            if (attempt > 20) { container.innerHTML = '<p class="fs-account-note">Sign-in is taking a moment to load — please try again.</p>'; return; }
+            if (attempt > 20) { container.innerHTML = '<p class="fs-account-note">Sign-in is taking a moment to load. Please try again.</p>'; return; }
             setTimeout(() => renderGsiButton(container, attempt), 150);
             return;
         }

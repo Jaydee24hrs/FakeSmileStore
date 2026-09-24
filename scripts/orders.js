@@ -141,7 +141,7 @@
                         <div class="order-foot-info">
                             <div class="order-foot-line">
                                 <span class="label">Ship to</span>
-                                <span class="value">${escapeHtml(shipName)}${shipName && shipParts ? ' &mdash; ' : ''}${escapeHtml(shipParts)}</span>
+                                <span class="value">${escapeHtml(shipName)}${shipName && shipParts ? ', ' : ''}${escapeHtml(shipParts)}</span>
                             </div>
                             <div class="order-foot-line">
                                 <span class="label">Payment</span>
@@ -170,7 +170,7 @@
         if (orders.length === 0) {
             if (wrapEl) wrapEl.hidden = true;
             if (emptyEl) emptyEl.hidden = false;
-            if (heroSubEl) heroSubEl.textContent = 'No orders yet — the drop is live, pull up.';
+            if (heroSubEl) heroSubEl.textContent = 'No orders yet, the drop is live, pull up.';
             return;
         }
 

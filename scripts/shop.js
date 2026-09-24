@@ -33,8 +33,8 @@
             : 'product-image-wrap';
 
         // Descriptive, per-view alt text (Image Search + screen readers).
-        const altFront = safeAttr(p.name + ' ' + p.tag + ' — front view, FakeSmile streetwear');
-        const altBack  = safeAttr(p.name + ' ' + p.tag + ' — back view, FakeSmile streetwear');
+        const altFront = safeAttr(p.name + ' ' + p.tag + ', front view, FakeSmile streetwear');
+        const altBack  = safeAttr(p.name + ' ' + p.tag + ', back view, FakeSmile streetwear');
         const imgs = hasBack
             ? '<img loading="lazy" decoding="async" class="fb-front" src="' + safeAttr(p.image) + '" alt="' + altFront + '">' +
               '<img loading="lazy" decoding="async" class="fb-back" src="' + safeAttr(p.backImage) + '" alt="' + altBack + '">' +

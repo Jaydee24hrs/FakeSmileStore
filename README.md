@@ -611,6 +611,30 @@ helper, so both entry points feed the one real list.
 
 ## 16. Change Log
 
+- **Removed every em/en-dash from visible site copy; tightened mobile hero
+  spacing.** Two brand-owner-reported fixes: (1) On phones, `.hero-title`
+  and `.hero-brand` kept their full desktop `margin-bottom`/`min-height`
+  while the surrounding text shrank (pretitle/tagline font-size), so the
+  *gaps* stayed desktop-sized and read as excess empty space around short
+  lines — tightened in the `@media (max-width: 768px)` block in `base.css`.
+  (2) Every em/en-dash in user-facing text (titles, meta descriptions,
+  JSON-LD, body copy, alt text, JS-generated UI strings) was replaced: two
+  independent clauses (`"brand — it's a truth"`) become two sentences
+  (`"brand. It's a truth."`); a trailing descriptor becomes a comma; a
+  parenthetical pair of dashes becomes actual parentheses; day/time/number
+  ranges (`Mon–Sat`, `9am–6pm`, `14–21`) become `"to"`; `<title>`/`og:title`
+  separators become `|`. Fixed in `products.js` (descriptions), the
+  `product.html`/`build-products.js` template pair (regenerated all 41
+  `products/*.html` + `shop.html`), and every root `*.html` page and
+  user-visible string in `scripts/*.js`. **Deliberately left alone:** JS
+  `//`/`/* */` code comments and `console.*` diagnostics — developer-only
+  text, never served to a visitor or crawler. Verified zero dashes remain
+  in any served HTML; spot-checked the highest-traffic prose (hero, About
+  story, FAQ, policies) by hand for a few cases the automated pass got
+  grammatically wrong (a "that"-clause split into a broken fragment, a
+  double-dash parenthetical collapsing into a confusing double-comma) —
+  see git history for the exact before/after if this needs redoing for new
+  copy later.
 - **Drop-alert banner: real email capture, not a decorative popup.** New
   time-of-day-greeting corner banner (`dropAlertBanner()` in
   `scripts/base.js`, `.fs-drop-banner` in `base.css`) shown once/day per

@@ -22,9 +22,9 @@
     // Human-readable, unique alt text per view (Image Search + accessibility).
     const altFor = (p, view) => {
         const base = p.name + ' ' + p.tag;
-        if (view === 'back') return base + ' — back view, FakeSmile streetwear';
+        if (view === 'back') return base + ', back view, FakeSmile streetwear';
         if (view === 'outfit') return base + ' worn as a full FakeSmile outfit';
-        return base + ' — front view, FakeSmile streetwear';
+        return base + ', front view, FakeSmile streetwear';
     };
 
     if (!product) {
@@ -123,7 +123,7 @@
     })();
 
     // ===== Populate hero strip =====
-    document.title = `${product.name} ${product.tag} — FakeSmile`;
+    document.title = `${product.name} ${product.tag} | FakeSmile`;
     const wordmark = document.getElementById('product-wordmark');
     if (wordmark) {
         const w = (product.name || 'DROP').toUpperCase();
@@ -264,7 +264,7 @@
             const partner = getProduct(product.partner);
             if (partner && partner.image) {
                 sources.push([partner.image,
-                    partner.name + ' ' + partner.tag + ' — the matching piece for the ' + product.name + ' ' + product.tag]);
+                    partner.name + ' ' + partner.tag + ', the matching piece for the ' + product.name + ' ' + product.tag]);
             }
         }
 

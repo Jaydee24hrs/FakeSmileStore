@@ -17,7 +17,7 @@ const PRODUCTS = {
         partner: 'sunset-signature-joggers',
         badge: 'New',
         description:
-            'Heavyweight 320GSM cotton hoodie finished in sunset orange and anchored by the FakeSmile brick crest. Pre-shrunk, double-stitched, with metal-tipped drawstrings and a kangaroo pocket — engineered to outlast the drop.',
+            'Heavyweight 320GSM cotton hoodie finished in sunset orange and anchored by the FakeSmile brick crest. Pre-shrunk, double-stitched, with metal-tipped drawstrings and a kangaroo pocket, engineered to outlast the drop.',
         details: {
             Material: '320GSM heavyweight cotton, brushed back',
             Fit: 'Relaxed, true-to-size',
@@ -60,7 +60,7 @@ const PRODUCTS = {
         partner: 'midnight-signature-joggers',
         badge: 'Bestseller',
         description:
-            'The signature midnight-black hoodie. Heavyweight cotton, FakeSmile brick crest, double-stitched cuffs and metal-tipped drawstrings — the most-pulled fit in the wardrobe.',
+            'The signature midnight-black hoodie. Heavyweight cotton, FakeSmile brick crest, double-stitched cuffs and metal-tipped drawstrings, the most-pulled fit in the wardrobe.',
         details: {
             Material: '320GSM heavyweight cotton, brushed back',
             Fit: 'Relaxed, true-to-size',
@@ -81,7 +81,7 @@ const PRODUCTS = {
         completewear: 'images/Completewear/49.webp',
         partner: 'crimson-court-shorts',
         description:
-            'Court-ready performance jersey in crimson with white trim. Lightweight breathable mesh tricot and the "FAKE A SMILE" wordmark — engineered for motion.',
+            'Court-ready performance jersey in crimson with white trim. Lightweight breathable mesh tricot and the "FAKE A SMILE" wordmark, engineered for motion.',
         details: {
             Material: 'Lightweight breathable polyester tricot',
             Fit: 'Athletic, true-to-size',
@@ -103,7 +103,7 @@ const PRODUCTS = {
         partner: 'onyx-gold-shorts',
         badge: 'Limited',
         description:
-            'Black-on-gold jersey with embroidered FakeSmile crest. Lightweight tricot, breathable mesh side panels and signature ribbed collar — limited run.',
+            'Black-on-gold jersey with embroidered FakeSmile crest. Lightweight tricot, breathable mesh side panels and signature ribbed collar, limited run.',
         details: {
             Material: 'Lightweight breathable polyester tricot',
             Fit: 'Athletic, true-to-size',
@@ -123,7 +123,7 @@ const PRODUCTS = {
         backImage: 'images/93.webp',
         completewear: 'images/Completewear/63.webp',
         description:
-            'Vintage-wash heavyweight tank with the Twin Faces print — two icons, one duality. Soft-touch cotton, dropped armholes and a relaxed streetwear cut.',
+            'Vintage-wash heavyweight tank with the Twin Faces print, two icons, one duality. Soft-touch cotton, dropped armholes and a relaxed streetwear cut.',
         details: {
             Material: '240GSM washed cotton',
             Fit: 'Relaxed, true-to-size',
@@ -165,7 +165,7 @@ const PRODUCTS = {
         completewear: 'images/Completewear/66.webp',
         badge: 'New',
         description:
-            'Forest green body, ivory contrast sleeves — a two-tone long sleeve carrying the FakeSmile brick crest at chest. Heavyweight knit, ribbed cuffs, built for layering.',
+            'Forest green body, ivory contrast sleeves, a two-tone long sleeve carrying the FakeSmile brick crest at chest. Heavyweight knit, ribbed cuffs, built for layering.',
         details: {
             Material: '300GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -186,7 +186,7 @@ const PRODUCTS = {
         completewear: 'images/Completewear/67.webp',
         badge: 'Bestseller',
         description:
-            'Midnight-black body, ivory contrast sleeves. Heavyweight knit, ribbed cuffs and the FakeSmile crest at chest — the loudest layering piece in the rotation.',
+            'Midnight-black body, ivory contrast sleeves. Heavyweight knit, ribbed cuffs and the FakeSmile crest at chest, the loudest layering piece in the rotation.',
         details: {
             Material: '300GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -207,7 +207,7 @@ const PRODUCTS = {
         completewear: 'images/Completewear/47.webp',
         partner: 'heather-stone-joggers',
         description:
-            'Steel-gray heavyweight hoodie with the FakeSmile brick crest. Brushed-back fleece, ribbed cuffs and metal-tipped drawstrings — neutral fit, loud silhouette.',
+            'Steel-gray heavyweight hoodie with the FakeSmile brick crest. Brushed-back fleece, ribbed cuffs and metal-tipped drawstrings, neutral fit, loud silhouette.',
         details: {
             Material: '320GSM heavyweight cotton, brushed back',
             Fit: 'Relaxed, true-to-size',
@@ -229,7 +229,7 @@ const PRODUCTS = {
         partner: 'forest-court-shorts',
         badge: 'New',
         description:
-            'Forest-green performance jersey with white trim. Lightweight breathable mesh tricot and the "FAKE A SMILE" wordmark — engineered for motion.',
+            'Forest-green performance jersey with white trim. Lightweight breathable mesh tricot and the "FAKE A SMILE" wordmark, engineered for motion.',
         details: {
             Material: 'Lightweight breathable polyester tricot',
             Fit: 'Athletic, true-to-size',
@@ -272,7 +272,7 @@ const PRODUCTS = {
         partner: 'sunset-court-shorts',
         badge: 'Limited',
         description:
-            'Sunset-orange performance jersey with the "FAKE A SMILE" wordmark across the chest. Lightweight breathable tricot — the loudest fit on the court.',
+            'Sunset-orange performance jersey with the "FAKE A SMILE" wordmark across the chest. Lightweight breathable tricot, the loudest fit on the court.',
         details: {
             Material: 'Lightweight breathable polyester tricot',
             Fit: 'Athletic, true-to-size',
@@ -293,7 +293,7 @@ const PRODUCTS = {
         completewear: 'images/Completewear/68.webp',
         badge: 'New',
         description:
-            'Ivory body, midnight contrast sleeves — a soft-tone two-tone long sleeve carrying the FakeSmile crest at chest. Heavyweight knit, ribbed cuffs, premium pre-shrunk cotton.',
+            'Ivory body, midnight contrast sleeves, a soft-tone two-tone long sleeve carrying the FakeSmile crest at chest. Heavyweight knit, ribbed cuffs, premium pre-shrunk cotton.',
         details: {
             Material: '300GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -312,7 +312,7 @@ const PRODUCTS = {
         image: 'images/119.webp',
         badge: 'New',
         description:
-            'Pitch-black heavyweight hoodie carrying the FakeSmile crest at chest. Brushed-back fleece, ribbed cuffs and metal-tipped drawstrings — clean silhouette, loud quality.',
+            'Pitch-black heavyweight hoodie carrying the FakeSmile crest at chest. Brushed-back fleece, ribbed cuffs and metal-tipped drawstrings, clean silhouette, loud quality.',
         details: {
             Material: '320GSM heavyweight cotton, brushed back',
             Fit: 'Relaxed, true-to-size',
@@ -330,7 +330,7 @@ const PRODUCTS = {
         price: 18000,
         image: 'images/189.webp',
         description:
-            'Heathered grey heavyweight hoodie with the FakeSmile crest at chest. Brushed cotton-fleece interior, ribbed cuffs — the neutral pull that pairs with every fit.',
+            'Heathered grey heavyweight hoodie with the FakeSmile crest at chest. Brushed cotton-fleece interior, ribbed cuffs, the neutral pull that pairs with every fit.',
         details: {
             Material: '320GSM heavyweight cotton, brushed back',
             Fit: 'Relaxed, true-to-size',
@@ -349,7 +349,7 @@ const PRODUCTS = {
         image: 'images/190.webp',
         badge: 'New',
         description:
-            'Pearl-white heavyweight hoodie carrying the FakeSmile crest at chest. Premium brushed inner, ribbed cuffs and metal-tipped drawstrings — clean, premium, signature.',
+            'Pearl-white heavyweight hoodie carrying the FakeSmile crest at chest. Premium brushed inner, ribbed cuffs and metal-tipped drawstrings, clean, premium, signature.',
         details: {
             Material: '320GSM heavyweight cotton, brushed back',
             Fit: 'Relaxed, true-to-size',
@@ -413,7 +413,7 @@ const PRODUCTS = {
         completewear: 'images/Completewear/10.webp',
         badge: 'Bestseller',
         description:
-            'Sunset-orange heavyweight tee. Brick crest at chest, signature wordmark across the back — premium pre-shrunk cotton.',
+            'Sunset-orange heavyweight tee. Brick crest at chest, signature wordmark across the back, premium pre-shrunk cotton.',
         details: {
             Material: '260GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -433,7 +433,7 @@ const PRODUCTS = {
         backImage: 'images/Tops F&B/12.webp',
         completewear: 'images/Completewear/13.webp',
         description:
-            'Midnight-black heavyweight tee. FakeSmile crest at chest and the signature script across the back — premium-feel cotton, built to last.',
+            'Midnight-black heavyweight tee. FakeSmile crest at chest and the signature script across the back, premium-feel cotton, built to last.',
         details: {
             Material: '260GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -515,7 +515,7 @@ const PRODUCTS = {
         backImage: 'images/Tops F&B/24.webp',
         completewear: 'images/Completewear/25.webp',
         description:
-            'Sand-tan heavyweight tee with the signature graphic across the back. Premium pre-shrunk cotton — the neutral pairer for every fit.',
+            'Sand-tan heavyweight tee with the signature graphic across the back. Premium pre-shrunk cotton, the neutral pairer for every fit.',
         details: {
             Material: '260GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -573,7 +573,7 @@ const PRODUCTS = {
         price: 15000,
         image: 'images/Tops F&B/39.webp',
         description:
-            'Onyx-black heavyweight tee carrying the FakeSmile patchwork stack — multi-icon graphic, signature script and a relaxed streetwear cut.',
+            'Onyx-black heavyweight tee carrying the FakeSmile patchwork stack, multi-icon graphic, signature script and a relaxed streetwear cut.',
         details: {
             Material: '260GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -591,7 +591,7 @@ const PRODUCTS = {
         price: 15000,
         image: 'images/Tops F&B/40.webp',
         description:
-            'Forest-green heavyweight tee with the FakeSmile patchwork stack at chest. Pre-shrunk premium cotton — soft, loud, built to last.',
+            'Forest-green heavyweight tee with the FakeSmile patchwork stack at chest. Pre-shrunk premium cotton, soft, loud, built to last.',
         details: {
             Material: '260GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -609,7 +609,7 @@ const PRODUCTS = {
         price: 15000,
         image: 'images/Tops F&B/41.webp',
         description:
-            'Mist heavyweight tee with the FakeSmile patchwork stack — multi-icon graphic on premium pre-shrunk cotton. A neutral pairer for any fit.',
+            'Mist heavyweight tee with the FakeSmile patchwork stack, multi-icon graphic on premium pre-shrunk cotton. A neutral pairer for any fit.',
         details: {
             Material: '260GSM heavyweight cotton',
             Fit: 'Relaxed, true-to-size',
@@ -673,7 +673,7 @@ const PRODUCTS = {
         partner: 'midnight-brick-hoodie',
         badge: 'Bestseller',
         description:
-            'The original midnight-black signature joggers. Heavy fleece, signature side script, perfect taper — the most-worn drop in the catalog.',
+            'The original midnight-black signature joggers. Heavy fleece, signature side script, perfect taper, the most-worn drop in the catalog.',
         details: {
             Material: '320GSM cotton-blend fleece',
             Fit: 'Tapered, true-to-size',
@@ -693,7 +693,7 @@ const PRODUCTS = {
         completewear: 'images/Completewear/47.webp',
         partner: 'steel-brick-hoodie',
         description:
-            'Heather-grey joggers with chrome-foil signature script — the everyday utility cut. Soft brushed fleece, drawstring waist, deep pockets.',
+            'Heather-grey joggers with chrome-foil signature script, the everyday utility cut. Soft brushed fleece, drawstring waist, deep pockets.',
         details: {
             Material: '320GSM cotton-blend fleece',
             Fit: 'Tapered, true-to-size',
@@ -820,7 +820,7 @@ const PRODUCTS = {
         details: {
             Material: 'Heavy cotton twill',
             Fit: 'One size, adjustable inner band',
-            Sizes: 'OS · 56–60cm',
+            Sizes: 'OS · 56 to 60cm',
             Care: 'Spot clean only',
             Origin: 'Crafted in Lagos',
         },
@@ -839,7 +839,7 @@ const PRODUCTS = {
         details: {
             Material: 'Heavy cotton twill',
             Fit: 'One size, adjustable inner band',
-            Sizes: 'OS · 56–60cm',
+            Sizes: 'OS · 56 to 60cm',
             Care: 'Spot clean only',
             Origin: 'Crafted in Lagos',
         },
@@ -857,7 +857,7 @@ const PRODUCTS = {
         details: {
             Material: 'Heavy cotton twill',
             Fit: 'One size, adjustable inner band',
-            Sizes: 'OS · 56–60cm',
+            Sizes: 'OS · 56 to 60cm',
             Care: 'Spot clean only',
             Origin: 'Crafted in Lagos',
         },
@@ -872,11 +872,11 @@ const PRODUCTS = {
         image: 'images/650.webp',
         badge: 'Limited',
         description:
-            'Crimson-red bucket hat with the FakeSmile brick crest. Heavy cotton twill, structured brim — the loudest finish on a court fit.',
+            'Crimson-red bucket hat with the FakeSmile brick crest. Heavy cotton twill, structured brim, the loudest finish on a court fit.',
         details: {
             Material: 'Heavy cotton twill',
             Fit: 'One size, adjustable inner band',
-            Sizes: 'OS · 56–60cm',
+            Sizes: 'OS · 56 to 60cm',
             Care: 'Spot clean only',
             Origin: 'Crafted in Lagos',
         },
@@ -891,11 +891,11 @@ const PRODUCTS = {
         image: 'images/651.webp',
         badge: 'New',
         description:
-            'Army-olive curved-brim cap carrying the FakeSmile globe patch and the "Smile even if it\'s fake" embroidered tagline. Laser-perforated panels for airflow, black contrast brim trim — a clean field-ready finish.',
+            'Army-olive curved-brim cap carrying the FakeSmile globe patch and the "Smile even if it\'s fake" embroidered tagline. Laser-perforated panels for airflow, black contrast brim trim, a clean field-ready finish.',
         details: {
             Material: 'Performance twill, laser-perforated panels',
             Fit: 'Curved brim, adjustable strap',
-            Sizes: 'OS · 56–60cm',
+            Sizes: 'OS · 56 to 60cm',
             Care: 'Spot clean only',
             Origin: 'Crafted in Lagos',
         },
@@ -910,11 +910,11 @@ const PRODUCTS = {
         image: 'images/652.webp',
         badge: 'New',
         description:
-            'Midnight-black curved-brim cap with neon-yellow brim trim, the FakeSmile globe patch and the "Smile even if it\'s fake" embroidered script. Laser-perforated panels for breathability — the loudest finish in the rotation.',
+            'Midnight-black curved-brim cap with neon-yellow brim trim, the FakeSmile globe patch and the "Smile even if it\'s fake" embroidered script. Laser-perforated panels for breathability, the loudest finish in the rotation.',
         details: {
             Material: 'Performance twill, laser-perforated panels',
             Fit: 'Curved brim, adjustable strap',
-            Sizes: 'OS · 56–60cm',
+            Sizes: 'OS · 56 to 60cm',
             Care: 'Spot clean only',
             Origin: 'Crafted in Lagos',
         },
@@ -922,7 +922,7 @@ const PRODUCTS = {
 };
 
 /* =====================================================================
-   CATALOG PRICING (best-guess by type — from the WhatsApp catalog
+   CATALOG PRICING (best-guess by type, from the WhatsApp catalog
    screenshots; REVIEW / adjust per product as needed).
    These are NGN BASE prices. The per-item markup (+₦5,000 in Naira /
    +£15 in Pounds) is applied at display + checkout time in base.js.
@@ -930,7 +930,7 @@ const PRODUCTS = {
    the card shows a "Coming Soon" badge and a disabled Add-to-Cart.
    No catalog price yet: Jersey, Tank, Long Sleeve, Shorts.
    (Catalog also listed: track hoodie ₦80k, track suit ₦80k,
-   handler tees ₦50k, stone-wash tee ₦40k, "PROJECT: FAKE" ₦55k — bump
+   handler tees ₦50k, stone-wash tee ₦40k, "PROJECT: FAKE" ₦55k, bump
    specific products to those if you want.)
    ===================================================================== */
 /* =====================================================================
@@ -966,7 +966,7 @@ const CATALOG_PRICE_BY_TAG = {
     'Tee': 38000,
     'Bucket Hat': 35000,
     'Cap': 20000,
-    'Joggers': 40000, // best-guess standalone jogger price — adjust as needed
+    'Joggers': 40000, // best-guess standalone jogger price, adjust as needed
 };
 Object.values(PRODUCTS).forEach((p) => {
     const catalogPrice = CATALOG_PRICE_BY_TAG[p.tag];
@@ -981,10 +981,10 @@ Object.values(PRODUCTS).forEach((p) => {
 /* =====================================================================
    COMPLETE-OUTFIT (SET) PRICING.
    Matching tops + bottoms are sold as ONE complete fit (up + down) at a
-   SINGLE price — never the two pieces summed, and never separately. Keyed
+   SINGLE price, never the two pieces summed, and never separately. Keyed
    by the TOP product id; the matching bottom (top.partner) inherits the
    same outfit price. Adding EITHER piece adds the one outfit (see the set
-   merge in base.js). Catalog "track suit" = ₦80,000 — REVIEW per set.
+   merge in base.js). Catalog "track suit" = ₦80,000, REVIEW per set.
    ===================================================================== */
 const OUTFIT_PRICE = {
     'sunset-brick-hoodie': 80000,
@@ -1003,7 +1003,7 @@ Object.keys(OUTFIT_PRICE).forEach((topId) => {
 
 /* =====================================================================
    PER-PRODUCT PRICE OVERRIDES (NGN base; markup applied at display time).
-   For individual products priced outside their tag's default — these win
+   For individual products priced outside their tag's default, these win
    over the tag table above and take the product off "Coming Soon".
    ===================================================================== */
 const PRICE_OVERRIDE = {

@@ -34,7 +34,7 @@
         const pick = shuffle(GALLERY_IMAGES).slice(0, 6);
         grid.innerHTML = pick.map((f) =>
             '<figure class="fs-gallery-item">' +
-                '<img loading="lazy" decoding="async" src="' + fsUrl(BASE + f) + '" alt="Real FakeSmile customer wearing their FakeSmile fit — photo from the Lagos crew gallery">' +
+                '<img loading="lazy" decoding="async" src="' + fsUrl(BASE + f) + '" alt="Real FakeSmile customer wearing their FakeSmile fit (Lagos crew gallery)">' +
                 '<span class="fs-gallery-shine" aria-hidden="true"></span>' +
                 '<figcaption class="fs-gallery-cap">' +
                     '<span class="fs-gallery-badge">' + CHECK + ' Real fit</span>' +

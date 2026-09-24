@@ -59,7 +59,7 @@ function fsImg(path) {
             const bar = document.createElement('div');
             bar.className = 'fs-resume-banner';
             bar.innerHTML =
-                '<span class="fs-resume-text">Payment started — finish your order ' +
+                '<span class="fs-resume-text">Payment started: finish your order ' +
                 (pending.id ? '<strong>' + pending.id + '</strong>' : '') + '</span>' +
                 '<a class="fs-resume-btn" href="' + fsUrl('checkout.html') + '">Finish order</a>' +
                 '<button class="fs-resume-close" aria-label="Dismiss">&times;</button>';
@@ -510,13 +510,13 @@ if (newsletterForm) {
             const data = await fsSubscribeEmail(value, 'footer');
             localStorage.setItem('fs_drop_alert_subscribed', '1');
             hint.textContent = data.alreadySubscribed
-                ? "You're already in the movement — thanks!"
+                ? "You're already in the movement, thanks!"
                 : `You're in. Welcome to the movement, ${value.split('@')[0]}.`;
             submit.textContent = 'Subscribed';
             input.value = '';
         } catch (err) {
             hint.classList.add('error');
-            hint.textContent = "Couldn't reach the server — try again in a moment.";
+            hint.textContent = "Couldn't reach the server. Try again in a moment.";
             submit.textContent = 'Subscribe';
         } finally {
             submitBtn.disabled = false;
@@ -683,13 +683,13 @@ if (header) {
                 '<span class="fs-drop-emoji" aria-hidden="true">' + g.emoji + '</span>' +
                 '<h4>Good ' + g.part + (firstName ? ', ' + firstName : '') + '!</h4>' +
             '</div>' +
-            '<p class="fs-drop-sub">Be first to hear about new drops, restocks and colorways &mdash; straight to your inbox.</p>' +
+            '<p class="fs-drop-sub">Be first to hear about new drops, restocks and colorways, straight to your inbox.</p>' +
             '<form class="fs-drop-form" novalidate>' +
                 '<input type="email" class="fs-drop-input" placeholder="you@example.com" required>' +
                 '<button type="submit" class="fs-drop-submit"><span>Notify Me</span></button>' +
             '</form>' +
             '<p class="fs-drop-hint" aria-live="polite"></p>' +
-            '<p class="fs-drop-fine">No spam &mdash; just drop alerts. Unsubscribe anytime.</p>';
+            '<p class="fs-drop-fine">No spam, just drop alerts. Unsubscribe anytime.</p>';
 
         document.body.appendChild(el);
         bannerEl = el;
@@ -723,13 +723,13 @@ if (header) {
                 localStorage.setItem(SUBSCRIBED_KEY, '1');
                 hint.classList.remove('is-error');
                 hint.textContent = data.alreadySubscribed
-                    ? "You're already on the list — thanks!"
+                    ? "You're already on the list, thanks!"
                     : "You're on the list! Watch your inbox.";
                 submitLabel.textContent = 'Added';
                 setTimeout(closeBanner, 2200);
             } catch (err) {
                 hint.classList.add('is-error');
-                hint.textContent = "Couldn't reach the server — try again in a moment.";
+                hint.textContent = "Couldn't reach the server. Try again in a moment.";
                 submitLabel.textContent = 'Notify Me';
                 submitBtn.disabled = false;
             }

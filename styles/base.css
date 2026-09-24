@@ -880,8 +880,16 @@ html, body {
     .cart-amount { display: none; }
     .cart-link { padding: 8px 12px; }
     .hero-content { padding: 60px 15px 40px; }
-    .hero-pretitle { font-size: 24px; }
-    .hero-tagline { font-size: 15px; }
+    .hero-pretitle { font-size: 24px; margin-bottom: 8px; }
+    /* .hero-title and .hero-brand keep their desktop margin-bottom/min-height
+       (20px / 28px+80px) on every other breakpoint above this one, but the
+       surrounding text here shrinks (pretitle/tagline font-size drop) —
+       leaving the GAPS at full desktop size made the hero read as mostly
+       empty space between short lines of text on phones. Tighten the
+       rhythm to match. */
+    .hero-title { margin-bottom: 10px; }
+    .hero-brand { margin-bottom: 12px; min-height: 52px; }
+    .hero-tagline { font-size: 15px; margin-bottom: 22px; }
     .btn { padding: 13px 30px; font-size: 15px; }
 }
 
