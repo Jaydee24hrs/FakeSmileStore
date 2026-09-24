@@ -420,8 +420,6 @@
             <div class="bridge-brick"></div>
         </div>
 
-        <div class="bridge-wordmark" aria-hidden="true" data-text="FULL FIT">FULL FIT</div>
-
         <div class="bridge-content">
             <!-- Left text -->
             <div class="bridge-side bridge-left">
@@ -447,6 +445,11 @@
 
             <!-- Center figure -->
             <div class="bridge-figure" aria-hidden="true">
+                <!-- Anchored to THIS box (not the whole section) so it always
+                     centers behind the photo, on any device, at any
+                     breakpoint — regardless of how tall the side text next
+                     to it happens to be. -->
+                <div class="bridge-wordmark" data-text="FULL FIT">FULL FIT</div>
                 <div class="bridge-platform"></div>
                 <div class="bridge-figure-glow"></div>
                 <div class="bridge-ring bridge-ring-1"></div>
@@ -454,7 +457,7 @@
                 <span class="bridge-spark spark-a">✦</span>
                 <span class="bridge-spark spark-b">✦</span>
                 <span class="bridge-spark spark-c">✦</span>
-                <img loading="lazy" decoding="async" src="images/ool/4.webp" alt="FakeSmile model in a full hoodie and joggers outfit, complete fits sold as one set" class="bridge-img">
+                <img loading="eager" fetchpriority="high" decoding="async" src="images/ool/4.webp" alt="FakeSmile model in a full hoodie and joggers outfit, complete fits sold as one set" class="bridge-img">
                 <div class="bridge-chip bridge-chip-top">
                     <span class="chip-label">Crafted in</span>
                     <strong>Lagos</strong>

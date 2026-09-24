@@ -1547,6 +1547,14 @@ button.bento-card { appearance: none; }
 }
 
 /* ===== Big background wordmark ===== */
+/* Lives INSIDE .bridge-figure (not as a sibling of .bridge-content) so it
+   centers on the FIGURE specifically via top/left 50% — correct on any
+   device at any breakpoint automatically. It used to be centered on the
+   whole (position:relative) .bridge-banner instead: fine on desktop, where
+   the figure sits mid-row, but on mobile/tablet the figure reorders to the
+   top of a much taller stacked column, so a 50% center fell on the text
+   below it instead of the photo. Anchoring it to the figure's own box
+   fixes that for good, with no per-breakpoint pixel math to keep in sync. */
 .bridge-wordmark {
     position: absolute;
     top: 50%;
@@ -1979,15 +1987,6 @@ button.bento-card { appearance: none; }
     }
     .bridge-chip-top { left: 4%; }
     .bridge-chip-bottom { right: 4%; }
-    /* .bridge-wordmark is centered on the whole (position:relative)
-       .bridge-banner box via top:50% — fine on desktop, where the figure
-       sits mid-row so the wordmark naturally lands behind it. Here the
-       figure reorders to the TOP of a much taller stacked layout, so a
-       50% center falls in the text below instead — reposition it to sit
-       behind the figure specifically: banner's top padding + half the
-       figure's own height (both set above/below in this same breakpoint —
-       update this if either changes). */
-    .bridge-wordmark { top: calc(110px + 480px / 2); }
 }
 
 @media (max-width: 720px) {
@@ -2001,9 +2000,6 @@ button.bento-card { appearance: none; }
     .bridge-figure { height: 420px; }
     .bridge-chip-top, .bridge-chip-bottom { padding: 10px 14px; }
     .bridge-chip-top strong { font-size: 18px; }
-    /* Same fix as the 1100px tier above, recalculated for this tier's own
-       padding-top (80px) and figure height (420px). */
-    .bridge-wordmark { top: calc(80px + 420px / 2); }
 }
 
 /* ============================================= */
