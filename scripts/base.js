@@ -624,13 +624,13 @@ if (header) {
 })();
 
 // ===== DROP ALERT BANNER (email capture for new-drop notifications) =====
-// A time-of-day-aware banner, shown once per calendar day per visitor (and
-// again right after a Google sign-in — a natural signup moment), that
-// captures an email via fsSubscribeEmail() into the same Cloudflare Worker
-// used for Nomba orders (POST /subscribe → KV, prefix "sub:"), so drops can
-// actually be announced later — not a decorative form. See
-// DEPLOY-WORKER.md for the (optional) owner-notification email setup and
-// how to pull the subscriber list.
+// A floating popup, styled to match the footer's "Join the movement" glass
+// card, shown once per calendar day per visitor (and again right after a
+// Google sign-in — a natural signup moment), that captures an email via
+// fsSubscribeEmail() into the same Cloudflare Worker used for Nomba orders
+// (POST /subscribe → KV, prefix "sub:"), so drops can actually be announced
+// later — not a decorative form. See DEPLOY-WORKER.md for the (optional)
+// owner-notification email setup and how to pull the subscriber list.
 (function dropAlertBanner() {
     const SHOWN_KEY = 'fs_drop_alert_shown_date';
     const SUBSCRIBED_KEY = 'fs_drop_alert_subscribed';
@@ -641,13 +641,6 @@ if (header) {
     function todayStr() {
         const d = new Date();
         return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-    }
-
-    function greeting() {
-        const h = new Date().getHours();
-        if (h < 12) return { part: 'morning', emoji: '☀️' };
-        if (h < 17) return { part: 'afternoon', emoji: '🌤️' };
-        return { part: 'evening', emoji: '🌙' };
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -669,8 +662,6 @@ if (header) {
         // reserved for genuine dismiss/success-close, where there's no
         // replacement banner competing for the same screen position.
         if (bannerEl) { bannerEl.remove(); bannerEl = null; }
-        const g = greeting();
-        const firstName = opts && opts.name ? opts.name.split(' ')[0] : '';
         const el = document.createElement('div');
         el.className = 'fs-drop-banner';
         el.setAttribute('role', 'complementary');
@@ -679,17 +670,20 @@ if (header) {
             '<button type="button" class="fs-drop-close" aria-label="Dismiss">' +
                 '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
             '</button>' +
-            '<div class="fs-drop-head">' +
-                '<span class="fs-drop-emoji" aria-hidden="true">' + g.emoji + '</span>' +
-                '<h4>Good ' + g.part + (firstName ? ', ' + firstName : '') + '!</h4>' +
-            '</div>' +
-            '<p class="fs-drop-sub">Be first to hear about new drops, restocks and colorways, straight to your inbox.</p>' +
+            '<p class="fs-drop-pretitle">Join the movement</p>' +
+            '<h4 class="fs-drop-title">Be first on every <span class="accent">drop</span>.</h4>' +
+            '<p class="fs-drop-sub">Early access. Exclusive colorways. Members-only restocks.</p>' +
             '<form class="fs-drop-form" novalidate>' +
-                '<input type="email" class="fs-drop-input" placeholder="you@example.com" required>' +
-                '<button type="submit" class="fs-drop-submit"><span>Notify Me</span></button>' +
+                '<div class="fs-drop-field">' +
+                    '<svg class="fs-drop-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>' +
+                    '<input type="email" class="fs-drop-input" placeholder="your@email.com" aria-label="Email address" required>' +
+                '</div>' +
+                '<button type="submit" class="fs-drop-submit">' +
+                    '<span>Subscribe</span>' +
+                    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>' +
+                '</button>' +
             '</form>' +
-            '<p class="fs-drop-hint" aria-live="polite"></p>' +
-            '<p class="fs-drop-fine">No spam, just drop alerts. Unsubscribe anytime.</p>';
+            '<p class="fs-drop-hint" aria-live="polite"></p>';
 
         document.body.appendChild(el);
         bannerEl = el;
@@ -730,7 +724,7 @@ if (header) {
             } catch (err) {
                 hint.classList.add('is-error');
                 hint.textContent = "Couldn't reach the server. Try again in a moment.";
-                submitLabel.textContent = 'Notify Me';
+                submitLabel.textContent = 'Subscribe';
                 submitBtn.disabled = false;
             }
         });
