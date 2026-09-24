@@ -153,6 +153,7 @@
     inset: -20%;
     background: radial-gradient(circle at 30% 30%, rgba(0, 217, 87, 0.25), transparent 60%);
     filter: blur(40px);
+    will-change: transform; /* avoids an iOS Safari bug where blur() on a large element renders as a flat solid color */
     z-index: 1;
     pointer-events: none;
 }

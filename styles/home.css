@@ -587,6 +587,15 @@
         radial-gradient(600px 400px at 15% 30%, rgba(0, 217, 87, 0.10), transparent 60%),
         radial-gradient(500px 350px at 85% 70%, rgba(0, 179, 71, 0.08), transparent 60%);
     filter: blur(40px);
+    /* iOS Safari has a known bug where filter:blur() on a large element
+       (this one spans the full height of the tall catalogue-section, unlike
+       the fixed ~400px .showcase-orb circles above) fails to composite and
+       renders as a flat solid color instead of a soft glow — exactly what
+       was reported: a bright green rectangle where this glow should be.
+       will-change forces the browser to promote it to its own GPU layer,
+       which resolves it (same fix already used by .showcase-orb/.bridge-orb/
+       .cta-orb in this file — those never had the bug for that reason). */
+    will-change: transform;
     pointer-events: none;
     z-index: 0;
 }
@@ -1818,6 +1827,7 @@ button.bento-card { appearance: none; }
     inset: 5% -10%;
     background: radial-gradient(circle at 50% 60%, rgba(0, 217, 87, 0.32), transparent 60%);
     filter: blur(40px);
+    will-change: transform; /* avoids the same iOS blur/solid-color bug as .catalogue-ambient */
     z-index: 1;
     animation: glowBreathe 5s ease-in-out infinite alternate;
 }
@@ -2329,6 +2339,7 @@ button.bento-card { appearance: none; }
     inset: -10%;
     background: radial-gradient(circle at center, rgba(0, 217, 87, 0.18), transparent 60%);
     filter: blur(30px);
+    will-change: transform; /* avoids the same iOS blur/solid-color bug as .catalogue-ambient */
     z-index: 0;
 }
 
