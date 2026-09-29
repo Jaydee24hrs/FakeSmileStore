@@ -2326,6 +2326,11 @@ button.bento-card { appearance: none; }
     filter:
         drop-shadow(0 30px 50px rgba(0, 0, 0, 0.7))
         drop-shadow(0 -10px 30px rgba(0, 217, 87, 0.25));
+    /* Fade the cutout's own bottom edge to transparent so it dissolves into
+       the card's background instead of ending in a visible edge, same fix
+       as .bridge-img in the "Built on the Bricks" banner. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 97%);
+            mask-image: linear-gradient(to bottom, #000 82%, transparent 97%);
     z-index: 4;
     animation: figureFloat 6s ease-in-out infinite;
 }
