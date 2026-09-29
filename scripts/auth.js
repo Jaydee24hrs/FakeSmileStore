@@ -28,7 +28,7 @@
     //   https://fakesmilestore.com  and  https://www.fakesmilestore.com
     // (add http://localhost:8000 too if you test locally). Full walkthrough
     // in GOOGLE-SIGNIN-SETUP.md.
-    const GOOGLE_CLIENT_ID = 'YOUR-GOOGLE-CLIENT-ID.apps.googleusercontent.com';
+    const GOOGLE_CLIENT_ID = '676257242607-9bkkba54d83lu9hn32h7cngtl1asv7id.apps.googleusercontent.com';
 
     const USER_KEY = 'fs_user';
     const configured = GOOGLE_CLIENT_ID.indexOf('YOUR-GOOGLE-CLIENT-ID') === -1;
