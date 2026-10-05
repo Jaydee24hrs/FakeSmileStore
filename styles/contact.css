@@ -143,8 +143,6 @@
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 36px rgba(0, 217, 87, 0.18);
 }
 
-.info-card-press { grid-column: 1 / -1; }
-
 .info-icon {
     width: 44px;
     height: 44px;
@@ -369,7 +367,6 @@
     .contact-form-wrap { padding: 30px 22px; }
     .form-row { grid-template-columns: 1fr; }
     .contact-info { grid-template-columns: 1fr; }
-    .info-card-press { grid-column: 1; }
     .contact-community { padding: 40px 20px 80px; }
     .community-card { padding: 40px 24px; }
     .community-socials { grid-template-columns: 1fr; }
