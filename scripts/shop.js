@@ -109,7 +109,7 @@
         return arr;
     }
 
-    // Drop the "Request a Custom Fit" banner into the middle of the grid as a
+    // Drop the small-batch-drops banner into the middle of the grid as a
     // full-width row. Snap it to a row boundary (based on the live column count)
     // so it never leaves a gap in a partial row.
     function injectFitBanner(count) {
