@@ -11,5 +11,6 @@ Disallow: /orders.html
 Disallow: /seed_flow
 Disallow: /seed_flow.html
 Disallow: /email-templates/
+Disallow: /tools/
 
 Sitemap: https://fakesmilestore.com/sitemap.xml
