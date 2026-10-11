@@ -333,6 +333,13 @@
         font-variant-numeric: tabular-nums;
     }
     .stat-card .label { font-size: 11.5px; color: var(--fg-muted); font-weight: 600; }
+    .stat-card .trend {
+        font-size: 11.5px; font-weight: 600; margin-top: 8px;
+        padding-top: 8px; border-top: 1px solid var(--line-soft);
+        color: var(--fg-faint);
+    }
+    .stat-card .trend .up { color: var(--accent-bright); }
+    .stat-card .trend .down { color: var(--bad-bright); }
 
     /* ===== Charts row ===== */
     .charts-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; margin-bottom: 20px; align-items: stretch; }
@@ -593,31 +600,31 @@
                         <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg></div>
                         <div class="num" id="ov-orders">&mdash;</div>
                         <div class="label">Total Orders</div>
+                        <div class="trend" id="ov-orders-week">&nbsp;</div>
                     </div>
                     <div class="stat-card">
                         <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
                         <div class="num" id="ov-paid">&mdash;</div>
                         <div class="label">Paid Orders</div>
+                        <div class="trend" id="ov-paid-week">&nbsp;</div>
                     </div>
                     <div class="stat-card bad">
                         <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></div>
                         <div class="num" id="ov-failed">&mdash;</div>
                         <div class="label">Failed Orders</div>
+                        <div class="trend" id="ov-failed-week">&nbsp;</div>
                     </div>
                     <div class="stat-card">
                         <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"></rect><path d="M2 10h20"></path><path d="M6 15h4"></path></svg></div>
                         <div class="num" id="ov-revenue">&mdash;</div>
                         <div class="label">Revenue (Paid)</div>
+                        <div class="trend" id="ov-revenue-week">&nbsp;</div>
                     </div>
                     <div class="stat-card">
                         <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
                         <div class="num" id="ov-subs">&mdash;</div>
                         <div class="label">Subscribers</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
-                        <div class="num" id="ov-subs-week">&mdash;</div>
-                        <div class="label">New Subs (7d)</div>
+                        <div class="trend" id="ov-subs-week">&nbsp;</div>
                     </div>
                 </div>
 
@@ -941,7 +948,16 @@
     }
 
     /* ===== Overview ===== */
+    function trendHtml(n, label, formatter) {
+        if (!n) return 'No new ' + label + ' this week';
+        const shown = formatter ? formatter(n) : n.toLocaleString();
+        return '<span class="up">&#9650; ' + shown + '</span> this week';
+    }
+
     function renderOverview() {
+        const weekAgo = Date.now() - 7 * 86400000;
+        const isRecent = (o) => (o.createdAt || 0) >= weekAgo;
+
         document.getElementById('ov-orders').textContent = allOrders.length.toLocaleString();
         const paid = allOrders.filter((o) => o.status === 'paid');
         const failed = allOrders.filter((o) => o.status !== 'paid');
@@ -950,8 +966,13 @@
         const revenue = paid.reduce((sum, o) => sum + (o.order && o.order.total ? Number(o.order.total) : 0), 0);
         document.getElementById('ov-revenue').textContent = fmtNGN(revenue);
         document.getElementById('ov-subs').textContent = allSubs.length.toLocaleString();
-        const weekAgo = Date.now() - 7 * 86400000;
-        document.getElementById('ov-subs-week').textContent = allSubs.filter((s) => s.subscribedAt >= weekAgo).length.toLocaleString();
+
+        document.getElementById('ov-orders-week').innerHTML = trendHtml(allOrders.filter(isRecent).length, 'orders');
+        document.getElementById('ov-paid-week').innerHTML = trendHtml(paid.filter(isRecent).length, 'paid orders');
+        document.getElementById('ov-failed-week').innerHTML = trendHtml(failed.filter(isRecent).length, 'failed orders');
+        const revenueWeek = paid.filter(isRecent).reduce((sum, o) => sum + (o.order && o.order.total ? Number(o.order.total) : 0), 0);
+        document.getElementById('ov-revenue-week').innerHTML = trendHtml(revenueWeek, 'revenue', fmtNGN);
+        document.getElementById('ov-subs-week').innerHTML = trendHtml(allSubs.filter((s) => s.subscribedAt >= weekAgo).length, 'subscribers');
 
         renderOrdersBarChart();
         renderPaidRateRing(paid.length, allOrders.length);
