@@ -438,8 +438,21 @@ async function finalizeOrder(env, orderRef) {
         lookup.status || lookup.transactionStatus || lookup.paymentStatus || ''
     ).toUpperCase();
     const paid = ['SUCCESS', 'SUCCESSFUL', 'COMPLETED', 'PAID'].includes(status);
+    const FAILED_STATUSES = ['FAILED', 'DECLINED', 'CANCELLED', 'CANCELED', 'EXPIRED', 'REVERSED', 'ERROR'];
 
     if (!paid) {
+        // A status Nomba reports as definitively over (not just "still waiting")
+        // gets persisted as 'failed' so it stops showing as pending forever —
+        // "still processing"/"unknown" statuses are left alone since the
+        // customer may yet complete or retry the same reference.
+        if (FAILED_STATUSES.includes(status) && rec) {
+            rec.status = 'failed';
+            rec.failedAt = Date.now();
+            if (env.ORDERS) {
+                await env.ORDERS.put('order:' + orderRef, JSON.stringify(rec), { expirationTtl: ORDER_TTL_SECONDS });
+            }
+            return { status: 'failed', emailed: false, order: rec.order, nombaReference: orderRef };
+        }
         return { status: status ? 'pending' : 'unknown', emailed: false };
     }
 

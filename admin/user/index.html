@@ -238,6 +238,7 @@
         text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
     }
     .stat-tile.warn .num { color: var(--warn); }
+    .stat-tile.bad .num { color: var(--bad); }
 
     /* ===== Toolbar / table ===== */
     .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
@@ -445,6 +446,7 @@
             <div class="stat-tile"><div class="num" id="ov-orders">—</div><div class="label">Total Orders</div></div>
             <div class="stat-tile"><div class="num" id="ov-paid">—</div><div class="label">Paid Orders</div></div>
             <div class="stat-tile warn"><div class="num" id="ov-pending">—</div><div class="label">Pending Orders</div></div>
+            <div class="stat-tile bad"><div class="num" id="ov-failed">—</div><div class="label">Failed Orders</div></div>
             <div class="stat-tile"><div class="num" id="ov-revenue">—</div><div class="label">Revenue (paid)</div></div>
             <div class="stat-tile"><div class="num" id="ov-subs">—</div><div class="label">Subscribers</div></div>
             <div class="stat-tile"><div class="num" id="ov-subs-week">—</div><div class="label">New (7 Days)</div></div>
@@ -463,6 +465,7 @@
                 <option value="">All statuses</option>
                 <option value="paid">Paid</option>
                 <option value="pending">Pending</option>
+                <option value="failed">Failed</option>
             </select>
             <button type="button" class="ghost" id="orders-copy-csv">Copy as CSV</button>
             <button type="button" class="ghost" id="orders-download-csv">Download CSV</button>
@@ -670,6 +673,12 @@
         return '₦' + v.toLocaleString('en-NG');
     }
 
+    function statusPillClass(status) {
+        if (status === 'paid') return 'ok';
+        if (status === 'failed') return 'bad';
+        return 'pending';
+    }
+
     async function load() {
         if (!currentKey) return;
         fallback.classList.remove('show');
@@ -724,9 +733,11 @@
     function renderOverview() {
         document.getElementById('ov-orders').textContent = allOrders.length.toLocaleString();
         const paid = allOrders.filter((o) => o.status === 'paid');
-        const pending = allOrders.filter((o) => o.status !== 'paid');
+        const failed = allOrders.filter((o) => o.status === 'failed');
+        const pending = allOrders.filter((o) => o.status !== 'paid' && o.status !== 'failed');
         document.getElementById('ov-paid').textContent = paid.length.toLocaleString();
         document.getElementById('ov-pending').textContent = pending.length.toLocaleString();
+        document.getElementById('ov-failed').textContent = failed.length.toLocaleString();
         const revenue = paid.reduce((sum, o) => sum + (o.order && o.order.total ? Number(o.order.total) : 0), 0);
         document.getElementById('ov-revenue').textContent = fmtNGN(revenue);
         document.getElementById('ov-subs').textContent = allSubs.length.toLocaleString();
@@ -741,7 +752,7 @@
             const c = (o.order && o.order.customer) || {};
             const name = (c.firstName || c.lastName) ? (c.firstName + ' ' + c.lastName).trim() : (c.email || 'Unknown');
             const total = o.order ? fmtNGN(o.order.total) : '—';
-            const statusClass = o.status === 'paid' ? 'ok' : 'pending';
+            const statusClass = statusPillClass(o.status);
             return '<div class="item-line"><span>' + escapeHtml(name) + ' &middot; ' + escapeHtml(o.nombaReference || '') + '</span>' +
                 '<span><span class="pill ' + statusClass + '">' + escapeHtml(o.status || 'unknown') + '</span> &nbsp; ' + total + '</span></div>';
         }).join('');
@@ -776,7 +787,8 @@
             itemCount: (o.order && o.order.items) ? o.order.items.reduce((n, it) => n + (it.qty || 1), 0) : 0,
             total: o.order ? Number(o.order.total || 0) : 0,
         }));
-        if (statusFilter) rows = rows.filter((o) => (statusFilter === 'paid' ? o.status === 'paid' : o.status !== 'paid'));
+        if (statusFilter === 'pending') rows = rows.filter((o) => o.status !== 'paid' && o.status !== 'failed');
+        else if (statusFilter) rows = rows.filter((o) => o.status === statusFilter);
         if (q) {
             rows = rows.filter((o) =>
                 (o.nombaReference || '').toLowerCase().includes(q) ||
@@ -806,7 +818,7 @@
 
         tbody.innerHTML = rows.map((o) => {
             const d = fmtDate(o.createdAt || 0);
-            const statusClass = o.status === 'paid' ? 'ok' : 'pending';
+            const statusClass = statusPillClass(o.status);
             const ref = o.nombaReference || '';
             const isOpen = ref === openOrderRef;
             let html = '<tr class="row-clickable" data-ref="' + escapeHtml(ref) + '">' +
@@ -826,6 +838,12 @@
                 const ref = tr.getAttribute('data-ref');
                 openOrderRef = (openOrderRef === ref) ? null : ref;
                 renderOrders();
+            });
+        });
+        tbody.querySelectorAll('.refresh-status-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                refreshOrderStatus(btn.getAttribute('data-ref'), btn);
             });
         });
     }
@@ -859,8 +877,40 @@
                 '<p>Status: <span class="muted">' + escapeHtml(o.status || 'unknown') + '</span></p>' +
                 '<p>Emailed: <span class="muted">' + (o.emailsSent ? 'Yes' : 'No') + '</span></p>' +
                 (o.paidAt ? '<p>Paid: <span class="muted">' + fmtDate(o.paidAt).abs + '</span></p>' : '') +
+                (o.failedAt ? '<p>Failed: <span class="muted">' + fmtDate(o.failedAt).abs + '</span></p>' : '') +
+                (o.status !== 'paid'
+                    ? '<button type="button" class="ghost refresh-status-btn" data-ref="' + escapeHtml(o.nombaReference || '') + '" style="margin-top:10px;">Check With Nomba</button>'
+                    : '') +
             '</div>' +
         '</div>';
+    }
+
+    async function refreshOrderStatus(ref, btn) {
+        if (!ref) return;
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Checking…';
+        try {
+            const res = await fetch(WORKER_URL + '/finalize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderReference: ref }),
+            });
+            const data = await res.json().catch(() => null);
+            if (!res.ok) throw new Error((data && data.error) || 'Check failed (' + res.status + ')');
+            const idx = allOrders.findIndex((o) => o.nombaReference === ref);
+            if (idx !== -1) {
+                allOrders[idx].status = data.status;
+                if (data.emailed) allOrders[idx].emailsSent = true;
+                if (data.status === 'paid') allOrders[idx].paidAt = allOrders[idx].paidAt || Date.now();
+                if (data.status === 'failed') allOrders[idx].failedAt = allOrders[idx].failedAt || Date.now();
+            }
+            renderOrders();
+            renderOverview();
+        } catch (err) {
+            btn.textContent = err && err.message ? err.message : 'Check failed';
+            setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2200);
+        }
     }
 
     function ordersToCSV() {
