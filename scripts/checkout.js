@@ -299,10 +299,12 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
             const link = data.checkoutLink || data.checkout_url || data.link;
             if (!link) throw new Error('Nomba response missing checkoutLink');
 
-            // IMPORTANT: Nomba ignores the orderId we send and generates its OWN
-            // orderReference (a UUID). That is the value it appends to the return
-            // URL and the only id its transaction-lookup knows — so we must store
-            // it and use it for matching + verification on return.
+            // Nomba's checkout-creation response echoes back its own internal
+            // "onlineCheckoutOrderId" (a UUID) under orderReference/orderRef/
+            // reference — kept here only as a fallback display value. Confirmed
+            // by direct testing that Nomba's transaction-lookup API actually
+            // requires OUR OWN order.id (what we sent it as orderReference), not
+            // this UUID, which 404s on lookup (see worker.js handleCreateCheckout).
             order.nombaRef = data.orderReference || data.orderRef || data.reference || null;
             localStorage.setItem(PENDING_ORDER_KEY, JSON.stringify(order));
 
@@ -341,13 +343,11 @@ const NOMBA_RETURN_URL = window.location.origin + window.location.pathname;
         const isRecent = pending.placedAt && (Date.now() - pending.placedAt) < 30 * 60 * 1000;
         if (!hasReturnSignal && !isRecent) { localStorage.removeItem(PENDING_ORDER_KEY); return false; }
 
-        // Verify with the reference Nomba appended on RETURN (the authoritative
-        // one for its transaction lookup); fall back to the ref captured at
-        // create-checkout, then our own order id. NOTE: we intentionally do NOT
-        // bail on a ref "mismatch" — in sandbox the returned ref can differ from
-        // the create-checkout ref, and bailing left the customer stuck bouncing
-        // back to the checkout form after a successful payment.
-        const orderRef = returnedRef || pending.nombaRef || pending.id;
+        // Our own order.id first — confirmed the one Nomba's transaction-lookup
+        // API actually accepts (see the note in createCheckout above). The
+        // UUID-style refs Nomba may append on return or echo at creation are
+        // kept only as a last-resort fallback, since they 404 on lookup.
+        const orderRef = pending.id || returnedRef || pending.nombaRef;
 
         // Show "Verifying payment…" while we check with Nomba
         layout.style.display = 'none';

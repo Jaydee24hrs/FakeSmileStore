@@ -190,10 +190,17 @@ async function handleCreateCheckout(request, env) {
 
     // Nomba returns { ..., data: { checkoutLink, orderReference, ... } }
     const payload = data.data || data;
-    const nombaRef = payload.orderReference || payload.orderRef || payload.reference || orderId;
+    // Confirmed by direct testing against the live lookup API: Nomba's
+    // transaction-lookup endpoint (/transactions/accounts/single) wants the
+    // MERCHANT's own orderReference (orderId, e.g. "FS-XXX") — not Nomba's own
+    // internal "onlineCheckoutOrderId" (a UUID), even though a UUID is what
+    // their checkout-creation response echoes back under orderReference/
+    // orderRef/reference. Using that UUID as the KV key made every later
+    // lookup (finalize, webhook, admin "Check With Nomba") silently 404.
+    const nombaRef = orderId;
 
     // Persist the full draft order so the webhook can finalize + email it even
-    // if the customer's browser never returns. Keyed by Nomba's orderReference.
+    // if the customer's browser never returns. Keyed by the merchant orderId.
     if (env.ORDERS && order) {
         try {
             await env.ORDERS.put(
@@ -247,8 +254,12 @@ async function handleWebhook(request, env) {
 
     const type = String(evt.event_type || evt.event || evt.type || '').toLowerCase();
     const d = evt.data || evt;
-    const orderRef = d.orderReference || d.order_reference || d.orderRef ||
-        (d.order && d.order.orderReference) || d.merchantTxRef || null;
+    // onlineCheckoutOrderReference is the field name confirmed by direct
+    // testing against the live transaction-lookup API — checked first.
+    // merchantTxRef is deliberately NOT used: on a real transaction it held a
+    // human-readable bank-transfer description, not an order reference.
+    const orderRef = d.onlineCheckoutOrderReference || d.orderReference || d.order_reference ||
+        d.orderRef || (d.order && d.order.orderReference) || null;
 
     // Verify the HMAC-SHA256 signature (defense in depth). This is NOT the only
     // guard: finalizeOrder independently asks Nomba's API whether this reference
@@ -470,7 +481,13 @@ async function finalizeOrder(env, orderRef) {
     }
 
     // Source of truth: ask Nomba whether this reference actually paid.
-    const lookup = await nombaLookup(env, orderRef);
+    let lookup = await nombaLookup(env, orderRef);
+    // Self-heals orders created before the orderId-vs-UUID lookup bug was
+    // fixed (see handleCreateCheckout): if the KV key itself isn't a lookup-
+    // able reference, retry with the merchant orderId stored alongside it.
+    if (lookup && lookup.notFound && rec && rec.merchantOrderId && rec.merchantOrderId !== orderRef) {
+        lookup = await nombaLookup(env, rec.merchantOrderId);
+    }
     const status = String(
         lookup.status || lookup.transactionStatus || lookup.paymentStatus || ''
     ).toUpperCase();
@@ -520,13 +537,17 @@ async function finalizeOrder(env, orderRef) {
     return { status: 'paid', emailed, order: rec.order, nombaReference: rec.nombaReference };
 }
 
-// GET the transaction from Nomba by orderReference.
+// GET the transaction from Nomba by orderReference. Must be the MERCHANT
+// orderReference (orderId) — confirmed by direct testing that Nomba's own
+// internal "onlineCheckoutOrderId" (a UUID) 404s on this endpoint even
+// though it's what checkout-creation echoes back as orderReference/reference.
 async function nombaLookup(env, orderReference) {
     const token = await getNombaToken(env);
     const res = await fetch(
         `${nombaBase(env)}/transactions/accounts/single?orderReference=${encodeURIComponent(orderReference)}`,
         { method: 'GET', headers: { 'accountId': env.NOMBA_ACCOUNT_ID, 'Authorization': `Bearer ${token}` } }
     );
+    if (res.status === 404) return { notFound: true };
     const data = await res.json().catch(() => ({}));
     return data.data || data;
 }
