@@ -308,6 +308,15 @@
         gap: 14px;
         margin-bottom: 20px;
     }
+    /* Overview's 5 cards: always one row on desktop, never wrap a lone card
+       onto its own line. Below 900px there isn't room for 5 without
+       squeezing numbers unreadable, so it drops to the auto-fit behavior
+       above (wraps in whatever grouping fits, same as the Subscribers tab's
+       3-card row already does at any width). */
+    .stat-row.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    @media (max-width: 900px) {
+        .stat-row.cols-5 { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    }
     .stat-card {
         background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
         border: 1px solid var(--line);
@@ -595,7 +604,7 @@
 
             <!-- ===== OVERVIEW ===== -->
             <section class="tab-panel active" id="tab-overview">
-                <div class="stat-row">
+                <div class="stat-row cols-5">
                     <div class="stat-card">
                         <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg></div>
                         <div class="num" id="ov-orders">&mdash;</div>
