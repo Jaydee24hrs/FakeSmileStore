@@ -35,6 +35,16 @@
                            this). Set it with `wrangler secret put`, same as
                            the other secrets — never put it in this file.
 
+     --- Admin login (tools/admin.html) ---
+     ADMIN_EMAILS    — comma-separated allowlist, e.g.
+                        "you@gmail.com,cofounder@gmail.com". Only these
+                        emails can log in.
+     ADMIN_PASSWORD  — the shared login password. Checked server-side; the
+                        admin page never embeds it. On success POST
+                        /admin-login hands back SUBSCRIBERS_EXPORT_KEY, so
+                        set that too or login succeeds but the dashboard
+                        has nothing to fetch with.
+
    KV BINDING (optional but recommended):
      ORDERS — a KV namespace bound as `ORDERS`. Stores the draft order at
               create-checkout time so the webhook can finalize + email it
@@ -65,6 +75,12 @@
             createdAt, paidAt, emailsSent, ... }] }
        Every order currently in KV (30-day TTL — see ORDER_TTL_SECONDS),
        newest first. Same secret as /subscribers; powers tools/admin.html.
+     POST /admin-login      { email, password }
+       -> { ok: true, key: <SUBSCRIBERS_EXPORT_KEY> } or 401 Unauthorized.
+       Gate for the admin dashboard: checks email against ADMIN_EMAILS and
+       password against ADMIN_PASSWORD, both server-side. On success hands
+       back the export key so the page can call /orders and /subscribers
+       without the admin ever typing or seeing that key directly.
    ============================================================== */
 
 export default {
@@ -105,6 +121,9 @@ export default {
             }
             if (url.pathname === '/orders' && request.method === 'GET') {
                 return await handleOrdersExport(url, env);
+            }
+            if (url.pathname === '/admin-login' && request.method === 'POST') {
+                return await handleAdminLogin(request, env);
             }
             if (url.pathname === '/' || url.pathname === '/health') {
                 return json({ ok: true, service: 'fakesmile-nomba-worker' }, 200, env);
@@ -369,6 +388,36 @@ async function handleOrdersExport(url, env) {
 
     orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     return json({ count: orders.length, orders }, 200, env);
+}
+
+/* ============================================================== */
+/* === ADMIN LOGIN ================================================ */
+/* ============================================================== */
+// Server-side email + password check so neither ever ships in the admin
+// page's source. Deliberately generic on failure (doesn't say whether the
+// email or the password was wrong) so the response can't be used to probe
+// which emails are in ADMIN_EMAILS.
+
+async function handleAdminLogin(request, env) {
+    if (!env.ADMIN_EMAILS || !env.ADMIN_PASSWORD) {
+        return json({ error: 'Admin login is not configured on this Worker (set ADMIN_EMAILS and ADMIN_PASSWORD).' }, 501, env);
+    }
+    let body;
+    try { body = await request.json(); } catch (_) { return json({ error: 'Invalid JSON body' }, 400, env); }
+
+    const email = String((body && body.email) || '').trim().toLowerCase();
+    const password = String((body && body.password) || '');
+    const allowed = env.ADMIN_EMAILS.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+
+    const emailOk = allowed.includes(email);
+    const passwordOk = timingSafeEqual(password, env.ADMIN_PASSWORD);
+    if (!emailOk || !passwordOk) {
+        return json({ error: 'Invalid email or password.' }, 401, env);
+    }
+    if (!env.SUBSCRIBERS_EXPORT_KEY) {
+        return json({ error: 'Logged in, but SUBSCRIBERS_EXPORT_KEY isn’t set, so there’s no data to fetch yet.' }, 501, env);
+    }
+    return json({ ok: true, key: env.SUBSCRIBERS_EXPORT_KEY }, 200, env);
 }
 
 /* ============================================================== */

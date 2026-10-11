@@ -381,11 +381,42 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="login-wrap">
     <header>
         <span class="eyebrow">FakeSmile · Admin</span>
         <h1>Store Dashboard</h1>
-        <p class="lede">Orders, subscribers and SEO health in one place. Runs entirely in your own browser — your export key is only ever sent to your own Worker, never saved anywhere else.</p>
+        <p class="lede">Orders, subscribers and SEO health in one place. Sign in with your admin account to continue.</p>
+    </header>
+
+    <div class="panel login-panel" id="login-panel">
+        <p class="panel-title">Admin Login</p>
+        <div class="field-row">
+            <div class="field">
+                <label for="login-email">Email</label>
+                <input type="text" id="login-email" placeholder="you@gmail.com" autocomplete="username" spellcheck="false">
+            </div>
+            <div class="field">
+                <label for="login-password">Password</label>
+                <div class="input-group">
+                    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+                    <button type="button" class="toggle-key" id="toggle-login-password">SHOW</button>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="button" class="primary" id="login-btn">Sign In</button>
+            </div>
+        </div>
+        <p class="hint"><strong>Stays signed in on this device</strong> until you log out — nothing is stored anywhere else.</p>
+        <div class="status-line" id="login-status"></div>
+    </div>
+</div>
+
+<div class="wrap" id="dashboard-wrap" style="display:none;">
+    <header>
+        <span class="eyebrow">FakeSmile · Admin</span>
+        <h1>Store Dashboard</h1>
+        <p class="lede">Orders, subscribers and SEO health in one place. Runs entirely in your own browser — your credentials and data are only ever sent to your own Worker.</p>
+        <button type="button" class="ghost" id="logout-btn" style="margin-top:14px;">Log Out</button>
     </header>
 
     <nav class="tabs" id="tabs">
@@ -395,31 +426,15 @@
         <button type="button" class="tab-btn" data-tab="seo">SEO Health</button>
     </nav>
 
-    <div class="panel" id="connection-panel">
-        <p class="panel-title">Connection</p>
-        <div class="field-row">
-            <div class="field">
-                <label for="worker-url">Worker URL</label>
-                <input type="text" id="worker-url" placeholder="https://fakesmile-nomba.YOUR-SUBDOMAIN.workers.dev" autocomplete="off" spellcheck="false">
-            </div>
-            <div class="field">
-                <label for="export-key">Export key</label>
-                <div class="input-group">
-                    <input type="password" id="export-key" placeholder="SUBSCRIBERS_EXPORT_KEY" autocomplete="off" spellcheck="false">
-                    <button type="button" class="toggle-key" id="toggle-key">SHOW</button>
-                </div>
-            </div>
-            <div class="actions">
-                <button type="button" class="primary" id="load-btn">Load Data</button>
-            </div>
-        </div>
-        <p class="hint"><strong>Remembered on this device only</strong> — saved to this browser's local storage, not to the file itself. Loads both orders and subscribers at once.</p>
+    <div class="panel" id="connection-panel" style="display:none;">
+        <p class="panel-title">Couldn&rsquo;t Load Data</p>
         <div class="status-line" id="status-line"></div>
         <div class="fallback" id="fallback">
             <p class="hint" style="margin-top:0;">Fetch blocked? Paste the JSON from <code>/orders?key=...</code> or <code>/subscribers?key=...</code> directly:</p>
             <textarea id="paste-json" placeholder='{"count": 2, "orders": [...]} or {"count": 2, "subscribers": [...]}'></textarea>
             <div class="fallback-actions">
                 <button type="button" class="ghost" id="load-pasted">Load Pasted JSON</button>
+                <button type="button" class="ghost" id="retry-btn">Retry</button>
             </div>
         </div>
     </div>
@@ -527,51 +542,111 @@
             document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-            document.getElementById('connection-panel').style.display =
-                (btn.dataset.tab === 'seo') ? 'none' : '';
         });
     });
 
-    /* ===== Shared connection + data loading ===== */
-    const workerInput = document.getElementById('worker-url');
-    const keyInput = document.getElementById('export-key');
-    const toggleKeyBtn = document.getElementById('toggle-key');
-    const loadBtn = document.getElementById('load-btn');
+    /* ===== Worker + auth ===== */
+    const WORKER_URL = 'https://fakesmile-nomba.josephnwach11.workers.dev';
+    const STORAGE_KEY = 'fs_admin_key';
+    const STORAGE_EMAIL = 'fs_admin_email';
+
+    const loginWrap = document.getElementById('login-wrap');
+    const dashboardWrap = document.getElementById('dashboard-wrap');
+    const loginEmail = document.getElementById('login-email');
+    const loginPassword = document.getElementById('login-password');
+    const toggleLoginPwBtn = document.getElementById('toggle-login-password');
+    const loginBtn = document.getElementById('login-btn');
+    const loginStatus = document.getElementById('login-status');
+    const logoutBtn = document.getElementById('logout-btn');
+
     const statusLine = document.getElementById('status-line');
+    const connectionPanel = document.getElementById('connection-panel');
     const fallback = document.getElementById('fallback');
     const pasteJson = document.getElementById('paste-json');
     const loadPastedBtn = document.getElementById('load-pasted');
-
-    const STORAGE_URL_KEY = 'fs_admin_worker_url';
-    const STORAGE_KEY_KEY = 'fs_admin_export_key';
+    const retryBtn = document.getElementById('retry-btn');
 
     let allOrders = [];
     let allSubs = [];
     let orderSortField = 'createdAt', orderSortDir = 'desc';
     let subSortField = 'subscribedAt', subSortDir = 'desc';
     let openOrderRef = null;
+    let currentKey = null;
 
-    try {
-        const savedUrl = localStorage.getItem(STORAGE_URL_KEY);
-        const savedKey = localStorage.getItem(STORAGE_KEY_KEY);
-        if (savedUrl) workerInput.value = savedUrl;
-        if (savedKey) keyInput.value = savedKey;
-    } catch (_) {}
-    if (!workerInput.value) workerInput.value = 'https://fakesmile-nomba.josephnwach11.workers.dev';
-
-    toggleKeyBtn.addEventListener('click', () => {
-        const show = keyInput.type === 'password';
-        keyInput.type = show ? 'text' : 'password';
-        toggleKeyBtn.textContent = show ? 'HIDE' : 'SHOW';
+    toggleLoginPwBtn.addEventListener('click', () => {
+        const show = loginPassword.type === 'password';
+        loginPassword.type = show ? 'text' : 'password';
+        toggleLoginPwBtn.textContent = show ? 'HIDE' : 'SHOW';
     });
+
+    function setLoginStatus(text, kind) {
+        loginStatus.className = 'status-line show' + (kind ? ' ' + kind : '');
+        if (kind === 'loading') loginStatus.innerHTML = '<span class="spinner"></span><span>' + text + '</span>';
+        else loginStatus.textContent = text;
+    }
+
+    async function doLogin() {
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value;
+        if (!email || !password) { setLoginStatus('Enter your email and password.', 'error'); return; }
+        loginBtn.disabled = true;
+        setLoginStatus('Signing in…', 'loading');
+        try {
+            const res = await fetch(WORKER_URL + '/admin-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await res.json().catch(() => null);
+            if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || 'Sign in failed (' + res.status + ')');
+            currentKey = data.key;
+            try { localStorage.setItem(STORAGE_KEY, currentKey); localStorage.setItem(STORAGE_EMAIL, email); } catch (_) {}
+            showDashboard();
+        } catch (err) {
+            setLoginStatus(err && err.message ? err.message : 'Sign in failed.', 'error');
+        } finally {
+            loginBtn.disabled = false;
+        }
+    }
+
+    loginBtn.addEventListener('click', doLogin);
+    loginEmail.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+    loginPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+
+    function showDashboard() {
+        loginWrap.style.display = 'none';
+        dashboardWrap.style.display = '';
+        loginStatus.className = 'status-line';
+        loginPassword.value = '';
+        load();
+    }
+
+    logoutBtn.addEventListener('click', () => {
+        currentKey = null;
+        try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_EMAIL); } catch (_) {}
+        allOrders = []; allSubs = [];
+        dashboardWrap.style.display = 'none';
+        loginWrap.style.display = '';
+        loginEmail.value = '';
+    });
+
+    (function tryResumeSession() {
+        try {
+            const savedKey = localStorage.getItem(STORAGE_KEY);
+            const savedEmail = localStorage.getItem(STORAGE_EMAIL);
+            if (savedKey) {
+                currentKey = savedKey;
+                if (savedEmail) loginEmail.value = savedEmail;
+                showDashboard();
+            }
+        } catch (_) {}
+    })();
 
     function setStatus(text, kind) {
         statusLine.className = 'status-line show' + (kind ? ' ' + kind : '');
         if (kind === 'loading') statusLine.innerHTML = '<span class="spinner"></span><span>' + text + '</span>';
         else statusLine.textContent = text;
     }
-    function clearStatus() { statusLine.className = 'status-line'; statusLine.textContent = ''; }
-
     function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
@@ -596,19 +671,15 @@
     }
 
     async function load() {
-        const workerUrl = workerInput.value.trim().replace(/\/$/, '');
-        const key = keyInput.value.trim();
-        if (!workerUrl || !key) { setStatus('Enter both the Worker URL and your export key.', 'error'); return; }
-        try { localStorage.setItem(STORAGE_URL_KEY, workerUrl); localStorage.setItem(STORAGE_KEY_KEY, key); } catch (_) {}
-
-        loadBtn.disabled = true;
-        setStatus('Loading orders and subscribers…', 'loading');
+        if (!currentKey) return;
         fallback.classList.remove('show');
+        connectionPanel.style.display = '';
+        setStatus('Loading orders and subscribers…', 'loading');
 
         try {
             const [ordersRes, subsRes] = await Promise.all([
-                fetch(workerUrl + '/orders?key=' + encodeURIComponent(key)),
-                fetch(workerUrl + '/subscribers?key=' + encodeURIComponent(key)),
+                fetch(WORKER_URL + '/orders?key=' + encodeURIComponent(currentKey)),
+                fetch(WORKER_URL + '/subscribers?key=' + encodeURIComponent(currentKey)),
             ]);
             const ordersData = await ordersRes.json().catch(() => null);
             const subsData = await subsRes.json().catch(() => null);
@@ -616,25 +687,21 @@
             if (!subsRes.ok) throw new Error((subsData && subsData.error) || 'Subscribers request failed (' + subsRes.status + ')');
             applyOrders(ordersData);
             applySubs(subsData);
-            clearStatus();
+            connectionPanel.style.display = 'none';
         } catch (err) {
             setStatus('Couldn’t load: ' + (err && err.message ? err.message : 'network error') + '. If this is a CORS error, use the fallback below.', 'error');
             fallback.classList.add('show');
-        } finally {
-            loadBtn.disabled = false;
         }
     }
 
-    loadBtn.addEventListener('click', load);
-    keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') load(); });
-    workerInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') load(); });
+    retryBtn.addEventListener('click', load);
 
     loadPastedBtn.addEventListener('click', () => {
         try {
             const data = JSON.parse(pasteJson.value);
             if (Array.isArray(data.orders)) applyOrders(data);
             if (Array.isArray(data.subscribers)) applySubs(data);
-            clearStatus();
+            connectionPanel.style.display = 'none';
         } catch (err) {
             setStatus('Could not parse that JSON: ' + err.message, 'error');
         }
