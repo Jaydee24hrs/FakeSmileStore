@@ -7,20 +7,26 @@
 <title>FakeSmile Admin</title>
 <style>
     :root {
-        --bg: #050806;
-        --panel: #0d130f;
-        --panel-2: #121a15;
-        --line: rgba(0, 217, 87, 0.18);
-        --line-soft: rgba(255, 255, 255, 0.08);
+        --bg: #07100b;
+        --sidebar-bg: #060b08;
+        --panel: #0d1612;
+        --panel-2: #111c16;
+        --line: rgba(0, 217, 87, 0.16);
+        --line-soft: rgba(255, 255, 255, 0.07);
         --fg: #f3f7f4;
         --fg-muted: rgba(243, 247, 244, 0.6);
-        --fg-faint: rgba(243, 247, 244, 0.38);
+        --fg-faint: rgba(243, 247, 244, 0.36);
         --accent: #00d957;
         --accent-bright: #4dffa0;
-        --bad: #ff8080;
+        --bad: #ff8585;
+        --bad-bright: #ffa3a3;
         --warn: #ffc857;
         --font-display: 'Clash Display', 'Segoe UI', system-ui, sans-serif;
         --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        --radius-lg: 18px;
+        --radius-md: 14px;
+        --radius-sm: 10px;
+        --sidebar-w: 248px;
         color-scheme: dark;
     }
 
@@ -34,72 +40,217 @@
         -webkit-font-smoothing: antialiased;
     }
 
-    body {
+    body { min-height: 100vh; }
+
+    a { color: inherit; }
+
+    svg.icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* ===================================================== */
+    /* ===== LOGIN SCREEN ==================================== */
+    /* ===================================================== */
+    #login-wrap {
         min-height: 100vh;
-        background:
-            radial-gradient(640px 420px at 85% -10%, rgba(0, 217, 87, 0.12), transparent 60%),
-            radial-gradient(520px 360px at -10% 20%, rgba(0, 217, 87, 0.08), transparent 60%),
-            var(--bg);
-        padding: 36px 20px 80px;
-    }
-
-    .wrap { max-width: 1080px; margin: 0 auto; }
-
-    header { margin-bottom: 22px; }
-
-    .eyebrow {
-        display: inline-flex;
+        display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 2.5px;
-        text-transform: uppercase;
-        color: var(--accent);
-        margin-bottom: 10px;
+        justify-content: center;
+        padding: 24px;
+        background:
+            radial-gradient(760px 480px at 85% -10%, rgba(0, 217, 87, 0.14), transparent 60%),
+            radial-gradient(620px 420px at -10% 110%, rgba(0, 217, 87, 0.08), transparent 60%),
+            var(--bg);
     }
-    .eyebrow::before {
-        content: "";
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--accent);
-        box-shadow: 0 0 10px var(--accent);
+    .login-card {
+        width: 100%;
+        max-width: 400px;
+        background: linear-gradient(165deg, var(--panel) 0%, var(--panel-2) 100%);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 36px 32px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.04);
     }
-
-    h1 {
+    .login-mark {
+        width: 46px; height: 46px;
+        border-radius: 13px;
+        background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+        display: grid; place-items: center;
         font-family: var(--font-display);
-        font-size: clamp(26px, 4vw, 34px);
+        font-weight: 800;
+        font-size: 18px;
+        color: #002b12;
+        margin-bottom: 18px;
+        box-shadow: 0 10px 24px rgba(0, 217, 87, 0.3);
+    }
+    .login-card h1 {
+        font-family: var(--font-display);
+        font-size: 24px;
         font-weight: 700;
         margin: 0 0 6px;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.3px;
     }
+    .login-card .sub { color: var(--fg-muted); font-size: 13.5px; margin: 0 0 26px; line-height: 1.55; }
 
-    .lede { color: var(--fg-muted); font-size: 13.5px; max-width: 60ch; line-height: 1.6; margin: 0; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field label { font-size: 12px; color: var(--fg-muted); font-weight: 600; }
 
-    /* ===== Tabs ===== */
-    .tabs {
-        display: flex;
-        gap: 6px;
-        margin: 22px 0 20px;
-        border-bottom: 1px solid var(--line-soft);
-        overflow-x: auto;
-    }
-    .tab-btn {
-        background: none;
-        border: none;
-        color: var(--fg-muted);
+    .input-group { position: relative; display: flex; align-items: center; }
+    input[type="text"], input[type="password"], input[type="search"] {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--line-soft);
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        color: var(--fg);
         font-family: var(--font-body);
         font-size: 13.5px;
-        font-weight: 600;
-        padding: 10px 16px;
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        white-space: nowrap;
-        transition: color 0.15s ease;
+        outline: none;
+        transition: border-color 0.2s ease, background 0.2s ease;
     }
-    .tab-btn:hover { color: var(--fg); }
-    .tab-btn.active { color: var(--accent-bright); border-bottom-color: var(--accent); }
+    input:focus { border-color: var(--accent); background: rgba(0, 217, 87, 0.05); }
+    .input-group input { padding-right: 58px; }
+
+    .toggle-key {
+        position: absolute; right: 10px;
+        background: none; border: none;
+        color: var(--fg-faint); font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+        cursor: pointer; padding: 4px 6px;
+    }
+    .toggle-key:hover { color: var(--accent); }
+
+    button.primary {
+        width: 100%;
+        background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+        color: #00210d;
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 13px 22px;
+        font-family: var(--font-body);
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        margin-top: 6px;
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+        box-shadow: 0 10px 24px rgba(0, 217, 87, 0.28);
+    }
+    button.primary:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(0, 217, 87, 0.4); }
+    button.primary:disabled { opacity: 0.55; cursor: default; transform: none; box-shadow: none; }
+
+    .hint { font-size: 11.5px; color: var(--fg-faint); margin-top: 14px; line-height: 1.55; text-align: center; }
+    .hint strong { color: var(--fg-muted); }
+
+    .status-line { margin-top: 14px; font-size: 13px; display: none; align-items: center; gap: 8px; }
+    .status-line.show { display: flex; }
+    .status-line.error { color: var(--bad); }
+    .status-line.loading { color: var(--fg-muted); }
+
+    .spinner {
+        width: 13px; height: 13px; border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.2);
+        border-top-color: var(--accent);
+        animation: spin 0.7s linear infinite;
+        flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===================================================== */
+    /* ===== APP SHELL ======================================= */
+    /* ===================================================== */
+    #app-shell { display: flex; min-height: 100vh; }
+
+    .sidebar {
+        width: var(--sidebar-w);
+        flex-shrink: 0;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--line-soft);
+        display: flex;
+        flex-direction: column;
+        padding: 22px 16px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+    }
+    .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 26px; }
+    .sidebar-brand .mark {
+        width: 32px; height: 32px; border-radius: 9px;
+        background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+        display: grid; place-items: center;
+        font-family: var(--font-display); font-weight: 800; font-size: 13px; color: #002b12;
+    }
+    .sidebar-brand .name { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.2px; }
+    .sidebar-brand .tag { font-size: 10px; color: var(--fg-faint); letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-top: 1px; }
+
+    .sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+    .nav-item {
+        display: flex; align-items: center; gap: 11px;
+        background: none; border: none;
+        color: var(--fg-muted);
+        font-family: var(--font-body);
+        font-size: 13.5px; font-weight: 600;
+        padding: 10px 12px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        text-align: left;
+        width: 100%;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+    .nav-item svg.icon { color: var(--fg-faint); transition: color 0.15s ease; }
+    .nav-item:hover { background: rgba(255, 255, 255, 0.04); color: var(--fg); }
+    .nav-item:hover svg.icon { color: var(--fg-muted); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(0, 217, 87, 0.16), rgba(0, 217, 87, 0.05)); color: var(--accent-bright); }
+    .nav-item.active svg.icon { color: var(--accent-bright); }
+
+    .sidebar-spacer { flex: 1; }
+
+    .sidebar-user {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 12px;
+        margin-bottom: 4px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--line-soft);
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .sidebar-user .avatar {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: linear-gradient(135deg, rgba(0, 217, 87, 0.3), rgba(0, 217, 87, 0.12));
+        border: 1px solid var(--line);
+        display: grid; place-items: center;
+        font-size: 11px; font-weight: 700; color: var(--accent-bright);
+        flex-shrink: 0;
+    }
+    .sidebar-user .email {
+        font-size: 12px; color: var(--fg-muted);
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .nav-item.logout { color: var(--bad); }
+    .nav-item.logout svg.icon { color: var(--bad); }
+    .nav-item.logout:hover { background: rgba(255, 128, 128, 0.08); }
+
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+    .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px;
+        padding: 26px 32px;
+        border-bottom: 1px solid var(--line-soft);
+        flex-wrap: wrap;
+    }
+    .topbar h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin: 0 0 3px; letter-spacing: -0.3px; }
+    .topbar .page-sub { font-size: 12.5px; color: var(--fg-muted); margin: 0; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .live-chip {
+        display: inline-flex; align-items: center; gap: 7px;
+        font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+        color: var(--accent-bright);
+        background: rgba(0, 217, 87, 0.1);
+        border: 1px solid rgba(0, 217, 87, 0.22);
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+    .live-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-bright); box-shadow: 0 0 8px var(--accent); animation: pulse 1.8s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .main-content { padding: 26px 32px 60px; max-width: 1280px; width: 100%; }
 
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
@@ -108,65 +259,18 @@
     .panel {
         background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
         border: 1px solid var(--line);
-        border-radius: 18px;
+        border-radius: var(--radius-lg);
         padding: 22px;
         margin-bottom: 20px;
     }
     .panel-title {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--fg-faint);
-        margin: 0 0 16px;
+        font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+        color: var(--fg-faint); margin: 0 0 16px;
     }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    .panel-head .panel-title { margin: 0; }
 
     .field-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .field { flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px; }
-    .field label { font-size: 12px; color: var(--fg-muted); font-weight: 500; }
-
-    .input-group { position: relative; display: flex; align-items: center; }
-    input[type="text"], input[type="password"], input[type="search"] {
-        width: 100%;
-        background: rgba(0, 0, 0, 0.35);
-        border: 1px solid var(--line-soft);
-        border-radius: 10px;
-        padding: 11px 14px;
-        color: var(--fg);
-        font-family: var(--font-body);
-        font-size: 13.5px;
-        outline: none;
-        transition: border-color 0.2s ease, background 0.2s ease;
-    }
-    input:focus { border-color: var(--accent); background: rgba(0, 217, 87, 0.05); }
-    .input-group input { padding-right: 60px; }
-
-    .toggle-key {
-        position: absolute; right: 10px;
-        background: none; border: none;
-        color: var(--fg-faint); font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
-        cursor: pointer; padding: 4px 6px;
-    }
-    .toggle-key:hover { color: var(--accent); }
-
-    .actions { display: flex; align-items: flex-end; gap: 10px; }
-
-    button.primary {
-        background: linear-gradient(135deg, var(--accent-bright), var(--accent));
-        color: #00210d;
-        border: none;
-        border-radius: 10px;
-        padding: 11px 22px;
-        font-family: var(--font-body);
-        font-size: 13.5px;
-        font-weight: 700;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: transform 0.15s ease, box-shadow 0.2s ease;
-        box-shadow: 0 8px 20px rgba(0, 217, 87, 0.25);
-    }
-    button.primary:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(0, 217, 87, 0.4); }
-    button.primary:disabled { opacity: 0.55; cursor: default; transform: none; box-shadow: none; }
 
     button.ghost {
         background: rgba(255,255,255,0.05);
@@ -181,23 +285,7 @@
     }
     button.ghost:hover { border-color: var(--accent); color: var(--accent-bright); }
 
-    .hint { font-size: 11.5px; color: var(--fg-faint); margin-top: 10px; line-height: 1.5; }
-    .hint strong { color: var(--fg-muted); }
-
-    .status-line {
-        margin-top: 12px; font-size: 13px; display: none; align-items: center; gap: 8px;
-    }
-    .status-line.show { display: flex; }
-    .status-line.error { color: var(--bad); }
-    .status-line.loading { color: var(--fg-muted); }
-
-    .spinner {
-        width: 13px; height: 13px; border-radius: 50%;
-        border: 2px solid rgba(255,255,255,0.2);
-        border-top-color: var(--accent);
-        animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .lede { color: var(--fg-muted); font-size: 13px; max-width: 70ch; line-height: 1.6; margin: 0; }
 
     .fallback { margin-top: 14px; display: none; }
     .fallback.show { display: block; }
@@ -205,7 +293,7 @@
         width: 100%; min-height: 110px;
         background: rgba(0,0,0,0.35);
         border: 1px solid var(--line-soft);
-        border-radius: 10px; padding: 12px;
+        border-radius: var(--radius-sm); padding: 12px;
         color: var(--fg);
         font-family: ui-monospace, 'SF Mono', Consolas, monospace;
         font-size: 12px; resize: vertical; outline: none;
@@ -213,32 +301,57 @@
     .fallback textarea:focus { border-color: var(--accent); }
     .fallback-actions { margin-top: 8px; display: flex; gap: 8px; }
 
-    /* ===== Stat tiles ===== */
+    /* ===== Stat cards ===== */
     .stat-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
         gap: 14px;
         margin-bottom: 20px;
     }
-    .stat-tile {
+    .stat-card {
         background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
         border: 1px solid var(--line);
-        border-radius: 16px;
+        border-radius: var(--radius-md);
         padding: 18px 20px;
+        position: relative;
+        overflow: hidden;
     }
-    .stat-tile .num {
-        font-family: var(--font-display);
-        font-size: 28px; font-weight: 700;
+    .stat-card .icon-badge {
+        width: 34px; height: 34px; border-radius: 10px;
+        display: grid; place-items: center;
+        background: rgba(0, 217, 87, 0.12);
+        border: 1px solid rgba(0, 217, 87, 0.2);
         color: var(--accent-bright);
+        margin-bottom: 14px;
+    }
+    .stat-card.bad .icon-badge { background: rgba(255, 128, 128, 0.1); border-color: rgba(255, 128, 128, 0.22); color: var(--bad-bright); }
+    .stat-card .num {
+        font-family: var(--font-display);
+        font-size: 26px; font-weight: 700;
+        color: var(--fg);
         line-height: 1; margin-bottom: 6px;
         font-variant-numeric: tabular-nums;
     }
-    .stat-tile .label {
-        font-size: 11px; color: var(--fg-muted);
-        text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
-    }
-    .stat-tile.warn .num { color: var(--warn); }
-    .stat-tile.bad .num { color: var(--bad); }
+    .stat-card .label { font-size: 11.5px; color: var(--fg-muted); font-weight: 600; }
+
+    /* ===== Charts row ===== */
+    .charts-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px; margin-bottom: 20px; align-items: stretch; }
+    .chart-card { display: flex; flex-direction: column; }
+    .chart-note { font-size: 11.5px; color: var(--fg-faint); margin: -10px 0 14px; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 140px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+    .bar-stack { width: 100%; max-width: 20px; display: flex; flex-direction: column-reverse; border-radius: 4px 4px 2px 2px; overflow: hidden; background: rgba(255,255,255,0.04); }
+    .bar-seg-paid { background: linear-gradient(180deg, var(--accent-bright), var(--accent)); width: 100%; min-height: 0; }
+    .bar-seg-failed { background: linear-gradient(180deg, var(--bad-bright), var(--bad)); width: 100%; min-height: 0; opacity: 0.85; }
+    .bar-label { font-size: 9.5px; color: var(--fg-faint); white-space: nowrap; }
+    .chart-legend { display: flex; gap: 16px; margin-top: 14px; font-size: 11.5px; color: var(--fg-muted); }
+    .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .chart-legend .sw { width: 8px; height: 8px; border-radius: 2px; }
+
+    .ring-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 10px; }
+    .ring-num { font-family: var(--font-display); font-size: 15px; font-weight: 700; fill: var(--fg); }
+    .ring-caption { font-size: 11.5px; color: var(--fg-muted); text-align: center; }
+    .ring-caption strong { color: var(--fg); }
 
     /* ===== Toolbar / table ===== */
     .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
@@ -255,7 +368,7 @@
     select.status-filter {
         background: rgba(0,0,0,0.3);
         border: 1px solid var(--line-soft);
-        border-radius: 10px;
+        border-radius: var(--radius-sm);
         padding: 9px 14px;
         color: var(--fg);
         font-family: var(--font-body);
@@ -267,7 +380,7 @@
     .table-card {
         background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
         border: 1px solid var(--line);
-        border-radius: 16px;
+        border-radius: var(--radius-lg);
         overflow: hidden;
     }
     .table-scroll { overflow-x: auto; max-height: 560px; overflow-y: auto; }
@@ -302,7 +415,7 @@
         border: 1px solid rgba(0, 217, 87, 0.25);
         text-transform: capitalize;
     }
-    .pill.bad { background: rgba(255, 128, 128, 0.12); color: var(--bad); border-color: rgba(255, 128, 128, 0.25); }
+    .pill.bad { background: rgba(255, 128, 128, 0.12); color: var(--bad-bright); border-color: rgba(255, 128, 128, 0.25); }
     .pill.ok { background: rgba(0, 217, 87, 0.12); color: var(--accent-bright); border-color: rgba(0, 217, 87, 0.25); }
 
     .empty-state { padding: 50px 20px; text-align: center; color: var(--fg-faint); font-size: 13px; }
@@ -315,21 +428,11 @@
         border-top: 1px dashed var(--line-soft);
         border-bottom: 1px solid var(--line-soft);
     }
-    .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-    }
-    .detail-col h4 {
-        font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
-        color: var(--fg-faint); margin: 0 0 10px; font-weight: 700;
-    }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .detail-col h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--fg-faint); margin: 0 0 10px; font-weight: 700; }
     .detail-col p { margin: 0 0 4px; font-size: 13px; color: var(--fg); line-height: 1.6; }
     .detail-col p.muted { color: var(--fg-muted); }
-    .item-line {
-        display: flex; justify-content: space-between; gap: 10px;
-        font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
+    .item-line { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .item-line:last-child { border-bottom: none; }
     .item-line .qty { color: var(--fg-faint); }
     .totals-line { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: var(--fg-muted); }
@@ -342,28 +445,17 @@
     .seo-progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-bright)); width: 0%; transition: width 0.2s ease; }
 
     .seo-grid { display: grid; gap: 12px; }
-    .seo-card {
-        background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 16px 18px;
-    }
+    .seo-card { background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 16px 18px; }
     .seo-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
     .seo-card-head a { color: var(--fg); font-weight: 600; font-size: 13.5px; text-decoration: none; }
     .seo-card-head a:hover { color: var(--accent-bright); }
     .seo-score { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
     .seo-score.good { background: rgba(0, 217, 87, 0.12); color: var(--accent-bright); }
     .seo-score.mid { background: rgba(255, 200, 87, 0.12); color: var(--warn); }
-    .seo-score.poor { background: rgba(255, 128, 128, 0.12); color: var(--bad); }
+    .seo-score.poor { background: rgba(255, 128, 128, 0.12); color: var(--bad-bright); }
 
     .check-list { display: flex; flex-wrap: wrap; gap: 8px; }
-    .check-item {
-        display: inline-flex; align-items: center; gap: 6px;
-        font-size: 12px; padding: 5px 10px; border-radius: 8px;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid var(--line-soft);
-        color: var(--fg-muted);
-    }
+    .check-item { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 5px 10px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--line-soft); color: var(--fg-muted); }
     .check-item .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .check-item.pass .dot { background: var(--accent-bright); box-shadow: 0 0 6px var(--accent); }
     .check-item.pass { color: var(--fg); }
@@ -372,176 +464,296 @@
     .check-item.warn .dot { background: var(--warn); }
     .check-item.warn { color: var(--fg); border-color: rgba(255,200,87,0.25); }
 
-    footer { margin-top: 10px; text-align: center; font-size: 11.5px; color: var(--fg-faint); }
+    .page-footer { margin-top: 10px; text-align: center; font-size: 11.5px; color: var(--fg-faint); }
+
+    @media (max-width: 920px) {
+        .charts-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 860px) {
+        #app-shell { flex-direction: column; }
+        .sidebar {
+            width: 100%; height: auto; position: sticky; top: 0; z-index: 20;
+            flex-direction: row; align-items: center; padding: 12px 16px; gap: 14px;
+            overflow-x: auto;
+        }
+        .sidebar-brand { padding: 0; flex-shrink: 0; }
+        .sidebar-nav { flex-direction: row; flex-shrink: 0; }
+        .nav-item { white-space: nowrap; }
+        .sidebar-spacer { display: none; }
+        .sidebar-user { display: none; }
+        .nav-item.logout { flex-shrink: 0; }
+        .topbar, .main-content { padding-left: 18px; padding-right: 18px; }
+    }
 
     @media (max-width: 520px) {
-        .actions { width: 100%; }
         button.primary { width: 100%; }
+        .login-card { padding: 28px 22px; }
     }
 </style>
 </head>
 <body>
-<div class="wrap" id="login-wrap">
-    <header>
-        <span class="eyebrow">FakeSmile · Admin</span>
-        <h1>Store Dashboard</h1>
-        <p class="lede">Orders, subscribers and SEO health in one place. Sign in with your admin account to continue.</p>
-    </header>
 
-    <div class="panel login-panel" id="login-panel">
-        <p class="panel-title">Admin Login</p>
-        <div class="field-row">
-            <div class="field">
-                <label for="login-email">Email</label>
-                <input type="text" id="login-email" placeholder="you@gmail.com" autocomplete="username" spellcheck="false">
-            </div>
-            <div class="field">
-                <label for="login-password">Password</label>
-                <div class="input-group">
-                    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
-                    <button type="button" class="toggle-key" id="toggle-login-password">SHOW</button>
-                </div>
-            </div>
-            <div class="actions">
-                <button type="button" class="primary" id="login-btn">Sign In</button>
+<!-- ===================================================== -->
+<!-- ===== LOGIN SCREEN ==================================== -->
+<!-- ===================================================== -->
+<div id="login-wrap">
+    <div class="login-card">
+        <div class="login-mark">FS</div>
+        <h1>Store Admin</h1>
+        <p class="sub">Orders, subscribers and SEO health in one place. Sign in to continue.</p>
+
+        <div class="field">
+            <label for="login-email">Email</label>
+            <input type="text" id="login-email" placeholder="you@gmail.com" autocomplete="username" spellcheck="false">
+        </div>
+        <div class="field">
+            <label for="login-password">Password</label>
+            <div class="input-group">
+                <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+                <button type="button" class="toggle-key" id="toggle-login-password">SHOW</button>
             </div>
         </div>
-        <p class="hint"><strong>Stays signed in on this device</strong> until you log out — nothing is stored anywhere else.</p>
+        <button type="button" class="primary" id="login-btn">Sign In</button>
+        <p class="hint"><strong>Stays signed in on this device</strong> until you log out.</p>
         <div class="status-line" id="login-status"></div>
     </div>
 </div>
 
-<div class="wrap" id="dashboard-wrap" style="display:none;">
-    <header>
-        <span class="eyebrow">FakeSmile · Admin</span>
-        <h1>Store Dashboard</h1>
-        <p class="lede">Orders, subscribers and SEO health in one place. Runs entirely in your own browser — your credentials and data are only ever sent to your own Worker.</p>
-        <button type="button" class="ghost" id="logout-btn" style="margin-top:14px;">Log Out</button>
-    </header>
-
-    <nav class="tabs" id="tabs">
-        <button type="button" class="tab-btn active" data-tab="overview">Overview</button>
-        <button type="button" class="tab-btn" data-tab="orders">Orders</button>
-        <button type="button" class="tab-btn" data-tab="subscribers">Subscribers</button>
-        <button type="button" class="tab-btn" data-tab="seo">SEO Health</button>
-    </nav>
-
-    <div class="panel" id="connection-panel" style="display:none;">
-        <p class="panel-title">Couldn&rsquo;t Load Data</p>
-        <div class="status-line" id="status-line"></div>
-        <div class="fallback" id="fallback">
-            <p class="hint" style="margin-top:0;">Fetch blocked? Paste the JSON from <code>/orders?key=...</code> or <code>/subscribers?key=...</code> directly:</p>
-            <textarea id="paste-json" placeholder='{"count": 2, "orders": [...]} or {"count": 2, "subscribers": [...]}'></textarea>
-            <div class="fallback-actions">
-                <button type="button" class="ghost" id="load-pasted">Load Pasted JSON</button>
-                <button type="button" class="ghost" id="retry-btn">Retry</button>
+<!-- ===================================================== -->
+<!-- ===== APP SHELL ======================================= -->
+<!-- ===================================================== -->
+<div id="app-shell" style="display:none;">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="mark">FS</div>
+            <div>
+                <div class="name">FakeSmile</div>
+                <span class="tag">Admin</span>
             </div>
         </div>
-    </div>
+        <nav class="sidebar-nav">
+            <button type="button" class="nav-item active" data-tab="overview">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+                <span>Overview</span>
+            </button>
+            <button type="button" class="nav-item" data-tab="orders">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                <span>Orders</span>
+            </button>
+            <button type="button" class="nav-item" data-tab="subscribers">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <span>Subscribers</span>
+            </button>
+            <button type="button" class="nav-item" data-tab="seo">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.35-4.35"></path><path d="M8 11h6M11 8v6"></path></svg>
+                <span>SEO Health</span>
+            </button>
+        </nav>
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-user">
+            <div class="avatar" id="sidebar-avatar">?</div>
+            <div class="email" id="sidebar-email">&nbsp;</div>
+        </div>
+        <button type="button" class="nav-item logout" id="logout-btn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span>Log Out</span>
+        </button>
+    </aside>
 
-    <!-- ===== OVERVIEW ===== -->
-    <section class="tab-panel active" id="tab-overview">
-        <div class="stat-row">
-            <div class="stat-tile"><div class="num" id="ov-orders">—</div><div class="label">Total Orders</div></div>
-            <div class="stat-tile"><div class="num" id="ov-paid">—</div><div class="label">Paid Orders</div></div>
-            <div class="stat-tile bad"><div class="num" id="ov-failed">—</div><div class="label">Failed Orders</div></div>
-            <div class="stat-tile"><div class="num" id="ov-revenue">—</div><div class="label">Revenue (paid)</div></div>
-            <div class="stat-tile"><div class="num" id="ov-subs">—</div><div class="label">Subscribers</div></div>
-            <div class="stat-tile"><div class="num" id="ov-subs-week">—</div><div class="label">New (7 Days)</div></div>
-        </div>
-        <div class="panel">
-            <p class="panel-title">Most Recent Orders</p>
-            <div id="ov-recent-orders" class="empty-state">Load data to see recent orders.</div>
-        </div>
-    </section>
-
-    <!-- ===== ORDERS ===== -->
-    <section class="tab-panel" id="tab-orders">
-        <div class="toolbar">
-            <div class="search-wrap"><input type="search" id="orders-search" placeholder="Search by order ID, name or email&hellip;"></div>
-            <select class="status-filter" id="orders-status-filter">
-                <option value="">All statuses</option>
-                <option value="paid">Paid</option>
-                <option value="failed">Failed</option>
-            </select>
-            <button type="button" class="ghost" id="orders-copy-csv">Copy as CSV</button>
-            <button type="button" class="ghost" id="orders-download-csv">Download CSV</button>
-        </div>
-        <div class="table-card">
-            <div class="table-scroll">
-                <table>
-                    <thead>
-                        <tr>
-                            <th data-sort="nombaReference">Order <span class="arrow">&#9650;</span></th>
-                            <th data-sort="customer">Customer <span class="arrow">&#9650;</span></th>
-                            <th data-sort="itemCount">Items <span class="arrow">&#9650;</span></th>
-                            <th data-sort="total">Total <span class="arrow">&#9650;</span></th>
-                            <th data-sort="status">Status <span class="arrow">&#9650;</span></th>
-                            <th data-sort="createdAt" class="active">Date <span class="arrow">&#9660;</span></th>
-                        </tr>
-                    </thead>
-                    <tbody id="orders-body"></tbody>
-                </table>
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1 id="page-title">Overview</h1>
+                <p class="page-sub" id="page-subtitle">Orders, subscribers and SEO health at a glance.</p>
             </div>
-            <div class="empty-state" id="orders-empty">Load data above to see orders.</div>
-        </div>
-    </section>
-
-    <!-- ===== SUBSCRIBERS ===== -->
-    <section class="tab-panel" id="tab-subscribers">
-        <div class="stat-row">
-            <div class="stat-tile"><div class="num" id="sub-count">0</div><div class="label">Total Subscribers</div></div>
-            <div class="stat-tile"><div class="num" id="sub-latest">—</div><div class="label">Most Recent</div></div>
-            <div class="stat-tile"><div class="num" id="sub-week">0</div><div class="label">Last 7 Days</div></div>
-        </div>
-        <div class="toolbar">
-            <div class="search-wrap"><input type="search" id="subs-search" placeholder="Search by email&hellip;"></div>
-            <button type="button" class="ghost" id="subs-copy-csv">Copy as CSV</button>
-            <button type="button" class="ghost" id="subs-download-csv">Download CSV</button>
-        </div>
-        <div class="table-card">
-            <div class="table-scroll">
-                <table>
-                    <thead>
-                        <tr>
-                            <th data-sort="email">Email <span class="arrow">&#9650;</span></th>
-                            <th data-sort="subscribedAt" class="active">Subscribed <span class="arrow">&#9660;</span></th>
-                            <th data-sort="source">Source <span class="arrow">&#9650;</span></th>
-                        </tr>
-                    </thead>
-                    <tbody id="subs-body"></tbody>
-                </table>
+            <div class="topbar-right">
+                <span class="live-chip"><span class="dot"></span>Live</span>
             </div>
-            <div class="empty-state" id="subs-empty">Load data above to see subscribers.</div>
-        </div>
-    </section>
+        </header>
 
-    <!-- ===== SEO HEALTH ===== -->
-    <section class="tab-panel" id="tab-seo">
-        <div class="panel">
-            <p class="panel-title">What this checks</p>
-            <p class="lede" style="margin-bottom:0;">Fetches each page directly from fakesmilestore.com (no key needed) and checks title, meta description, canonical URL, Open Graph tags, structured data (JSON-LD), and exactly one H1 heading. This is a static on-page check, not real search-ranking data — for clicks, impressions and position, that needs Google Search Console connected separately.</p>
-        </div>
-        <div class="seo-check-row">
-            <button type="button" class="primary" id="seo-run-btn">Run SEO Check</button>
-            <div class="seo-progress" id="seo-progress"><div class="seo-progress-bar" id="seo-progress-bar"></div></div>
-            <span class="hint" id="seo-status" style="margin:0;"></span>
-        </div>
-        <div class="seo-grid" id="seo-results"></div>
-    </section>
+        <div class="main-content">
+            <div class="panel" id="connection-panel" style="display:none;">
+                <p class="panel-title">Couldn&rsquo;t Load Data</p>
+                <div class="status-line" id="status-line"></div>
+                <div class="fallback" id="fallback">
+                    <p class="hint" style="margin-top:0; text-align:left;">Fetch blocked? Paste the JSON from <code>/orders?key=...</code> or <code>/subscribers?key=...</code> directly:</p>
+                    <textarea id="paste-json" placeholder='{"count": 2, "orders": [...]} or {"count": 2, "subscribers": [...]}'></textarea>
+                    <div class="fallback-actions">
+                        <button type="button" class="ghost" id="load-pasted">Load Pasted JSON</button>
+                        <button type="button" class="ghost" id="retry-btn">Retry</button>
+                    </div>
+                </div>
+            </div>
 
-    <footer>Data from your <code>ORDERS</code> KV namespace &middot; See DEPLOY-WORKER.md for setup</footer>
+            <!-- ===== OVERVIEW ===== -->
+            <section class="tab-panel active" id="tab-overview">
+                <div class="stat-row">
+                    <div class="stat-card">
+                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg></div>
+                        <div class="num" id="ov-orders">&mdash;</div>
+                        <div class="label">Total Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                        <div class="num" id="ov-paid">&mdash;</div>
+                        <div class="label">Paid Orders</div>
+                    </div>
+                    <div class="stat-card bad">
+                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></div>
+                        <div class="num" id="ov-failed">&mdash;</div>
+                        <div class="label">Failed Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"></rect><path d="M2 10h20"></path><path d="M6 15h4"></path></svg></div>
+                        <div class="num" id="ov-revenue">&mdash;</div>
+                        <div class="label">Revenue (Paid)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                        <div class="num" id="ov-subs">&mdash;</div>
+                        <div class="label">Subscribers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+                        <div class="num" id="ov-subs-week">&mdash;</div>
+                        <div class="label">New Subs (7d)</div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="panel chart-card">
+                        <p class="panel-title">Orders &mdash; Last 14 Days</p>
+                        <div class="bar-chart" id="orders-bar-chart"></div>
+                        <div class="chart-legend">
+                            <span><span class="sw" style="background:var(--accent-bright);"></span>Paid</span>
+                            <span><span class="sw" style="background:var(--bad-bright);"></span>Failed</span>
+                        </div>
+                    </div>
+                    <div class="panel chart-card">
+                        <p class="panel-title">Paid Rate</p>
+                        <div class="ring-wrap" id="paid-rate-ring"></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <p class="panel-title">Most Recent Orders</p>
+                    <div id="ov-recent-orders" class="empty-state">Load data to see recent orders.</div>
+                </div>
+            </section>
+
+            <!-- ===== ORDERS ===== -->
+            <section class="tab-panel" id="tab-orders">
+                <div class="toolbar">
+                    <div class="search-wrap"><input type="search" id="orders-search" placeholder="Search by order ID, name or email&hellip;"></div>
+                    <select class="status-filter" id="orders-status-filter">
+                        <option value="">All statuses</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                    <button type="button" class="ghost" id="orders-copy-csv">Copy as CSV</button>
+                    <button type="button" class="ghost" id="orders-download-csv">Download CSV</button>
+                </div>
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-sort="nombaReference">Order <span class="arrow">&#9650;</span></th>
+                                    <th data-sort="customer">Customer <span class="arrow">&#9650;</span></th>
+                                    <th data-sort="itemCount">Items <span class="arrow">&#9650;</span></th>
+                                    <th data-sort="total">Total <span class="arrow">&#9650;</span></th>
+                                    <th data-sort="status">Status <span class="arrow">&#9650;</span></th>
+                                    <th data-sort="createdAt" class="active">Date <span class="arrow">&#9660;</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state" id="orders-empty">Load data above to see orders.</div>
+                </div>
+            </section>
+
+            <!-- ===== SUBSCRIBERS ===== -->
+            <section class="tab-panel" id="tab-subscribers">
+                <div class="stat-row">
+                    <div class="stat-card">
+                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div>
+                        <div class="num" id="sub-count">0</div>
+                        <div class="label">Total Subscribers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+                        <div class="num" id="sub-latest">&mdash;</div>
+                        <div class="label">Most Recent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+                        <div class="num" id="sub-week">0</div>
+                        <div class="label">Last 7 Days</div>
+                    </div>
+                </div>
+                <div class="toolbar">
+                    <div class="search-wrap"><input type="search" id="subs-search" placeholder="Search by email&hellip;"></div>
+                    <button type="button" class="ghost" id="subs-copy-csv">Copy as CSV</button>
+                    <button type="button" class="ghost" id="subs-download-csv">Download CSV</button>
+                </div>
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-sort="email">Email <span class="arrow">&#9650;</span></th>
+                                    <th data-sort="subscribedAt" class="active">Subscribed <span class="arrow">&#9660;</span></th>
+                                    <th data-sort="source">Source <span class="arrow">&#9650;</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="subs-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state" id="subs-empty">Load data above to see subscribers.</div>
+                </div>
+            </section>
+
+            <!-- ===== SEO HEALTH ===== -->
+            <section class="tab-panel" id="tab-seo">
+                <div class="panel">
+                    <p class="panel-title">What This Checks</p>
+                    <p class="lede">Fetches each page directly from fakesmilestore.com (no key needed) and checks title, meta description, canonical URL, Open Graph tags, structured data (JSON-LD), and exactly one H1 heading. This is a static on-page check, not real search-ranking data &mdash; for clicks, impressions and position, that needs Google Search Console connected separately.</p>
+                </div>
+                <div class="seo-check-row">
+                    <button type="button" class="primary" id="seo-run-btn" style="width:auto; margin-top:0;">Run SEO Check</button>
+                    <div class="seo-progress" id="seo-progress"><div class="seo-progress-bar" id="seo-progress-bar"></div></div>
+                    <span class="hint" id="seo-status" style="margin:0;"></span>
+                </div>
+                <div class="seo-grid" id="seo-results"></div>
+            </section>
+
+            <p class="page-footer">Data from your <code>ORDERS</code> KV namespace &middot; See DEPLOY-WORKER.md for setup</p>
+        </div>
+    </main>
 </div>
 
 <script>
 (function () {
-    /* ===== Tabs ===== */
-    document.querySelectorAll('.tab-btn').forEach((btn) => {
+    /* ===== Tabs / nav ===== */
+    const PAGE_META = {
+        overview: ['Overview', 'Orders, subscribers and SEO health at a glance.'],
+        orders: ['Orders', 'Every order stored in your Worker, newest first.'],
+        subscribers: ['Subscribers', 'Everyone who signed up for drop alerts.'],
+        seo: ['SEO Health', 'On-page checks across every main page of the site.'],
+    };
+    document.querySelectorAll('.nav-item[data-tab]').forEach((btn) => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+            document.querySelectorAll('.nav-item[data-tab]').forEach((b) => b.classList.remove('active'));
             document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            const meta = PAGE_META[btn.dataset.tab];
+            if (meta) {
+                document.getElementById('page-title').textContent = meta[0];
+                document.getElementById('page-subtitle').textContent = meta[1];
+            }
         });
     });
 
@@ -551,13 +763,15 @@
     const STORAGE_EMAIL = 'fs_admin_email';
 
     const loginWrap = document.getElementById('login-wrap');
-    const dashboardWrap = document.getElementById('dashboard-wrap');
+    const appShell = document.getElementById('app-shell');
     const loginEmail = document.getElementById('login-email');
     const loginPassword = document.getElementById('login-password');
     const toggleLoginPwBtn = document.getElementById('toggle-login-password');
     const loginBtn = document.getElementById('login-btn');
     const loginStatus = document.getElementById('login-status');
     const logoutBtn = document.getElementById('logout-btn');
+    const sidebarAvatar = document.getElementById('sidebar-avatar');
+    const sidebarEmail = document.getElementById('sidebar-email');
 
     const statusLine = document.getElementById('status-line');
     const connectionPanel = document.getElementById('connection-panel');
@@ -601,7 +815,7 @@
             if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || 'Sign in failed (' + res.status + ')');
             currentKey = data.key;
             try { localStorage.setItem(STORAGE_KEY, currentKey); localStorage.setItem(STORAGE_EMAIL, email); } catch (_) {}
-            showDashboard();
+            showDashboard(email);
         } catch (err) {
             setLoginStatus(err && err.message ? err.message : 'Sign in failed.', 'error');
         } finally {
@@ -613,11 +827,13 @@
     loginEmail.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
     loginPassword.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
 
-    function showDashboard() {
+    function showDashboard(email) {
         loginWrap.style.display = 'none';
-        dashboardWrap.style.display = '';
+        appShell.style.display = 'flex';
         loginStatus.className = 'status-line';
         loginPassword.value = '';
+        sidebarEmail.textContent = email || '';
+        sidebarAvatar.textContent = (email || '?').slice(0, 2).toUpperCase();
         load();
     }
 
@@ -625,8 +841,8 @@
         currentKey = null;
         try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_EMAIL); } catch (_) {}
         allOrders = []; allSubs = [];
-        dashboardWrap.style.display = 'none';
-        loginWrap.style.display = '';
+        appShell.style.display = 'none';
+        loginWrap.style.display = 'flex';
         loginEmail.value = '';
     });
 
@@ -637,7 +853,7 @@
             if (savedKey) {
                 currentKey = savedKey;
                 if (savedEmail) loginEmail.value = savedEmail;
-                showDashboard();
+                showDashboard(savedEmail);
             }
         } catch (_) {}
     })();
@@ -737,6 +953,9 @@
         const weekAgo = Date.now() - 7 * 86400000;
         document.getElementById('ov-subs-week').textContent = allSubs.filter((s) => s.subscribedAt >= weekAgo).length.toLocaleString();
 
+        renderOrdersBarChart();
+        renderPaidRateRing(paid.length, allOrders.length);
+
         const recent = allOrders.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 5);
         const el = document.getElementById('ov-recent-orders');
         if (!recent.length) { el.className = 'empty-state'; el.textContent = 'No orders yet.'; return; }
@@ -749,6 +968,68 @@
             return '<div class="item-line"><span>' + escapeHtml(name) + ' &middot; ' + escapeHtml(o.nombaReference || '') + '</span>' +
                 '<span><span class="pill ' + statusClass + '">' + escapeHtml(o.status || 'unknown') + '</span> &nbsp; ' + total + '</span></div>';
         }).join('');
+    }
+
+    /* ===== Charts (hand-rolled, no library) ===== */
+    function renderOrdersBarChart() {
+        const container = document.getElementById('orders-bar-chart');
+        const days = [];
+        const now = new Date();
+        for (let i = 13; i >= 0; i--) {
+            const d = new Date(now);
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() - i);
+            days.push(d);
+        }
+        const counts = days.map((d) => {
+            const start = d.getTime();
+            const end = start + 86400000;
+            const dayOrders = allOrders.filter((o) => (o.createdAt || 0) >= start && (o.createdAt || 0) < end);
+            return {
+                paid: dayOrders.filter((o) => o.status === 'paid').length,
+                failed: dayOrders.filter((o) => o.status !== 'paid').length,
+                label: d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+            };
+        });
+        const maxTotal = Math.max(1, ...counts.map((c) => c.paid + c.failed));
+
+        if (!allOrders.length) {
+            container.innerHTML = '<div class="empty-state" style="width:100%;padding:30px 10px;">No order data yet.</div>';
+            return;
+        }
+
+        container.innerHTML = counts.map((c) => {
+            const total = c.paid + c.failed;
+            const heightPct = total === 0 ? 2 : Math.max(4, Math.round((total / maxTotal) * 100));
+            const paidShare = total === 0 ? 0 : Math.round((c.paid / total) * 100);
+            const failedShare = total === 0 ? 0 : 100 - paidShare;
+            return '<div class="bar-col" title="' + c.label + ': ' + c.paid + ' paid, ' + c.failed + ' failed">' +
+                '<div class="bar-stack" style="height:' + heightPct + '%;">' +
+                    (c.failed ? '<div class="bar-seg-failed" style="height:' + failedShare + '%;"></div>' : '') +
+                    (c.paid ? '<div class="bar-seg-paid" style="height:' + paidShare + '%;"></div>' : '') +
+                '</div>' +
+                '<span class="bar-label">' + c.label.split(' ')[0] + '</span>' +
+            '</div>';
+        }).join('');
+    }
+
+    function renderPaidRateRing(paidCount, totalCount) {
+        const container = document.getElementById('paid-rate-ring');
+        const pct = totalCount ? Math.round((paidCount / totalCount) * 100) : 0;
+        const r = 52, circumference = 2 * Math.PI * r;
+        const offset = circumference * (1 - pct / 100);
+        container.innerHTML =
+            '<svg viewBox="0 0 120 120" width="150" height="150">' +
+                '<circle cx="60" cy="60" r="' + r + '" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"></circle>' +
+                '<circle cx="60" cy="60" r="' + r + '" fill="none" stroke="url(#ringGrad)" stroke-width="12" ' +
+                    'stroke-linecap="round" stroke-dasharray="' + circumference + '" stroke-dashoffset="' + offset + '" ' +
+                    'transform="rotate(-90 60 60)"></circle>' +
+                '<defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">' +
+                    '<stop offset="0%" stop-color="#4dffa0"></stop><stop offset="100%" stop-color="#00d957"></stop>' +
+                '</linearGradient></defs>' +
+                '<text x="60" y="66" text-anchor="middle" class="ring-num">' + pct + '%</text>' +
+            '</svg>' +
+            '<p class="ring-caption"><strong>' + paidCount + '</strong> of <strong>' + totalCount + '</strong> orders paid</p>';
     }
 
     /* ===== Orders tab ===== */
