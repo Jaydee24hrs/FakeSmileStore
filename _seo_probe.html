@@ -1,0 +1,22 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"></head>
+<body style="background:#000;color:#0f0;font-family:monospace;font-size:13px;white-space:pre-wrap;">
+<div id="out">probing...</div>
+<script>
+(async () => {
+  const out = document.getElementById('out');
+  let log = '';
+  try {
+    const res = await fetch('/', { cache: 'no-store' });
+    const html = await res.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    log += 'fetch / : ' + res.status + ', html length ' + html.length + '\n';
+    log += 'title: ' + (doc.querySelector('title') ? doc.querySelector('title').textContent : 'MISSING') + '\n';
+    log += 'meta description: ' + (doc.querySelector('meta[name="description"]') ? 'present' : 'MISSING') + '\n';
+    log += 'canonical: ' + (doc.querySelector('link[rel="canonical"]') ? 'present' : 'MISSING') + '\n';
+    log += 'json-ld count: ' + doc.querySelectorAll('script[type="application/ld+json"]').length + '\n';
+    log += 'h1 count: ' + doc.querySelectorAll('h1').length + '\n';
+  } catch (e) { log += 'FAILED: ' + e.message + '\n'; }
+  out.textContent = log;
+})();
+</script>
+</body></html>
