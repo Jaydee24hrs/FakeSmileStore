@@ -59,7 +59,7 @@
        -> { checkoutLink, orderReference, ... } from Nomba
      POST /verify-payment   { orderReference }   -> raw Nomba transaction
      POST /finalize         { orderReference }   -> idempotent completion
-       -> { status:'paid'|'failed'|'pending', emailed:bool, order? }
+       -> { status:'paid'|'failed', emailed:bool, order? }
      POST /webhook          (Nomba -> us; HMAC-signed) payment_success
      GET  /order-status?ref=<orderReference>     -> { status, order? }
      POST /subscribe        { email, source? }   -> { ok, alreadySubscribed }
@@ -209,7 +209,11 @@ async function handleCreateCheckout(request, env) {
                     order,                 // full order (items, shipping, customer, totals)
                     merchantOrderId: orderId,
                     amount: amountNum,
-                    status: 'pending',
+                    // No "pending" state: an order is 'paid' once finalizeOrder
+                    // confirms it, 'failed' until then (covers not-yet-attempted,
+                    // abandoned and genuinely failed alike — the admin only
+                    // needs to know paid vs not).
+                    status: 'failed',
                     emailsSent: false,
                     createdAt: Date.now(),
                 }),
@@ -492,14 +496,15 @@ async function finalizeOrder(env, orderRef) {
         lookup.status || lookup.transactionStatus || lookup.paymentStatus || ''
     ).toUpperCase();
     const paid = ['SUCCESS', 'SUCCESSFUL', 'COMPLETED', 'PAID'].includes(status);
-    const FAILED_STATUSES = ['FAILED', 'DECLINED', 'CANCELLED', 'CANCELED', 'EXPIRED', 'REVERSED', 'ERROR'];
 
     if (!paid) {
-        // A status Nomba reports as definitively over (not just "still waiting")
-        // gets persisted as 'failed' so it stops showing as pending forever —
-        // "still processing"/"unknown" statuses are left alone since the
-        // customer may yet complete or retry the same reference.
-        if (FAILED_STATUSES.includes(status) && rec) {
+        // No "pending"/"unknown" middle state — anything that isn't a
+        // confirmed success (an explicit failure, still-processing, or no
+        // record at all) is marked failed. finalizeOrder only ever runs when
+        // the customer already returned from Nomba, Nomba's own webhook fired
+        // a success event, or the admin manually re-checks, so there's no
+        // risk of marking an in-progress payment failed too early.
+        if (rec) {
             rec.status = 'failed';
             rec.failedAt = Date.now();
             if (env.ORDERS) {
@@ -507,7 +512,7 @@ async function finalizeOrder(env, orderRef) {
             }
             return { status: 'failed', emailed: false, order: rec.order, nombaReference: orderRef };
         }
-        return { status: status ? 'pending' : 'unknown', emailed: false };
+        return { status: 'failed', emailed: false };
     }
 
     // No KV record (KV not configured, or order wasn't stored): we can confirm

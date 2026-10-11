@@ -302,7 +302,6 @@
         border: 1px solid rgba(0, 217, 87, 0.25);
         text-transform: capitalize;
     }
-    .pill.pending { background: rgba(255, 200, 87, 0.12); color: var(--warn); border-color: rgba(255, 200, 87, 0.25); }
     .pill.bad { background: rgba(255, 128, 128, 0.12); color: var(--bad); border-color: rgba(255, 128, 128, 0.25); }
     .pill.ok { background: rgba(0, 217, 87, 0.12); color: var(--accent-bright); border-color: rgba(0, 217, 87, 0.25); }
 
@@ -445,7 +444,6 @@
         <div class="stat-row">
             <div class="stat-tile"><div class="num" id="ov-orders">—</div><div class="label">Total Orders</div></div>
             <div class="stat-tile"><div class="num" id="ov-paid">—</div><div class="label">Paid Orders</div></div>
-            <div class="stat-tile warn"><div class="num" id="ov-pending">—</div><div class="label">Pending Orders</div></div>
             <div class="stat-tile bad"><div class="num" id="ov-failed">—</div><div class="label">Failed Orders</div></div>
             <div class="stat-tile"><div class="num" id="ov-revenue">—</div><div class="label">Revenue (paid)</div></div>
             <div class="stat-tile"><div class="num" id="ov-subs">—</div><div class="label">Subscribers</div></div>
@@ -464,7 +462,6 @@
             <select class="status-filter" id="orders-status-filter">
                 <option value="">All statuses</option>
                 <option value="paid">Paid</option>
-                <option value="pending">Pending</option>
                 <option value="failed">Failed</option>
             </select>
             <button type="button" class="ghost" id="orders-copy-csv">Copy as CSV</button>
@@ -674,9 +671,7 @@
     }
 
     function statusPillClass(status) {
-        if (status === 'paid') return 'ok';
-        if (status === 'failed') return 'bad';
-        return 'pending';
+        return status === 'paid' ? 'ok' : 'bad';
     }
 
     async function load() {
@@ -733,10 +728,8 @@
     function renderOverview() {
         document.getElementById('ov-orders').textContent = allOrders.length.toLocaleString();
         const paid = allOrders.filter((o) => o.status === 'paid');
-        const failed = allOrders.filter((o) => o.status === 'failed');
-        const pending = allOrders.filter((o) => o.status !== 'paid' && o.status !== 'failed');
+        const failed = allOrders.filter((o) => o.status !== 'paid');
         document.getElementById('ov-paid').textContent = paid.length.toLocaleString();
-        document.getElementById('ov-pending').textContent = pending.length.toLocaleString();
         document.getElementById('ov-failed').textContent = failed.length.toLocaleString();
         const revenue = paid.reduce((sum, o) => sum + (o.order && o.order.total ? Number(o.order.total) : 0), 0);
         document.getElementById('ov-revenue').textContent = fmtNGN(revenue);
@@ -787,7 +780,7 @@
             itemCount: (o.order && o.order.items) ? o.order.items.reduce((n, it) => n + (it.qty || 1), 0) : 0,
             total: o.order ? Number(o.order.total || 0) : 0,
         }));
-        if (statusFilter === 'pending') rows = rows.filter((o) => o.status !== 'paid' && o.status !== 'failed');
+        if (statusFilter === 'failed') rows = rows.filter((o) => o.status !== 'paid');
         else if (statusFilter) rows = rows.filter((o) => o.status === statusFilter);
         if (q) {
             rows = rows.filter((o) =>
