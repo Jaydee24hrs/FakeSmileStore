@@ -229,15 +229,14 @@
     .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
     .topbar {
-        display: flex; align-items: center; justify-content: space-between;
+        display: flex; align-items: center;
         gap: 16px;
         padding: 26px 32px;
         border-bottom: 1px solid var(--line-soft);
-        flex-wrap: wrap;
     }
-    .topbar h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin: 0 0 3px; letter-spacing: -0.3px; }
-    .topbar .page-sub { font-size: 12.5px; color: var(--fg-muted); margin: 0; }
-    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .topbar h1 { font-family: var(--font-display); font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px; }
+    .topbar .page-sub { font-size: 12.5px; color: var(--fg-muted); margin: 3px 0 0; }
+    .title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .live-chip {
         display: inline-flex; align-items: center; gap: 7px;
         font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
@@ -606,12 +605,12 @@
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
                 <div>
-                    <h1 id="page-title">Overview</h1>
+                    <div class="title-row">
+                        <h1 id="page-title">Overview</h1>
+                        <span class="live-chip"><span class="dot"></span>Live</span>
+                    </div>
                     <p class="page-sub" id="page-subtitle">Orders, subscribers and SEO health at a glance.</p>
                 </div>
-            </div>
-            <div class="topbar-right">
-                <span class="live-chip"><span class="dot"></span>Live</span>
             </div>
         </header>
 
