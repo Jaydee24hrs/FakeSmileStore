@@ -125,6 +125,9 @@ export default {
             if (url.pathname === '/admin-login' && request.method === 'POST') {
                 return await handleAdminLogin(request, env);
             }
+            if (url.pathname === '/debug-lookup' && request.method === 'GET') {
+                return await handleDebugLookup(url, env);
+            }
             if (url.pathname === '/' || url.pathname === '/health') {
                 return json({ ok: true, service: 'fakesmile-nomba-worker' }, 200, env);
             }
@@ -418,6 +421,40 @@ async function handleAdminLogin(request, env) {
         return json({ error: 'Logged in, but SUBSCRIBERS_EXPORT_KEY isn’t set, so there’s no data to fetch yet.' }, 501, env);
     }
     return json({ ok: true, key: env.SUBSCRIBERS_EXPORT_KEY }, 200, env);
+}
+
+/* ============================================================== */
+/* === DEBUG: raw Nomba lookup ==================================== */
+/* ============================================================== */
+// Temporary diagnostic — same gate as /subscribers and /orders. Returns
+// exactly what Nomba's transaction-lookup API sends back for one
+// reference, unmodified, so a status-matching mismatch in finalizeOrder()
+// can be diagnosed from real data instead of guessed at. Safe to remove
+// once that's sorted, or safe to leave — it can't do anything but read.
+async function handleDebugLookup(url, env) {
+    if (!env.SUBSCRIBERS_EXPORT_KEY) {
+        return json({ error: 'Export not enabled. Set SUBSCRIBERS_EXPORT_KEY as a Worker secret first.' }, 501, env);
+    }
+    const provided = url.searchParams.get('key') || '';
+    if (!timingSafeEqual(provided, env.SUBSCRIBERS_EXPORT_KEY)) {
+        return json({ error: 'Unauthorized' }, 401, env);
+    }
+    const ref = url.searchParams.get('ref');
+    if (!ref) return json({ error: 'Missing ref' }, 400, env);
+
+    try {
+        const token = await getNombaToken(env);
+        const res = await fetch(
+            `${nombaBase(env)}/transactions/accounts/single?orderReference=${encodeURIComponent(ref)}`,
+            { method: 'GET', headers: { 'accountId': env.NOMBA_ACCOUNT_ID, 'Authorization': `Bearer ${token}` } }
+        );
+        const raw = await res.text();
+        let parsed = null;
+        try { parsed = JSON.parse(raw); } catch (_) {}
+        return json({ nombaBase: nombaBase(env), httpStatus: res.status, raw: parsed || raw }, 200, env);
+    } catch (err) {
+        return json({ error: err.message || 'Lookup failed' }, 500, env);
+    }
 }
 
 /* ============================================================== */
