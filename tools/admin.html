@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>FakeSmile Admin</title>
+<style>
+    :root {
+        --bg: #050806;
+        --panel: #0d130f;
+        --panel-2: #121a15;
+        --line: rgba(0, 217, 87, 0.18);
+        --line-soft: rgba(255, 255, 255, 0.08);
+        --fg: #f3f7f4;
+        --fg-muted: rgba(243, 247, 244, 0.6);
+        --fg-faint: rgba(243, 247, 244, 0.38);
+        --accent: #00d957;
+        --accent-bright: #4dffa0;
+        --bad: #ff8080;
+        --warn: #ffc857;
+        --font-display: 'Clash Display', 'Segoe UI', system-ui, sans-serif;
+        --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-body);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+        min-height: 100vh;
+        background:
+            radial-gradient(640px 420px at 85% -10%, rgba(0, 217, 87, 0.12), transparent 60%),
+            radial-gradient(520px 360px at -10% 20%, rgba(0, 217, 87, 0.08), transparent 60%),
+            var(--bg);
+        padding: 36px 20px 80px;
+    }
+
+    .wrap { max-width: 1080px; margin: 0 auto; }
+
+    header { margin-bottom: 22px; }
+
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+    }
+    .eyebrow::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent);
+    }
+
+    h1 {
+        font-family: var(--font-display);
+        font-size: clamp(26px, 4vw, 34px);
+        font-weight: 700;
+        margin: 0 0 6px;
+        letter-spacing: -0.5px;
+    }
+
+    .lede { color: var(--fg-muted); font-size: 13.5px; max-width: 60ch; line-height: 1.6; margin: 0; }
+
+    /* ===== Tabs ===== */
+    .tabs {
+        display: flex;
+        gap: 6px;
+        margin: 22px 0 20px;
+        border-bottom: 1px solid var(--line-soft);
+        overflow-x: auto;
+    }
+    .tab-btn {
+        background: none;
+        border: none;
+        color: var(--fg-muted);
+        font-family: var(--font-body);
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 10px 16px;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+        transition: color 0.15s ease;
+    }
+    .tab-btn:hover { color: var(--fg); }
+    .tab-btn.active { color: var(--accent-bright); border-bottom-color: var(--accent); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ===== Shared panel ===== */
+    .panel {
+        background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+    .panel-title {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--fg-faint);
+        margin: 0 0 16px;
+    }
+
+    .field-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .field { flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 12px; color: var(--fg-muted); font-weight: 500; }
+
+    .input-group { position: relative; display: flex; align-items: center; }
+    input[type="text"], input[type="password"], input[type="search"] {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--line-soft);
+        border-radius: 10px;
+        padding: 11px 14px;
+        color: var(--fg);
+        font-family: var(--font-body);
+        font-size: 13.5px;
+        outline: none;
+        transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    input:focus { border-color: var(--accent); background: rgba(0, 217, 87, 0.05); }
+    .input-group input { padding-right: 60px; }
+
+    .toggle-key {
+        position: absolute; right: 10px;
+        background: none; border: none;
+        color: var(--fg-faint); font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+        cursor: pointer; padding: 4px 6px;
+    }
+    .toggle-key:hover { color: var(--accent); }
+
+    .actions { display: flex; align-items: flex-end; gap: 10px; }
+
+    button.primary {
+        background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+        color: #00210d;
+        border: none;
+        border-radius: 10px;
+        padding: 11px 22px;
+        font-family: var(--font-body);
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+        box-shadow: 0 8px 20px rgba(0, 217, 87, 0.25);
+    }
+    button.primary:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(0, 217, 87, 0.4); }
+    button.primary:disabled { opacity: 0.55; cursor: default; transform: none; box-shadow: none; }
+
+    button.ghost {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--line-soft);
+        color: var(--fg);
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-family: var(--font-body);
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    button.ghost:hover { border-color: var(--accent); color: var(--accent-bright); }
+
+    .hint { font-size: 11.5px; color: var(--fg-faint); margin-top: 10px; line-height: 1.5; }
+    .hint strong { color: var(--fg-muted); }
+
+    .status-line {
+        margin-top: 12px; font-size: 13px; display: none; align-items: center; gap: 8px;
+    }
+    .status-line.show { display: flex; }
+    .status-line.error { color: var(--bad); }
+    .status-line.loading { color: var(--fg-muted); }
+
+    .spinner {
+        width: 13px; height: 13px; border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.2);
+        border-top-color: var(--accent);
+        animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .fallback { margin-top: 14px; display: none; }
+    .fallback.show { display: block; }
+    .fallback textarea {
+        width: 100%; min-height: 110px;
+        background: rgba(0,0,0,0.35);
+        border: 1px solid var(--line-soft);
+        border-radius: 10px; padding: 12px;
+        color: var(--fg);
+        font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+        font-size: 12px; resize: vertical; outline: none;
+    }
+    .fallback textarea:focus { border-color: var(--accent); }
+    .fallback-actions { margin-top: 8px; display: flex; gap: 8px; }
+
+    /* ===== Stat tiles ===== */
+    .stat-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+    .stat-tile {
+        background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 18px 20px;
+    }
+    .stat-tile .num {
+        font-family: var(--font-display);
+        font-size: 28px; font-weight: 700;
+        color: var(--accent-bright);
+        line-height: 1; margin-bottom: 6px;
+        font-variant-numeric: tabular-nums;
+    }
+    .stat-tile .label {
+        font-size: 11px; color: var(--fg-muted);
+        text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+    }
+    .stat-tile.warn .num { color: var(--warn); }
+
+    /* ===== Toolbar / table ===== */
+    .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+    .search-wrap { flex: 1 1 200px; position: relative; }
+    .search-wrap input { padding-left: 34px; }
+    .search-wrap::before {
+        content: ""; position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+        width: 13px; height: 13px; border: 2px solid var(--fg-faint); border-radius: 50%; pointer-events: none;
+    }
+    .search-wrap::after {
+        content: ""; position: absolute; left: 21px; top: 61%;
+        width: 6px; height: 2px; background: var(--fg-faint); transform: rotate(45deg); pointer-events: none;
+    }
+    select.status-filter {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid var(--line-soft);
+        border-radius: 10px;
+        padding: 9px 14px;
+        color: var(--fg);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+    }
+    select.status-filter:focus { border-color: var(--accent); }
+
+    .table-card {
+        background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .table-scroll { overflow-x: auto; max-height: 560px; overflow-y: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 520px; }
+    thead th {
+        position: sticky; top: 0;
+        background: var(--panel-2);
+        text-align: left; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+        color: var(--fg-faint); font-weight: 700;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    thead th:hover { color: var(--accent); }
+    thead th .arrow { opacity: 0.4; margin-left: 4px; font-size: 10px; }
+    thead th.active .arrow { opacity: 1; color: var(--accent); }
+
+    tbody td { padding: 13px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr.row-clickable { cursor: pointer; }
+    tbody tr.row-clickable:hover { background: rgba(0, 217, 87, 0.04); }
+
+    .email-cell { font-weight: 500; }
+    .date-cell { color: var(--fg-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .date-cell .rel { display: block; font-size: 11px; color: var(--fg-faint); margin-top: 2px; }
+
+    .pill {
+        display: inline-block; font-size: 11px; font-weight: 600;
+        padding: 3px 10px; border-radius: 20px;
+        background: rgba(0, 217, 87, 0.12); color: var(--accent-bright);
+        border: 1px solid rgba(0, 217, 87, 0.25);
+        text-transform: capitalize;
+    }
+    .pill.pending { background: rgba(255, 200, 87, 0.12); color: var(--warn); border-color: rgba(255, 200, 87, 0.25); }
+    .pill.bad { background: rgba(255, 128, 128, 0.12); color: var(--bad); border-color: rgba(255, 128, 128, 0.25); }
+    .pill.ok { background: rgba(0, 217, 87, 0.12); color: var(--accent-bright); border-color: rgba(0, 217, 87, 0.25); }
+
+    .empty-state { padding: 50px 20px; text-align: center; color: var(--fg-faint); font-size: 13px; }
+
+    /* ===== Order detail drawer ===== */
+    .detail-row td { padding: 0; }
+    .detail-box {
+        padding: 20px 22px;
+        background: rgba(0,0,0,0.25);
+        border-top: 1px dashed var(--line-soft);
+        border-bottom: 1px solid var(--line-soft);
+    }
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+    .detail-col h4 {
+        font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+        color: var(--fg-faint); margin: 0 0 10px; font-weight: 700;
+    }
+    .detail-col p { margin: 0 0 4px; font-size: 13px; color: var(--fg); line-height: 1.6; }
+    .detail-col p.muted { color: var(--fg-muted); }
+    .item-line {
+        display: flex; justify-content: space-between; gap: 10px;
+        font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .item-line:last-child { border-bottom: none; }
+    .item-line .qty { color: var(--fg-faint); }
+    .totals-line { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; color: var(--fg-muted); }
+    .totals-line.grand { color: var(--accent-bright); font-weight: 700; font-size: 14px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--line-soft); }
+
+    /* ===== SEO tab ===== */
+    .seo-check-row { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .seo-progress { flex: 1 1 200px; height: 6px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; display: none; }
+    .seo-progress.show { display: block; }
+    .seo-progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-bright)); width: 0%; transition: width 0.2s ease; }
+
+    .seo-grid { display: grid; gap: 12px; }
+    .seo-card {
+        background: linear-gradient(160deg, var(--panel) 0%, var(--panel-2) 100%);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px 18px;
+    }
+    .seo-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
+    .seo-card-head a { color: var(--fg); font-weight: 600; font-size: 13.5px; text-decoration: none; }
+    .seo-card-head a:hover { color: var(--accent-bright); }
+    .seo-score { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .seo-score.good { background: rgba(0, 217, 87, 0.12); color: var(--accent-bright); }
+    .seo-score.mid { background: rgba(255, 200, 87, 0.12); color: var(--warn); }
+    .seo-score.poor { background: rgba(255, 128, 128, 0.12); color: var(--bad); }
+
+    .check-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .check-item {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 12px; padding: 5px 10px; border-radius: 8px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--line-soft);
+        color: var(--fg-muted);
+    }
+    .check-item .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .check-item.pass .dot { background: var(--accent-bright); box-shadow: 0 0 6px var(--accent); }
+    .check-item.pass { color: var(--fg); }
+    .check-item.fail .dot { background: var(--bad); }
+    .check-item.fail { color: var(--fg); border-color: rgba(255,128,128,0.25); }
+    .check-item.warn .dot { background: var(--warn); }
+    .check-item.warn { color: var(--fg); border-color: rgba(255,200,87,0.25); }
+
+    footer { margin-top: 10px; text-align: center; font-size: 11.5px; color: var(--fg-faint); }
+
+    @media (max-width: 520px) {
+        .actions { width: 100%; }
+        button.primary { width: 100%; }
+    }
+</style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <span class="eyebrow">FakeSmile · Admin</span>
+        <h1>Store Dashboard</h1>
+        <p class="lede">Orders, subscribers and SEO health in one place. Runs entirely in your own browser — your export key is only ever sent to your own Worker, never saved anywhere else.</p>
+    </header>
+
+    <nav class="tabs" id="tabs">
+        <button type="button" class="tab-btn active" data-tab="overview">Overview</button>
+        <button type="button" class="tab-btn" data-tab="orders">Orders</button>
+        <button type="button" class="tab-btn" data-tab="subscribers">Subscribers</button>
+        <button type="button" class="tab-btn" data-tab="seo">SEO Health</button>
+    </nav>
+
+    <div class="panel" id="connection-panel">
+        <p class="panel-title">Connection</p>
+        <div class="field-row">
+            <div class="field">
+                <label for="worker-url">Worker URL</label>
+                <input type="text" id="worker-url" placeholder="https://fakesmile-nomba.YOUR-SUBDOMAIN.workers.dev" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="field">
+                <label for="export-key">Export key</label>
+                <div class="input-group">
+                    <input type="password" id="export-key" placeholder="SUBSCRIBERS_EXPORT_KEY" autocomplete="off" spellcheck="false">
+                    <button type="button" class="toggle-key" id="toggle-key">SHOW</button>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="button" class="primary" id="load-btn">Load Data</button>
+            </div>
+        </div>
+        <p class="hint"><strong>Remembered on this device only</strong> — saved to this browser's local storage, not to the file itself. Loads both orders and subscribers at once.</p>
+        <div class="status-line" id="status-line"></div>
+        <div class="fallback" id="fallback">
+            <p class="hint" style="margin-top:0;">Fetch blocked? Paste the JSON from <code>/orders?key=...</code> or <code>/subscribers?key=...</code> directly:</p>
+            <textarea id="paste-json" placeholder='{"count": 2, "orders": [...]} or {"count": 2, "subscribers": [...]}'></textarea>
+            <div class="fallback-actions">
+                <button type="button" class="ghost" id="load-pasted">Load Pasted JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== OVERVIEW ===== -->
+    <section class="tab-panel active" id="tab-overview">
+        <div class="stat-row">
+            <div class="stat-tile"><div class="num" id="ov-orders">—</div><div class="label">Total Orders</div></div>
+            <div class="stat-tile"><div class="num" id="ov-paid">—</div><div class="label">Paid Orders</div></div>
+            <div class="stat-tile warn"><div class="num" id="ov-pending">—</div><div class="label">Pending Orders</div></div>
+            <div class="stat-tile"><div class="num" id="ov-revenue">—</div><div class="label">Revenue (paid)</div></div>
+            <div class="stat-tile"><div class="num" id="ov-subs">—</div><div class="label">Subscribers</div></div>
+            <div class="stat-tile"><div class="num" id="ov-subs-week">—</div><div class="label">New (7 Days)</div></div>
+        </div>
+        <div class="panel">
+            <p class="panel-title">Most Recent Orders</p>
+            <div id="ov-recent-orders" class="empty-state">Load data to see recent orders.</div>
+        </div>
+    </section>
+
+    <!-- ===== ORDERS ===== -->
+    <section class="tab-panel" id="tab-orders">
+        <div class="toolbar">
+            <div class="search-wrap"><input type="search" id="orders-search" placeholder="Search by order ID, name or email&hellip;"></div>
+            <select class="status-filter" id="orders-status-filter">
+                <option value="">All statuses</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+            </select>
+            <button type="button" class="ghost" id="orders-copy-csv">Copy as CSV</button>
+            <button type="button" class="ghost" id="orders-download-csv">Download CSV</button>
+        </div>
+        <div class="table-card">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-sort="nombaReference">Order <span class="arrow">&#9650;</span></th>
+                            <th data-sort="customer">Customer <span class="arrow">&#9650;</span></th>
+                            <th data-sort="itemCount">Items <span class="arrow">&#9650;</span></th>
+                            <th data-sort="total">Total <span class="arrow">&#9650;</span></th>
+                            <th data-sort="status">Status <span class="arrow">&#9650;</span></th>
+                            <th data-sort="createdAt" class="active">Date <span class="arrow">&#9660;</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-body"></tbody>
+                </table>
+            </div>
+            <div class="empty-state" id="orders-empty">Load data above to see orders.</div>
+        </div>
+    </section>
+
+    <!-- ===== SUBSCRIBERS ===== -->
+    <section class="tab-panel" id="tab-subscribers">
+        <div class="stat-row">
+            <div class="stat-tile"><div class="num" id="sub-count">0</div><div class="label">Total Subscribers</div></div>
+            <div class="stat-tile"><div class="num" id="sub-latest">—</div><div class="label">Most Recent</div></div>
+            <div class="stat-tile"><div class="num" id="sub-week">0</div><div class="label">Last 7 Days</div></div>
+        </div>
+        <div class="toolbar">
+            <div class="search-wrap"><input type="search" id="subs-search" placeholder="Search by email&hellip;"></div>
+            <button type="button" class="ghost" id="subs-copy-csv">Copy as CSV</button>
+            <button type="button" class="ghost" id="subs-download-csv">Download CSV</button>
+        </div>
+        <div class="table-card">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-sort="email">Email <span class="arrow">&#9650;</span></th>
+                            <th data-sort="subscribedAt" class="active">Subscribed <span class="arrow">&#9660;</span></th>
+                            <th data-sort="source">Source <span class="arrow">&#9650;</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="subs-body"></tbody>
+                </table>
+            </div>
+            <div class="empty-state" id="subs-empty">Load data above to see subscribers.</div>
+        </div>
+    </section>
+
+    <!-- ===== SEO HEALTH ===== -->
+    <section class="tab-panel" id="tab-seo">
+        <div class="panel">
+            <p class="panel-title">What this checks</p>
+            <p class="lede" style="margin-bottom:0;">Fetches each page directly from fakesmilestore.com (no key needed) and checks title, meta description, canonical URL, Open Graph tags, structured data (JSON-LD), and exactly one H1 heading. This is a static on-page check, not real search-ranking data — for clicks, impressions and position, that needs Google Search Console connected separately.</p>
+        </div>
+        <div class="seo-check-row">
+            <button type="button" class="primary" id="seo-run-btn">Run SEO Check</button>
+            <div class="seo-progress" id="seo-progress"><div class="seo-progress-bar" id="seo-progress-bar"></div></div>
+            <span class="hint" id="seo-status" style="margin:0;"></span>
+        </div>
+        <div class="seo-grid" id="seo-results"></div>
+    </section>
+
+    <footer>Data from your <code>ORDERS</code> KV namespace &middot; See DEPLOY-WORKER.md for setup</footer>
+</div>
+
+<script>
+(function () {
+    /* ===== Tabs ===== */
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            document.getElementById('connection-panel').style.display =
+                (btn.dataset.tab === 'seo') ? 'none' : '';
+        });
+    });
+
+    /* ===== Shared connection + data loading ===== */
+    const workerInput = document.getElementById('worker-url');
+    const keyInput = document.getElementById('export-key');
+    const toggleKeyBtn = document.getElementById('toggle-key');
+    const loadBtn = document.getElementById('load-btn');
+    const statusLine = document.getElementById('status-line');
+    const fallback = document.getElementById('fallback');
+    const pasteJson = document.getElementById('paste-json');
+    const loadPastedBtn = document.getElementById('load-pasted');
+
+    const STORAGE_URL_KEY = 'fs_admin_worker_url';
+    const STORAGE_KEY_KEY = 'fs_admin_export_key';
+
+    let allOrders = [];
+    let allSubs = [];
+    let orderSortField = 'createdAt', orderSortDir = 'desc';
+    let subSortField = 'subscribedAt', subSortDir = 'desc';
+    let openOrderRef = null;
+
+    try {
+        const savedUrl = localStorage.getItem(STORAGE_URL_KEY);
+        const savedKey = localStorage.getItem(STORAGE_KEY_KEY);
+        if (savedUrl) workerInput.value = savedUrl;
+        if (savedKey) keyInput.value = savedKey;
+    } catch (_) {}
+    if (!workerInput.value) workerInput.value = 'https://fakesmile-nomba.josephnwach11.workers.dev';
+
+    toggleKeyBtn.addEventListener('click', () => {
+        const show = keyInput.type === 'password';
+        keyInput.type = show ? 'text' : 'password';
+        toggleKeyBtn.textContent = show ? 'HIDE' : 'SHOW';
+    });
+
+    function setStatus(text, kind) {
+        statusLine.className = 'status-line show' + (kind ? ' ' + kind : '');
+        if (kind === 'loading') statusLine.innerHTML = '<span class="spinner"></span><span>' + text + '</span>';
+        else statusLine.textContent = text;
+    }
+    function clearStatus() { statusLine.className = 'status-line'; statusLine.textContent = ''; }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function fmtDate(ts) {
+        const d = new Date(ts);
+        const abs = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) +
+            ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        const diffDays = Math.floor((Date.now() - ts) / 86400000);
+        let rel;
+        if (diffDays <= 0) rel = 'Today';
+        else if (diffDays === 1) rel = 'Yesterday';
+        else if (diffDays < 30) rel = diffDays + ' days ago';
+        else if (diffDays < 365) rel = Math.floor(diffDays / 30) + 'mo ago';
+        else rel = Math.floor(diffDays / 365) + 'y ago';
+        return { abs, rel };
+    }
+
+    function fmtNGN(n) {
+        const v = Math.round(Number(n) || 0);
+        return '₦' + v.toLocaleString('en-NG');
+    }
+
+    async function load() {
+        const workerUrl = workerInput.value.trim().replace(/\/$/, '');
+        const key = keyInput.value.trim();
+        if (!workerUrl || !key) { setStatus('Enter both the Worker URL and your export key.', 'error'); return; }
+        try { localStorage.setItem(STORAGE_URL_KEY, workerUrl); localStorage.setItem(STORAGE_KEY_KEY, key); } catch (_) {}
+
+        loadBtn.disabled = true;
+        setStatus('Loading orders and subscribers…', 'loading');
+        fallback.classList.remove('show');
+
+        try {
+            const [ordersRes, subsRes] = await Promise.all([
+                fetch(workerUrl + '/orders?key=' + encodeURIComponent(key)),
+                fetch(workerUrl + '/subscribers?key=' + encodeURIComponent(key)),
+            ]);
+            const ordersData = await ordersRes.json().catch(() => null);
+            const subsData = await subsRes.json().catch(() => null);
+            if (!ordersRes.ok) throw new Error((ordersData && ordersData.error) || 'Orders request failed (' + ordersRes.status + ')');
+            if (!subsRes.ok) throw new Error((subsData && subsData.error) || 'Subscribers request failed (' + subsRes.status + ')');
+            applyOrders(ordersData);
+            applySubs(subsData);
+            clearStatus();
+        } catch (err) {
+            setStatus('Couldn’t load: ' + (err && err.message ? err.message : 'network error') + '. If this is a CORS error, use the fallback below.', 'error');
+            fallback.classList.add('show');
+        } finally {
+            loadBtn.disabled = false;
+        }
+    }
+
+    loadBtn.addEventListener('click', load);
+    keyInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') load(); });
+    workerInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') load(); });
+
+    loadPastedBtn.addEventListener('click', () => {
+        try {
+            const data = JSON.parse(pasteJson.value);
+            if (Array.isArray(data.orders)) applyOrders(data);
+            if (Array.isArray(data.subscribers)) applySubs(data);
+            clearStatus();
+        } catch (err) {
+            setStatus('Could not parse that JSON: ' + err.message, 'error');
+        }
+    });
+
+    function applyOrders(data) {
+        if (!data || !Array.isArray(data.orders)) return;
+        allOrders = data.orders;
+        renderOrders();
+        renderOverview();
+    }
+    function applySubs(data) {
+        if (!data || !Array.isArray(data.subscribers)) return;
+        allSubs = data.subscribers;
+        renderSubs();
+        renderOverview();
+    }
+
+    /* ===== Overview ===== */
+    function renderOverview() {
+        document.getElementById('ov-orders').textContent = allOrders.length.toLocaleString();
+        const paid = allOrders.filter((o) => o.status === 'paid');
+        const pending = allOrders.filter((o) => o.status !== 'paid');
+        document.getElementById('ov-paid').textContent = paid.length.toLocaleString();
+        document.getElementById('ov-pending').textContent = pending.length.toLocaleString();
+        const revenue = paid.reduce((sum, o) => sum + (o.order && o.order.total ? Number(o.order.total) : 0), 0);
+        document.getElementById('ov-revenue').textContent = fmtNGN(revenue);
+        document.getElementById('ov-subs').textContent = allSubs.length.toLocaleString();
+        const weekAgo = Date.now() - 7 * 86400000;
+        document.getElementById('ov-subs-week').textContent = allSubs.filter((s) => s.subscribedAt >= weekAgo).length.toLocaleString();
+
+        const recent = allOrders.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 5);
+        const el = document.getElementById('ov-recent-orders');
+        if (!recent.length) { el.className = 'empty-state'; el.textContent = 'No orders yet.'; return; }
+        el.className = '';
+        el.innerHTML = recent.map((o) => {
+            const c = (o.order && o.order.customer) || {};
+            const name = (c.firstName || c.lastName) ? (c.firstName + ' ' + c.lastName).trim() : (c.email || 'Unknown');
+            const total = o.order ? fmtNGN(o.order.total) : '—';
+            const statusClass = o.status === 'paid' ? 'ok' : 'pending';
+            return '<div class="item-line"><span>' + escapeHtml(name) + ' &middot; ' + escapeHtml(o.nombaReference || '') + '</span>' +
+                '<span><span class="pill ' + statusClass + '">' + escapeHtml(o.status || 'unknown') + '</span> &nbsp; ' + total + '</span></div>';
+        }).join('');
+    }
+
+    /* ===== Orders tab ===== */
+    document.querySelectorAll('#tab-orders thead th').forEach((th) => {
+        th.addEventListener('click', () => {
+            const field = th.getAttribute('data-sort');
+            if (orderSortField === field) orderSortDir = orderSortDir === 'asc' ? 'desc' : 'asc';
+            else { orderSortField = field; orderSortDir = (field === 'createdAt' || field === 'total') ? 'desc' : 'asc'; }
+            document.querySelectorAll('#tab-orders thead th').forEach((t) => { t.classList.remove('active'); t.querySelector('.arrow').innerHTML = '&#9650;'; });
+            th.classList.add('active');
+            th.querySelector('.arrow').innerHTML = orderSortDir === 'asc' ? '&#9650;' : '&#9660;';
+            renderOrders();
+        });
+    });
+    document.getElementById('orders-search').addEventListener('input', renderOrders);
+    document.getElementById('orders-status-filter').addEventListener('change', renderOrders);
+
+    function orderCustomerName(o) {
+        const c = (o.order && o.order.customer) || {};
+        return ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || c.email || '';
+    }
+
+    function renderOrders() {
+        const q = document.getElementById('orders-search').value.trim().toLowerCase();
+        const statusFilter = document.getElementById('orders-status-filter').value;
+        let rows = allOrders.map((o) => ({
+            ...o,
+            customer: orderCustomerName(o),
+            itemCount: (o.order && o.order.items) ? o.order.items.reduce((n, it) => n + (it.qty || 1), 0) : 0,
+            total: o.order ? Number(o.order.total || 0) : 0,
+        }));
+        if (statusFilter) rows = rows.filter((o) => (statusFilter === 'paid' ? o.status === 'paid' : o.status !== 'paid'));
+        if (q) {
+            rows = rows.filter((o) =>
+                (o.nombaReference || '').toLowerCase().includes(q) ||
+                (o.merchantOrderId || '').toLowerCase().includes(q) ||
+                o.customer.toLowerCase().includes(q) ||
+                ((o.order && o.order.customer && o.order.customer.email) || '').toLowerCase().includes(q)
+            );
+        }
+        rows.sort((a, b) => {
+            let av = a[orderSortField], bv = b[orderSortField];
+            if (typeof av === 'string') { av = av.toLowerCase(); bv = String(bv || '').toLowerCase(); }
+            else { av = av || 0; bv = bv || 0; }
+            if (av < bv) return orderSortDir === 'asc' ? -1 : 1;
+            if (av > bv) return orderSortDir === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        const tbody = document.getElementById('orders-body');
+        const empty = document.getElementById('orders-empty');
+        if (!rows.length) {
+            tbody.innerHTML = '';
+            empty.style.display = 'block';
+            empty.textContent = allOrders.length ? 'No orders match your search.' : 'Load data above to see orders.';
+            return;
+        }
+        empty.style.display = 'none';
+
+        tbody.innerHTML = rows.map((o) => {
+            const d = fmtDate(o.createdAt || 0);
+            const statusClass = o.status === 'paid' ? 'ok' : 'pending';
+            const ref = o.nombaReference || '';
+            const isOpen = ref === openOrderRef;
+            let html = '<tr class="row-clickable" data-ref="' + escapeHtml(ref) + '">' +
+                '<td>' + escapeHtml(ref || o.merchantOrderId || '—') + '</td>' +
+                '<td class="email-cell">' + escapeHtml(o.customer || '—') + '</td>' +
+                '<td>' + o.itemCount + '</td>' +
+                '<td>' + fmtNGN(o.total) + '</td>' +
+                '<td><span class="pill ' + statusClass + '">' + escapeHtml(o.status || 'unknown') + '</span></td>' +
+                '<td class="date-cell">' + d.abs + '<span class="rel">' + d.rel + '</span></td>' +
+            '</tr>';
+            if (isOpen) html += '<tr class="detail-row"><td colspan="6"><div class="detail-box">' + orderDetailHTML(o) + '</div></td></tr>';
+            return html;
+        }).join('');
+
+        tbody.querySelectorAll('tr.row-clickable').forEach((tr) => {
+            tr.addEventListener('click', () => {
+                const ref = tr.getAttribute('data-ref');
+                openOrderRef = (openOrderRef === ref) ? null : ref;
+                renderOrders();
+            });
+        });
+    }
+
+    function orderDetailHTML(o) {
+        const order = o.order || {};
+        const c = order.customer || {};
+        const s = order.shipping || {};
+        const items = order.items || [];
+        const itemsHtml = items.length
+            ? items.map((it) => '<div class="item-line"><span>' + (it.qty || 1) + '&times; ' + escapeHtml(it.name || '') +
+                (it.size ? ' <span class="qty">(Size ' + escapeHtml(it.size) + ')</span>' : '') + '</span><span>' + fmtNGN((it.price || 0) * (it.qty || 1)) + '</span></div>').join('')
+            : '<p class="muted">No item details stored.</p>';
+        const shipAddr = [s.address1, s.address2, [s.city, s.state, s.postal].filter(Boolean).join(', '), s.country].filter(Boolean).map(escapeHtml).join('<br>') || '<span class="muted">Not provided</span>';
+
+        return '<div class="detail-grid">' +
+            '<div class="detail-col"><h4>Customer</h4>' +
+                '<p>' + escapeHtml((c.firstName || '') + ' ' + (c.lastName || '')).trim() + '</p>' +
+                '<p class="muted">' + escapeHtml(c.email || '') + '</p>' +
+                '<p class="muted">' + escapeHtml(c.phone || '') + '</p>' +
+            '</div>' +
+            '<div class="detail-col"><h4>Shipping</h4><p>' + shipAddr + '</p></div>' +
+            '<div class="detail-col"><h4>Items</h4>' + itemsHtml +
+                '<div class="totals-line"><span>Subtotal</span><span>' + fmtNGN(order.subtotal || 0) + '</span></div>' +
+                (order.discount ? '<div class="totals-line"><span>Discount</span><span>-' + fmtNGN(order.discount) + '</span></div>' : '') +
+                (order.vat ? '<div class="totals-line"><span>VAT</span><span>' + fmtNGN(order.vat) + '</span></div>' : '') +
+                '<div class="totals-line grand"><span>Total</span><span>' + fmtNGN(order.total || 0) + '</span></div>' +
+            '</div>' +
+            '<div class="detail-col"><h4>Payment</h4>' +
+                '<p>Reference: <span class="muted">' + escapeHtml(o.nombaReference || '—') + '</span></p>' +
+                '<p>Status: <span class="muted">' + escapeHtml(o.status || 'unknown') + '</span></p>' +
+                '<p>Emailed: <span class="muted">' + (o.emailsSent ? 'Yes' : 'No') + '</span></p>' +
+                (o.paidAt ? '<p>Paid: <span class="muted">' + fmtDate(o.paidAt).abs + '</span></p>' : '') +
+            '</div>' +
+        '</div>';
+    }
+
+    function ordersToCSV() {
+        const header = 'orderReference,customer,email,items,total,status,createdAt\n';
+        const rows = allOrders.map((o) => {
+            const c = (o.order && o.order.customer) || {};
+            const itemCount = (o.order && o.order.items) ? o.order.items.reduce((n, it) => n + (it.qty || 1), 0) : 0;
+            return [
+                JSON.stringify(o.nombaReference || ''),
+                JSON.stringify(orderCustomerName(o)),
+                JSON.stringify(c.email || ''),
+                itemCount,
+                o.order ? Number(o.order.total || 0) : 0,
+                JSON.stringify(o.status || ''),
+                new Date(o.createdAt || 0).toISOString(),
+            ].join(',');
+        });
+        return header + rows.join('\n');
+    }
+    document.getElementById('orders-copy-csv').addEventListener('click', (e) => copyCSV(ordersToCSV(), e.target));
+    document.getElementById('orders-download-csv').addEventListener('click', () => downloadCSV(ordersToCSV(), 'fakesmile-orders'));
+
+    /* ===== Subscribers tab ===== */
+    document.querySelectorAll('#tab-subscribers thead th').forEach((th) => {
+        th.addEventListener('click', () => {
+            const field = th.getAttribute('data-sort');
+            if (subSortField === field) subSortDir = subSortDir === 'asc' ? 'desc' : 'asc';
+            else { subSortField = field; subSortDir = field === 'subscribedAt' ? 'desc' : 'asc'; }
+            document.querySelectorAll('#tab-subscribers thead th').forEach((t) => { t.classList.remove('active'); t.querySelector('.arrow').innerHTML = '&#9650;'; });
+            th.classList.add('active');
+            th.querySelector('.arrow').innerHTML = subSortDir === 'asc' ? '&#9650;' : '&#9660;';
+            renderSubs();
+        });
+    });
+    document.getElementById('subs-search').addEventListener('input', renderSubs);
+
+    function renderSubs() {
+        const q = document.getElementById('subs-search').value.trim().toLowerCase();
+        let rows = allSubs.filter((s) => !q || s.email.toLowerCase().includes(q));
+        rows.sort((a, b) => {
+            let av = a[subSortField], bv = b[subSortField];
+            if (subSortField === 'subscribedAt') { av = av || 0; bv = bv || 0; }
+            else { av = String(av || '').toLowerCase(); bv = String(bv || '').toLowerCase(); }
+            if (av < bv) return subSortDir === 'asc' ? -1 : 1;
+            if (av > bv) return subSortDir === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        document.getElementById('subs-body').innerHTML = rows.map((s) => {
+            const d = fmtDate(s.subscribedAt);
+            return '<tr><td class="email-cell">' + escapeHtml(s.email) + '</td>' +
+                '<td class="date-cell">' + d.abs + '<span class="rel">' + d.rel + '</span></td>' +
+                '<td><span class="pill">' + escapeHtml(s.source || 'unknown') + '</span></td></tr>';
+        }).join('');
+        document.getElementById('subs-empty').style.display = rows.length ? 'none' : 'block';
+        document.querySelector('#tab-subscribers .table-scroll').style.display = rows.length ? 'block' : 'none';
+
+        document.getElementById('sub-count').textContent = allSubs.length.toLocaleString();
+        if (allSubs.length) {
+            const mostRecent = allSubs.reduce((m, s) => (s.subscribedAt > m ? s.subscribedAt : m), 0);
+            document.getElementById('sub-latest').textContent = fmtDate(mostRecent).rel;
+        } else {
+            document.getElementById('sub-latest').textContent = '—';
+        }
+        const weekAgo = Date.now() - 7 * 86400000;
+        document.getElementById('sub-week').textContent = allSubs.filter((s) => s.subscribedAt >= weekAgo).length.toLocaleString();
+    }
+
+    function subsToCSV() {
+        const header = 'email,subscribedAt,source\n';
+        const rows = allSubs.map((s) => [JSON.stringify(s.email), new Date(s.subscribedAt).toISOString(), JSON.stringify(s.source || '')].join(','));
+        return header + rows.join('\n');
+    }
+    document.getElementById('subs-copy-csv').addEventListener('click', (e) => copyCSV(subsToCSV(), e.target));
+    document.getElementById('subs-download-csv').addEventListener('click', () => downloadCSV(subsToCSV(), 'fakesmile-subscribers'));
+
+    async function copyCSV(csv, btn) {
+        const original = btn.textContent;
+        try { await navigator.clipboard.writeText(csv); btn.textContent = 'Copied!'; }
+        catch (_) {
+            const ta = document.createElement('textarea');
+            ta.value = csv; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            btn.textContent = 'Copied!';
+        }
+        setTimeout(() => { btn.textContent = original; }, 1500);
+    }
+    function downloadCSV(csv, name) {
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = name + '-' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    /* ===== SEO Health tab ===== */
+    const SEO_PAGES = [
+        '/', '/shop.html', '/about.html', '/contact.html', '/faq.html',
+        '/shipping.html', '/returns.html', '/size-guide.html', '/terms.html',
+        '/privacy.html', '/cookies.html', '/cart.html', '/checkout.html',
+        '/orders.html', '/product.html',
+    ];
+
+    function parseHead(html) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const title = doc.querySelector('title');
+        const desc = doc.querySelector('meta[name="description"]');
+        const canonical = doc.querySelector('link[rel="canonical"]');
+        const ogTitle = doc.querySelector('meta[property="og:title"]');
+        const ogDesc = doc.querySelector('meta[property="og:description"]');
+        const ogImage = doc.querySelector('meta[property="og:image"]');
+        const jsonLd = doc.querySelectorAll('script[type="application/ld+json"]');
+        const h1s = doc.querySelectorAll('h1');
+
+        let jsonLdValid = jsonLd.length > 0;
+        if (jsonLdValid) {
+            for (const s of jsonLd) {
+                try { JSON.parse(s.textContent); } catch (_) { jsonLdValid = false; break; }
+            }
+        }
+
+        const titleLen = title ? title.textContent.trim().length : 0;
+        const descLen = desc ? (desc.getAttribute('content') || '').trim().length : 0;
+
+        return {
+            titleOk: titleLen >= 10 && titleLen <= 65,
+            titleWarn: titleLen > 0 && (titleLen < 10 || titleLen > 65),
+            titlePresent: titleLen > 0,
+            descOk: descLen >= 50 && descLen <= 160,
+            descWarn: descLen > 0 && (descLen < 50 || descLen > 160),
+            descPresent: descLen > 0,
+            canonicalOk: !!canonical,
+            ogOk: !!(ogTitle && ogDesc && ogImage),
+            jsonLdOk: jsonLdValid,
+            h1Ok: h1s.length === 1,
+            h1Count: h1s.length,
+        };
+    }
+
+    function checkItem(ok, warn, labelOk, labelWarn, labelFail) {
+        const cls = ok ? 'pass' : (warn ? 'warn' : 'fail');
+        const label = ok ? labelOk : (warn ? labelWarn : labelFail);
+        return '<span class="check-item ' + cls + '"><span class="dot"></span>' + escapeHtml(label) + '</span>';
+    }
+
+    document.getElementById('seo-run-btn').addEventListener('click', runSeoCheck);
+
+    async function runSeoCheck() {
+        const btn = document.getElementById('seo-run-btn');
+        const progress = document.getElementById('seo-progress');
+        const bar = document.getElementById('seo-progress-bar');
+        const statusEl = document.getElementById('seo-status');
+        const results = document.getElementById('seo-results');
+        btn.disabled = true;
+        progress.classList.add('show');
+        bar.style.width = '0%';
+        results.innerHTML = '';
+        statusEl.textContent = '';
+
+        let done = 0;
+        const cards = [];
+        for (const path of SEO_PAGES) {
+            try {
+                const res = await fetch(path, { cache: 'no-store' });
+                const html = await res.text();
+                const checks = parseHead(html);
+                const passCount = [checks.titleOk, checks.descOk, checks.canonicalOk, checks.ogOk, checks.jsonLdOk, checks.h1Ok].filter(Boolean).length;
+                const scoreClass = passCount >= 5 ? 'good' : (passCount >= 3 ? 'mid' : 'poor');
+                cards.push(
+                    '<div class="seo-card">' +
+                        '<div class="seo-card-head"><a href="' + path + '" target="_blank" rel="noopener">' + path + '</a>' +
+                            '<span class="seo-score ' + scoreClass + '">' + passCount + '/6</span></div>' +
+                        '<div class="check-list">' +
+                            checkItem(checks.titleOk, checks.titleWarn, 'Title OK', 'Title length off', checks.titlePresent ? 'Title length off' : 'Title missing') +
+                            checkItem(checks.descOk, checks.descWarn, 'Description OK', 'Description length off', checks.descPresent ? 'Description length off' : 'Description missing') +
+                            checkItem(checks.canonicalOk, false, 'Canonical set', '', 'No canonical') +
+                            checkItem(checks.ogOk, false, 'Open Graph OK', '', 'Open Graph incomplete') +
+                            checkItem(checks.jsonLdOk, false, 'Structured data OK', '', 'No/invalid structured data') +
+                            checkItem(checks.h1Ok, checks.h1Count > 1, 'One H1', checks.h1Count + ' H1 tags', 'No H1') +
+                        '</div>' +
+                    '</div>'
+                );
+            } catch (err) {
+                cards.push('<div class="seo-card"><div class="seo-card-head"><a href="' + path + '" target="_blank" rel="noopener">' + path + '</a>' +
+                    '<span class="seo-score poor">Error</span></div><div class="check-list">' +
+                    '<span class="check-item fail"><span class="dot"></span>Could not fetch page</span></div></div>');
+            }
+            done++;
+            bar.style.width = Math.round((done / SEO_PAGES.length) * 100) + '%';
+            statusEl.textContent = done + ' / ' + SEO_PAGES.length + ' pages checked';
+        }
+        results.innerHTML = cards.join('');
+        btn.disabled = false;
+        setTimeout(() => progress.classList.remove('show'), 600);
+    }
+})();
+</script>
+</body>
+</html>

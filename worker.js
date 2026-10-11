@@ -60,6 +60,11 @@
        -> { count, subscribers: [{ email, subscribedAt, source }] }
        Pull the list to paste into whatever you send drop announcements
        with. Example: curl "https://<your-worker>.workers.dev/subscribers?key=YOUR_SECRET"
+     GET  /orders?key=<SUBSCRIBERS_EXPORT_KEY>
+       -> { count, orders: [{ nombaReference, status, order, amount,
+            createdAt, paidAt, emailsSent, ... }] }
+       Every order currently in KV (30-day TTL — see ORDER_TTL_SECONDS),
+       newest first. Same secret as /subscribers; powers tools/admin.html.
    ============================================================== */
 
 export default {
@@ -97,6 +102,9 @@ export default {
             }
             if (url.pathname === '/subscribers' && request.method === 'GET') {
                 return await handleSubscribersExport(url, env);
+            }
+            if (url.pathname === '/orders' && request.method === 'GET') {
+                return await handleOrdersExport(url, env);
             }
             if (url.pathname === '/' || url.pathname === '/health') {
                 return json({ ok: true, service: 'fakesmile-nomba-worker' }, 200, env);
@@ -329,6 +337,38 @@ async function handleSubscribersExport(url, env) {
 
     subscribers.sort((a, b) => (b.subscribedAt || 0) - (a.subscribedAt || 0));
     return json({ count: subscribers.length, subscribers }, 200, env);
+}
+
+/* ============================================================== */
+/* === ORDERS ADMIN EXPORT ======================================= */
+/* ============================================================== */
+// Same gate as /subscribers (SUBSCRIBERS_EXPORT_KEY) — both are owner-only
+// reads of the same ORDERS KV namespace, just different key prefixes, so
+// there's no reason to make the owner set up a second secret.
+
+async function handleOrdersExport(url, env) {
+    if (!env.SUBSCRIBERS_EXPORT_KEY) {
+        return json({ error: 'Export not enabled. Set SUBSCRIBERS_EXPORT_KEY as a Worker secret first.' }, 501, env);
+    }
+    const provided = url.searchParams.get('key') || '';
+    if (!timingSafeEqual(provided, env.SUBSCRIBERS_EXPORT_KEY)) {
+        return json({ error: 'Unauthorized' }, 401, env);
+    }
+    if (!env.ORDERS) return json({ error: 'KV not configured' }, 503, env);
+
+    const orders = [];
+    let cursor;
+    do {
+        const page = await env.ORDERS.list({ prefix: 'order:', cursor, limit: 1000 });
+        for (const k of page.keys) {
+            const rec = await env.ORDERS.get(k.name, 'json');
+            if (rec) orders.push({ nombaReference: k.name.slice('order:'.length), ...rec });
+        }
+        cursor = page.list_complete ? undefined : page.cursor;
+    } while (cursor);
+
+    orders.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    return json({ count: orders.length, orders }, 200, env);
 }
 
 /* ============================================================== */
