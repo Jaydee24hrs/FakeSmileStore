@@ -1142,7 +1142,11 @@
         }
         const entries = Object.keys(data.days || {}).sort();
         if (!entries.length) {
-            panel.innerHTML = '<div class="panel"><p class="panel-title">Site Traffic</p><div class="empty-state">No pageviews recorded yet in this period.</div></div>';
+            const debugBlock = { variables: data.debugVariables, raw: data.debugRaw };
+            panel.innerHTML = '<div class="panel"><p class="panel-title">Site Traffic</p>' +
+                '<div class="empty-state">No pageviews recorded yet in this period.</div>' +
+                '<pre class="hint" style="white-space:pre-wrap; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; overflow:auto; margin-top:14px;">' + escapeHtml(JSON.stringify(debugBlock, null, 2)) + '</pre>' +
+            '</div>';
             return;
         }
         const maxVal = Math.max(1, ...entries.map((d) => data.days[d]));

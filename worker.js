@@ -643,6 +643,19 @@ async function handleTraffic(url, env) {
             byDay[day] = (byDay[day] || 0) + (g.count || 0);
             total += g.count || 0;
         }
+        // No GraphQL errors but zero rows: Cloudflare's dashboard can show
+        // data that this query still misses (wrong field, filter not
+        // matching, etc). Pass the raw response through so it's visible
+        // instead of a flat "no data" dead end.
+        if (total === 0) {
+            return json({
+                configured: true,
+                totalPageviews: 0,
+                days: {},
+                debugRaw: data.data,
+                debugVariables: { accountTag: env.CF_ACCOUNT_ID, siteTag: env.CF_SITE_TAG, since: since.toISOString(), until: until.toISOString() },
+            }, 200, env);
+        }
         return json({ configured: true, totalPageviews: total, days: byDay }, 200, env);
     } catch (err) {
         return json({ configured: true, error: err.message || 'Request to Cloudflare failed' }, 502, env);
