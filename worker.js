@@ -608,6 +608,17 @@ async function handleTraffic(url, env) {
         const data = await res.json().catch(() => null);
         if (!data) return json({ configured: true, error: 'Cloudflare returned an unparseable response (HTTP ' + res.status + ').' }, 502, env);
         if (data.errors && data.errors.length) {
+            // Decoupled check: is CF_API_TOKEN itself valid/active at all,
+            // independent of whether it has the right permission for this
+            // query? Disambiguates "wrong/corrupted secret value" from
+            // "token's fine, something else about the request is wrong".
+            let tokenVerify = null;
+            try {
+                const vRes = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', {
+                    headers: { 'Authorization': `Bearer ${env.CF_API_TOKEN}` },
+                });
+                tokenVerify = await vRes.json().catch(() => null);
+            } catch (_) {}
             // Surface the full raw error objects too — Cloudflare's GraphQL
             // errors are often terse ("Authentication error") with the real
             // cause only visible in extensions/other fields.
@@ -616,6 +627,8 @@ async function handleTraffic(url, env) {
                 error: data.errors.map((e) => e.message || JSON.stringify(e)).join('; '),
                 httpStatus: res.status,
                 rawErrors: data.errors,
+                tokenVerify,
+                tokenLength: env.CF_API_TOKEN ? env.CF_API_TOKEN.length : 0,
             }, 502, env);
         }
         const accounts = data.data && data.data.viewer && data.data.viewer.accounts;
