@@ -606,9 +606,17 @@ async function handleTraffic(url, env) {
             }),
         });
         const data = await res.json().catch(() => null);
-        if (!data) return json({ configured: true, error: 'Cloudflare returned an unparseable response.' }, 502, env);
+        if (!data) return json({ configured: true, error: 'Cloudflare returned an unparseable response (HTTP ' + res.status + ').' }, 502, env);
         if (data.errors && data.errors.length) {
-            return json({ configured: true, error: data.errors.map((e) => e.message).join('; ') }, 502, env);
+            // Surface the full raw error objects too — Cloudflare's GraphQL
+            // errors are often terse ("Authentication error") with the real
+            // cause only visible in extensions/other fields.
+            return json({
+                configured: true,
+                error: data.errors.map((e) => e.message || JSON.stringify(e)).join('; '),
+                httpStatus: res.status,
+                rawErrors: data.errors,
+            }, 502, env);
         }
         const accounts = data.data && data.data.viewer && data.data.viewer.accounts;
         const groups = (accounts && accounts[0] && accounts[0].rumPageloadEventsAdaptiveGroups) || [];

@@ -1164,9 +1164,11 @@
 
     function trafficSetupHTML(data) {
         const err = data && data.error;
+        const raw = data && data.rawErrors;
         return '<div class="panel">' +
             '<p class="panel-title">' + (err ? 'Couldn&rsquo;t Load Traffic Data' : 'Connect Site Traffic') + '</p>' +
             (err ? '<p class="lede" style="color:var(--bad-bright);">' + escapeHtml(err) + '</p>' : '') +
+            (raw ? '<pre class="hint" style="white-space:pre-wrap; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; overflow:auto;">' + escapeHtml(JSON.stringify(raw, null, 2)) + '</pre>' : '') +
             '<p class="lede">Powered by Cloudflare Web Analytics &mdash; free, no cookies, doesn&rsquo;t affect SEO. To connect it:</p>' +
             '<ol class="hint" style="padding-left:18px; line-height:1.8;">' +
                 '<li>Cloudflare dashboard &rarr; <b>Analytics &amp; Logs &rarr; Web Analytics</b> &rarr; Add Site &rarr; enter fakesmilestore.com, get a beacon snippet.</li>' +
