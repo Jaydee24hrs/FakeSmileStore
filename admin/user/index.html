@@ -365,6 +365,28 @@
     .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
     .chart-legend .sw { width: 8px; height: 8px; border-radius: 2px; }
 
+    .order-toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 80;
+        background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+        color: #002b12;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 14px 20px;
+        border-radius: 14px;
+        box-shadow: 0 16px 40px rgba(0, 217, 87, 0.35);
+        transform: translateY(20px);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    .order-toast.show { transform: translateY(0); opacity: 1; }
+    @media (max-width: 860px) {
+        .order-toast { right: 16px; left: 16px; bottom: 16px; text-align: center; }
+    }
+
     .ring-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 10px; }
     .ring-num { font-family: var(--font-display); font-size: 15px; font-weight: 700; fill: var(--fg); }
     .ring-caption { font-size: 11.5px; color: var(--fg-muted); text-align: center; }
@@ -583,6 +605,10 @@
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 <span>Subscribers</span>
             </button>
+            <button type="button" class="nav-item" data-tab="traffic">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                <span>Site Traffic</span>
+            </button>
             <button type="button" class="nav-item" data-tab="seo">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.35-4.35"></path><path d="M8 11h6M11 8v6"></path></svg>
                 <span>SEO Health</span>
@@ -759,6 +785,11 @@
                 </div>
             </section>
 
+            <!-- ===== SITE TRAFFIC ===== -->
+            <section class="tab-panel" id="tab-traffic">
+                <div id="traffic-content"><div class="empty-state">Load data to see site traffic.</div></div>
+            </section>
+
             <!-- ===== SEO HEALTH ===== -->
             <section class="tab-panel" id="tab-seo">
                 <div class="panel">
@@ -785,6 +816,7 @@
         overview: ['Overview', 'Orders, subscribers and SEO health at a glance.'],
         orders: ['Orders', 'Every order stored in your Worker, newest first.'],
         subscribers: ['Subscribers', 'Everyone who signed up for drop alerts.'],
+        traffic: ['Site Traffic', 'Pageviews from Cloudflare Web Analytics.'],
         seo: ['SEO Health', 'On-page checks across every main page of the site.'],
     };
     document.querySelectorAll('.nav-item[data-tab]').forEach((btn) => {
@@ -843,6 +875,11 @@
     let subSortField = 'subscribedAt', subSortDir = 'desc';
     let openOrderRef = null;
     let currentKey = null;
+    let pollTimer = null;
+    const LAST_SEEN_ORDER_KEY = 'fs_admin_last_order_ts';
+    let lastSeenOrderTs = (function () {
+        try { const v = localStorage.getItem(LAST_SEEN_ORDER_KEY); return v ? Number(v) : null; } catch (_) { return null; }
+    })();
 
     toggleLoginPwBtn.addEventListener('click', () => {
         const show = loginPassword.type === 'password';
@@ -892,10 +929,18 @@
         sidebarEmail.textContent = email || '';
         sidebarAvatar.textContent = (email || '?').slice(0, 2).toUpperCase();
         load();
+        try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (_) {}
+        stopPolling();
+        pollTimer = setInterval(load, 60000);
+    }
+
+    function stopPolling() {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
     }
 
     logoutBtn.addEventListener('click', () => {
         currentKey = null;
+        stopPolling();
         try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_EMAIL); } catch (_) {}
         allOrders = []; allSubs = [];
         appShell.style.display = 'none';
@@ -969,6 +1014,7 @@
             setStatus('Couldn’t load: ' + (err && err.message ? err.message : 'network error') + '. If this is a CORS error, use the fallback below.', 'error');
             fallback.classList.add('show');
         }
+        loadTraffic();
     }
 
     retryBtn.addEventListener('click', load);
@@ -986,15 +1032,150 @@
 
     function applyOrders(data) {
         if (!data || !Array.isArray(data.orders)) return;
+        const previousTs = lastSeenOrderTs;
         allOrders = data.orders;
         renderOrders();
         renderOverview();
+        checkForNewOrders(previousTs);
     }
     function applySubs(data) {
         if (!data || !Array.isArray(data.subscribers)) return;
         allSubs = data.subscribers;
         renderSubs();
         renderOverview();
+    }
+
+    /* ===== New-order alert (notification + sound + toast) ===== */
+    function checkForNewOrders(previousTs) {
+        if (!allOrders.length) return;
+        const maxTs = allOrders.reduce((m, o) => Math.max(m, o.createdAt || 0), 0);
+        if (previousTs === null) {
+            // First load ever on this device — just record the high-water mark,
+            // don't alert retroactively for orders that already existed.
+            lastSeenOrderTs = maxTs;
+            try { localStorage.setItem(LAST_SEEN_ORDER_KEY, String(maxTs)); } catch (_) {}
+            return;
+        }
+        const fresh = allOrders.filter((o) => (o.createdAt || 0) > previousTs);
+        if (fresh.length) notifyNewOrders(fresh);
+        if (maxTs > lastSeenOrderTs) {
+            lastSeenOrderTs = maxTs;
+            try { localStorage.setItem(LAST_SEEN_ORDER_KEY, String(maxTs)); } catch (_) {}
+        }
+    }
+
+    function notifyNewOrders(fresh) {
+        const n = fresh.length;
+        const label = n === 1 ? '1 new order' : n + ' new orders';
+        try {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const first = fresh[0];
+                const c = (first.order && first.order.customer) || {};
+                const name = (c.firstName || c.lastName) ? (c.firstName + ' ' + c.lastName).trim() : (c.email || 'Someone');
+                new Notification('FakeSmile Admin — ' + label, {
+                    body: n === 1 ? (name + ' · ' + fmtNGN(first.order ? first.order.total : 0)) : 'Open the dashboard to see them.',
+                });
+            }
+        } catch (_) {}
+        playAlertBeep();
+        showOrderToast(label);
+    }
+
+    function playAlertBeep() {
+        try {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return;
+            const ctx = new Ctx();
+            [880, 1174].forEach((freq, i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                osc.connect(gain); gain.connect(ctx.destination);
+                const start = ctx.currentTime + i * 0.16;
+                gain.gain.setValueAtTime(0.0001, start);
+                gain.gain.exponentialRampToValueAtTime(0.18, start + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.14);
+                osc.start(start);
+                osc.stop(start + 0.16);
+            });
+            setTimeout(() => { try { ctx.close(); } catch (_) {} }, 500);
+        } catch (_) {}
+    }
+
+    function showOrderToast(label) {
+        let toast = document.getElementById('order-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'order-toast';
+            toast.className = 'order-toast';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = '🔔 ' + label;
+        toast.classList.add('show');
+        clearTimeout(toast._hideTimer);
+        toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 6000);
+    }
+
+    /* ===== Site traffic (Cloudflare Web Analytics) ===== */
+    async function loadTraffic() {
+        if (!currentKey) return;
+        const panel = document.getElementById('traffic-content');
+        if (!panel) return;
+        try {
+            const res = await fetch(WORKER_URL + '/traffic?key=' + encodeURIComponent(currentKey));
+            const data = await res.json().catch(() => null);
+            renderTraffic(data, res.ok);
+        } catch (err) {
+            renderTraffic({ error: 'Could not reach the Worker.' }, false);
+        }
+    }
+
+    function renderTraffic(data, ok) {
+        const panel = document.getElementById('traffic-content');
+        if (!panel) return;
+        if (!data || !ok || data.error || data.configured === false) {
+            panel.innerHTML = trafficSetupHTML(data);
+            const retryBtn = panel.querySelector('#traffic-retry-btn');
+            if (retryBtn) retryBtn.addEventListener('click', loadTraffic);
+            return;
+        }
+        const entries = Object.keys(data.days || {}).sort();
+        if (!entries.length) {
+            panel.innerHTML = '<div class="panel"><p class="panel-title">Site Traffic</p><div class="empty-state">No pageviews recorded yet in this period.</div></div>';
+            return;
+        }
+        const maxVal = Math.max(1, ...entries.map((d) => data.days[d]));
+        const bars = entries.map((d) => {
+            const v = data.days[d];
+            const heightPct = v === 0 ? 2 : Math.max(4, Math.round((v / maxVal) * 100));
+            const label = new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+            return '<div class="bar-col" title="' + label + ': ' + v + ' pageviews">' +
+                '<div class="bar-stack" style="height:' + heightPct + '%;"><div class="bar-seg-paid" style="height:100%;"></div></div>' +
+                '<span class="bar-label">' + label.split(' ')[0] + '</span>' +
+            '</div>';
+        }).join('');
+        panel.innerHTML =
+            '<div class="stat-row" style="margin-bottom:22px;">' +
+                '<div class="stat-card"><div class="num">' + (data.totalPageviews || 0).toLocaleString() + '</div><div class="label">Pageviews (period)</div></div>' +
+            '</div>' +
+            '<div class="panel chart-card"><p class="panel-title">Pageviews By Day</p><div class="bar-chart">' + bars + '</div></div>';
+    }
+
+    function trafficSetupHTML(data) {
+        const err = data && data.error;
+        return '<div class="panel">' +
+            '<p class="panel-title">' + (err ? 'Couldn&rsquo;t Load Traffic Data' : 'Connect Site Traffic') + '</p>' +
+            (err ? '<p class="lede" style="color:var(--bad-bright);">' + escapeHtml(err) + '</p>' : '') +
+            '<p class="lede">Powered by Cloudflare Web Analytics &mdash; free, no cookies, doesn&rsquo;t affect SEO. To connect it:</p>' +
+            '<ol class="hint" style="padding-left:18px; line-height:1.8;">' +
+                '<li>Cloudflare dashboard &rarr; <b>Analytics &amp; Logs &rarr; Web Analytics</b> &rarr; Add Site &rarr; enter fakesmilestore.com, get a beacon snippet.</li>' +
+                '<li>The snippet&rsquo;s <code>data-cf-beacon</code> token contains your <b>site tag</b>.</li>' +
+                '<li>Create an API token with <b>Account &rarr; Analytics &rarr; Read</b> permission.</li>' +
+                '<li>Set 3 Worker secrets: <code>CF_API_TOKEN</code>, <code>CF_ACCOUNT_ID</code>, <code>CF_SITE_TAG</code>.</li>' +
+            '</ol>' +
+            '<button type="button" class="ghost" id="traffic-retry-btn" style="margin-top:6px;">Retry</button>' +
+        '</div>';
     }
 
     /* ===== Overview ===== */
@@ -1191,6 +1372,26 @@
                 refreshOrderStatus(btn.getAttribute('data-ref'), btn);
             });
         });
+        tbody.querySelectorAll('.resend-email-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                resendOrderEmail(btn.getAttribute('data-ref'), btn);
+            });
+        });
+        tbody.querySelectorAll('.mark-paid-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!confirm('Mark this order as PAID? This also emails the customer if they haven\'t been emailed yet.')) return;
+                setOrderStatus(btn.getAttribute('data-ref'), 'paid', btn);
+            });
+        });
+        tbody.querySelectorAll('.mark-failed-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!confirm('Mark this order as FAILED?')) return;
+                setOrderStatus(btn.getAttribute('data-ref'), 'failed', btn);
+            });
+        });
     }
 
     function orderDetailHTML(o) {
@@ -1223,9 +1424,21 @@
                 '<p>Emailed: <span class="muted">' + (o.emailsSent ? 'Yes' : 'No') + '</span></p>' +
                 (o.paidAt ? '<p>Paid: <span class="muted">' + fmtDate(o.paidAt).abs + '</span></p>' : '') +
                 (o.failedAt ? '<p>Failed: <span class="muted">' + fmtDate(o.failedAt).abs + '</span></p>' : '') +
-                (o.status !== 'paid'
-                    ? '<button type="button" class="ghost refresh-status-btn" data-ref="' + escapeHtml(o.nombaReference || '') + '" style="margin-top:10px;">Check With Nomba</button>'
-                    : '') +
+                (o.manualOverride ? '<p class="muted">Manually set by an admin.</p>' : '') +
+                '<div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">' +
+                    (o.status !== 'paid'
+                        ? '<button type="button" class="ghost refresh-status-btn" data-ref="' + escapeHtml(o.nombaReference || '') + '">Check With Nomba</button>'
+                        : '') +
+                    (o.order
+                        ? '<button type="button" class="ghost resend-email-btn" data-ref="' + escapeHtml(o.nombaReference || '') + '">Resend Email</button>'
+                        : '') +
+                    (o.status !== 'paid'
+                        ? '<button type="button" class="ghost mark-paid-btn" data-ref="' + escapeHtml(o.nombaReference || '') + '">Mark Paid</button>'
+                        : '') +
+                    (o.status !== 'failed'
+                        ? '<button type="button" class="ghost mark-failed-btn" data-ref="' + escapeHtml(o.nombaReference || '') + '">Mark Failed</button>'
+                        : '') +
+                '</div>' +
             '</div>' +
         '</div>';
     }
@@ -1254,6 +1467,56 @@
             renderOverview();
         } catch (err) {
             btn.textContent = err && err.message ? err.message : 'Check failed';
+            setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2200);
+        }
+    }
+
+    async function resendOrderEmail(ref, btn) {
+        if (!ref) return;
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        try {
+            const res = await fetch(WORKER_URL + '/resend-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderReference: ref, key: currentKey }),
+            });
+            const data = await res.json().catch(() => null);
+            if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || 'Resend failed (' + res.status + ')');
+            btn.textContent = 'Sent ✓';
+            setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2200);
+        } catch (err) {
+            btn.textContent = err && err.message ? err.message : 'Resend failed';
+            setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2200);
+        }
+    }
+
+    async function setOrderStatus(ref, status, btn) {
+        if (!ref) return;
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = status === 'paid' ? 'Marking Paid…' : 'Marking Failed…';
+        try {
+            const res = await fetch(WORKER_URL + '/admin-set-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderReference: ref, status, key: currentKey }),
+            });
+            const data = await res.json().catch(() => null);
+            if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || 'Update failed (' + res.status + ')');
+            const idx = allOrders.findIndex((o) => o.nombaReference === ref);
+            if (idx !== -1) {
+                allOrders[idx].status = data.status;
+                allOrders[idx].manualOverride = true;
+                if (data.emailed) allOrders[idx].emailsSent = true;
+                if (data.status === 'paid') allOrders[idx].paidAt = allOrders[idx].paidAt || Date.now();
+                if (data.status === 'failed') allOrders[idx].failedAt = allOrders[idx].failedAt || Date.now();
+            }
+            renderOrders();
+            renderOverview();
+        } catch (err) {
+            btn.textContent = err && err.message ? err.message : 'Update failed';
             setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2200);
         }
     }

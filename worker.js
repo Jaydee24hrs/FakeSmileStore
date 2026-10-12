@@ -81,6 +81,37 @@
        password against ADMIN_PASSWORD, both server-side. On success hands
        back the export key so the page can call /orders and /subscribers
        without the admin ever typing or seeing that key directly.
+     POST /resend-email     { orderReference, key }
+       -> { ok: true }
+       Re-sends the order confirmation emails (seller + customer) for an
+       order, bypassing the emailsSent guard. Admin-only (same key as
+       /orders) — key goes in the JSON body, not the querystring.
+     POST /admin-set-status { orderReference, status: 'paid'|'failed', key }
+       -> { ok: true, status, emailed }
+       Manually overrides an order's status from the admin dashboard, for
+       cases the Nomba lookup can't resolve on its own. Marking an order
+       paid this way also sends the confirmation emails if they haven't
+       gone out yet. Admin-only (same key as /orders).
+     GET  /traffic?key=<SUBSCRIBERS_EXPORT_KEY>&days=14
+       -> { configured: false } if CF_API_TOKEN/CF_ACCOUNT_ID/CF_SITE_TAG
+          aren't set, or { configured: true, totalPageviews, days: {date:
+          count} }, or { configured: true, error } if Cloudflare's API
+          rejected the request. Pulls pageview counts from Cloudflare Web
+          Analytics (RUM) via the GraphQL Analytics API — see the three
+          CF_* vars below for what to set and where to find them.
+
+     --- Site traffic tab (optional) ---
+     CF_API_TOKEN   — a Cloudflare API token with "Account Analytics: Read"
+                       permission (dash.cloudflare.com -> My Profile ->
+                       API Tokens -> Create Token).
+     CF_ACCOUNT_ID  — your Cloudflare account ID (same one Wrangler uses;
+                       visible on the right-hand side of any zone's
+                       Overview page in the dashboard).
+     CF_SITE_TAG    — set up Web Analytics first: dashboard -> Analytics &
+                       Logs -> Web Analytics -> Add Site -> fakesmilestore.com.
+                       It hands you a <script> snippet to paste on the
+                       site; the site tag is the 32-char hex value inside
+                       its data-cf-beacon="{"token":"..."}" attribute.
    ============================================================== */
 
 export default {
@@ -124,6 +155,15 @@ export default {
             }
             if (url.pathname === '/admin-login' && request.method === 'POST') {
                 return await handleAdminLogin(request, env);
+            }
+            if (url.pathname === '/resend-email' && request.method === 'POST') {
+                return await handleResendEmail(request, env);
+            }
+            if (url.pathname === '/admin-set-status' && request.method === 'POST') {
+                return await handleAdminSetStatus(request, env);
+            }
+            if (url.pathname === '/traffic' && request.method === 'GET') {
+                return await handleTraffic(url, env);
             }
             if (url.pathname === '/debug-lookup' && request.method === 'GET') {
                 return await handleDebugLookup(url, env);
@@ -436,6 +476,156 @@ async function handleAdminLogin(request, env) {
         return json({ error: 'Logged in, but SUBSCRIBERS_EXPORT_KEY isn’t set, so there’s no data to fetch yet.' }, 501, env);
     }
     return json({ ok: true, key: env.SUBSCRIBERS_EXPORT_KEY }, 200, env);
+}
+
+/* ============================================================== */
+/* === ADMIN ORDER ACTIONS ======================================= */
+/* ============================================================== */
+// Both take the export key in the JSON body (not the querystring, since
+// these are POSTs) — same secret as /orders and /subscribers.
+
+async function handleResendEmail(request, env) {
+    if (!env.SUBSCRIBERS_EXPORT_KEY) {
+        return json({ error: 'Export not enabled. Set SUBSCRIBERS_EXPORT_KEY as a Worker secret first.' }, 501, env);
+    }
+    let body;
+    try { body = await request.json(); } catch (_) { return json({ error: 'Invalid JSON body' }, 400, env); }
+    if (!timingSafeEqual(String((body && body.key) || ''), env.SUBSCRIBERS_EXPORT_KEY)) {
+        return json({ error: 'Unauthorized' }, 401, env);
+    }
+    const orderRef = String((body && body.orderReference) || '');
+    if (!orderRef) return json({ error: 'Missing orderReference' }, 400, env);
+    if (!env.ORDERS) return json({ error: 'KV not configured' }, 503, env);
+
+    const rec = await env.ORDERS.get('order:' + orderRef, 'json');
+    if (!rec) return json({ error: 'Order not found' }, 404, env);
+    if (!rec.order) return json({ error: 'No order details stored for this order — nothing to email.' }, 400, env);
+    if (!emailConfigured(env)) return json({ error: 'Email isn’t configured on this Worker (EMAILJS_* secrets missing).' }, 501, env);
+
+    try {
+        await sendOrderEmails(env, rec.order, rec.nombaReference || orderRef);
+    } catch (e) {
+        return json({ error: 'Email send failed: ' + (e.message || 'unknown error') }, 502, env);
+    }
+
+    rec.emailsSent = true;
+    rec.lastEmailResendAt = Date.now();
+    await env.ORDERS.put('order:' + orderRef, JSON.stringify(rec), { expirationTtl: ORDER_TTL_SECONDS });
+    return json({ ok: true }, 200, env);
+}
+
+async function handleAdminSetStatus(request, env) {
+    if (!env.SUBSCRIBERS_EXPORT_KEY) {
+        return json({ error: 'Export not enabled. Set SUBSCRIBERS_EXPORT_KEY as a Worker secret first.' }, 501, env);
+    }
+    let body;
+    try { body = await request.json(); } catch (_) { return json({ error: 'Invalid JSON body' }, 400, env); }
+    if (!timingSafeEqual(String((body && body.key) || ''), env.SUBSCRIBERS_EXPORT_KEY)) {
+        return json({ error: 'Unauthorized' }, 401, env);
+    }
+    const orderRef = String((body && body.orderReference) || '');
+    const status = String((body && body.status) || '');
+    if (!orderRef) return json({ error: 'Missing orderReference' }, 400, env);
+    if (status !== 'paid' && status !== 'failed') return json({ error: 'status must be "paid" or "failed"' }, 400, env);
+    if (!env.ORDERS) return json({ error: 'KV not configured' }, 503, env);
+
+    const rec = await env.ORDERS.get('order:' + orderRef, 'json');
+    if (!rec) return json({ error: 'Order not found' }, 404, env);
+
+    rec.status = status;
+    rec.manualOverride = true;
+    let emailed = false;
+    if (status === 'paid') {
+        rec.paidAt = rec.paidAt || Date.now();
+        if (!rec.emailsSent && rec.order && emailConfigured(env)) {
+            try {
+                await sendOrderEmails(env, rec.order, rec.nombaReference || orderRef);
+                rec.emailsSent = true;
+                emailed = true;
+            } catch (e) {
+                console.error('Manual-override email send failed:', e);
+            }
+        }
+    } else {
+        rec.failedAt = Date.now();
+    }
+
+    await env.ORDERS.put('order:' + orderRef, JSON.stringify(rec), { expirationTtl: ORDER_TTL_SECONDS });
+    return json({ ok: true, status: rec.status, emailed: emailed || !!rec.emailsSent }, 200, env);
+}
+
+/* ============================================================== */
+/* === SITE TRAFFIC (Cloudflare Web Analytics via GraphQL) ====== */
+/* ============================================================== */
+
+async function handleTraffic(url, env) {
+    if (!env.SUBSCRIBERS_EXPORT_KEY) {
+        return json({ error: 'Export not enabled. Set SUBSCRIBERS_EXPORT_KEY as a Worker secret first.' }, 501, env);
+    }
+    const provided = url.searchParams.get('key') || '';
+    if (!timingSafeEqual(provided, env.SUBSCRIBERS_EXPORT_KEY)) {
+        return json({ error: 'Unauthorized' }, 401, env);
+    }
+    if (!env.CF_API_TOKEN || !env.CF_ACCOUNT_ID || !env.CF_SITE_TAG) {
+        return json({ configured: false }, 200, env);
+    }
+
+    const days = Math.min(Math.max(parseInt(url.searchParams.get('days') || '14', 10) || 14, 1), 30);
+    const until = new Date();
+    const since = new Date(until.getTime() - days * 86400000);
+
+    const query = `query TrafficStats($accountTag: String!, $siteTag: String!, $since: Time!, $until: Time!) {
+        viewer {
+            accounts(filter: { accountTag: $accountTag }) {
+                rumPageloadEventsAdaptiveGroups(
+                    limit: 5000
+                    filter: { siteTag: $siteTag, datetime_geq: $since, datetime_leq: $until }
+                ) {
+                    count
+                    dimensions { ts: datetimeFifteenMinutes }
+                }
+            }
+        }
+    }`;
+
+    try {
+        const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${env.CF_API_TOKEN}`,
+            },
+            body: JSON.stringify({
+                query,
+                variables: {
+                    accountTag: env.CF_ACCOUNT_ID,
+                    siteTag: env.CF_SITE_TAG,
+                    since: since.toISOString(),
+                    until: until.toISOString(),
+                },
+            }),
+        });
+        const data = await res.json().catch(() => null);
+        if (!data) return json({ configured: true, error: 'Cloudflare returned an unparseable response.' }, 502, env);
+        if (data.errors && data.errors.length) {
+            return json({ configured: true, error: data.errors.map((e) => e.message).join('; ') }, 502, env);
+        }
+        const accounts = data.data && data.data.viewer && data.data.viewer.accounts;
+        const groups = (accounts && accounts[0] && accounts[0].rumPageloadEventsAdaptiveGroups) || [];
+
+        const byDay = {};
+        let total = 0;
+        for (const g of groups) {
+            const ts = g.dimensions && g.dimensions.ts;
+            if (!ts) continue;
+            const day = String(ts).slice(0, 10);
+            byDay[day] = (byDay[day] || 0) + (g.count || 0);
+            total += g.count || 0;
+        }
+        return json({ configured: true, totalPageviews: total, days: byDay }, 200, env);
+    } catch (err) {
+        return json({ configured: true, error: err.message || 'Request to Cloudflare failed' }, 502, env);
+    }
 }
 
 /* ============================================================== */
