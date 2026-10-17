@@ -24,8 +24,10 @@ function syncHomeCardsToCatalog() {
         const priceEl = card.querySelector('.product-price');
         const addBtn = card.querySelector('.product-add');
         const glass = card.querySelector('.product-glass') || card;
+        const soldOut = !p.comingSoon && !!p.soldOut;
         if (p.comingSoon) {
             card.classList.add('coming-soon');
+            card.classList.remove('sold-out');
             if (priceEl) {
                 priceEl.removeAttribute('data-price-ngn');
                 priceEl.classList.add('product-price-soon');
@@ -36,7 +38,7 @@ function syncHomeCardsToCatalog() {
             // Keep "Limited" as-is; Bestseller/New/none become "Coming Soon".
             let badgeEl = card.querySelector('.product-badge');
             if (p.badge === 'Limited') {
-                if (badgeEl) { badgeEl.textContent = 'Limited'; badgeEl.classList.remove('product-badge-soon'); }
+                if (badgeEl) { badgeEl.textContent = 'Limited'; badgeEl.classList.remove('product-badge-soon', 'product-badge-sold'); }
             } else {
                 if (!badgeEl) {
                     badgeEl = document.createElement('span');
@@ -45,7 +47,27 @@ function syncHomeCardsToCatalog() {
                 }
                 badgeEl.textContent = 'Coming Soon';
                 badgeEl.classList.add('product-badge-soon');
+                badgeEl.classList.remove('product-badge-sold');
             }
+        } else if (soldOut) {
+            card.classList.add('sold-out');
+            card.classList.remove('coming-soon');
+            // Sold-out items still show their real price — only remove the
+            // ability to add them, and mark the badge, same as the shop card.
+            if (priceEl && typeof formatMarked === 'function') {
+                priceEl.setAttribute('data-price-ngn', p.price);
+                priceEl.innerHTML = formatMarked(p.price, 1);
+            }
+            if (addBtn) { addBtn.disabled = true; addBtn.setAttribute('aria-disabled', 'true'); }
+            let badgeEl = card.querySelector('.product-badge');
+            if (!badgeEl) {
+                badgeEl = document.createElement('span');
+                badgeEl.className = 'product-badge';
+                glass.insertBefore(badgeEl, glass.firstChild);
+            }
+            badgeEl.textContent = 'Sold Out';
+            badgeEl.classList.add('product-badge-sold');
+            badgeEl.classList.remove('product-badge-soon');
         } else if (priceEl && typeof formatMarked === 'function') {
             priceEl.setAttribute('data-price-ngn', p.price);
             priceEl.innerHTML = formatMarked(p.price, 1);

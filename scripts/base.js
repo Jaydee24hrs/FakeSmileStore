@@ -337,9 +337,11 @@ function addToCart(input) {
 
     const baseId = item.id;
 
-    // ===== COMING-SOON GUARD =====
-    // Products with no catalog price yet can't be purchased.
-    if (typeof PRODUCTS !== 'undefined' && PRODUCTS[baseId] && PRODUCTS[baseId].comingSoon) {
+    // ===== COMING-SOON / SOLD-OUT GUARD =====
+    // Products with no catalog price yet, or currently marked sold out,
+    // can't be purchased.
+    if (typeof PRODUCTS !== 'undefined' && PRODUCTS[baseId] &&
+        (PRODUCTS[baseId].comingSoon || PRODUCTS[baseId].soldOut)) {
         return;
     }
 

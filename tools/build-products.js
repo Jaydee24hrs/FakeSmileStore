@@ -101,9 +101,12 @@ function relatedFor(id) {
 }
 
 function relatedCard(p) {
+    const so = !p.comingSoon && !!p.soldOut;
     const badge = (p.comingSoon && p.badge !== 'Limited')
         ? '<span class="pd-related-soon">Coming Soon</span>'
-        : (p.badge ? '<span class="pd-related-badge">' + esc(p.badge) + '</span>' : '');
+        : so
+            ? '<span class="pd-related-sold">Sold Out</span>'
+            : (p.badge ? '<span class="pd-related-badge">' + esc(p.badge) + '</span>' : '');
     const price = p.comingSoon
         ? '<span class="pd-related-price product-price-soon">Coming Soon</span>'
         : '<span class="pd-related-price" data-price-ngn="' + p.price + '">' + displayPrice(p) + '</span>';
@@ -147,7 +150,7 @@ function productJsonLd(p, url) {
             url: url,
             priceCurrency: 'NGN',
             price: String(Math.round((Number(p.price) || 0) + MARKUP_NGN)),
-            availability: 'https://schema.org/InStock',
+            availability: p.soldOut ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
             itemCondition: 'https://schema.org/NewCondition',
             seller: { '@id': SITE + '/#org' },
             shippingDetails: {
@@ -217,15 +220,20 @@ function renderProduct(p) {
         '<p class="page-hero-sub" id="hero-sub">' + esc(p.category) + ' · Crafted in Lagos · Free worldwide shipping.</p>', 'hero-sub');
 
     // Detail section state + badge
+    const soldOut = !p.comingSoon && !!p.soldOut;
     if (p.comingSoon) {
         h = replaceOnce(h, '<section class="product-detail" id="product-detail">',
             '<section class="product-detail coming-soon" id="product-detail">', 'product-detail');
+    } else if (soldOut) {
+        h = replaceOnce(h, '<section class="product-detail" id="product-detail">',
+            '<section class="product-detail sold-out" id="product-detail">', 'product-detail');
     }
     let badgeText = p.badge || '';
     if (p.comingSoon) badgeText = (p.badge === 'Limited') ? 'Limited' : 'Coming Soon';
+    else if (soldOut) badgeText = 'Sold Out';
     h = replaceOnce(h, '<span class="pd-badge" id="pd-badge" hidden></span>',
         badgeText
-            ? '<span class="pd-badge' + (badgeText === 'Coming Soon' ? ' product-badge-soon' : '') + '" id="pd-badge">' + esc(badgeText) + '</span>'
+            ? '<span class="pd-badge' + (badgeText === 'Coming Soon' ? ' product-badge-soon' : (badgeText === 'Sold Out' ? ' product-badge-sold' : '')) + '" id="pd-badge">' + esc(badgeText) + '</span>'
             : '<span class="pd-badge" id="pd-badge" hidden></span>', 'pd-badge');
 
     // Gallery
@@ -269,6 +277,9 @@ function renderProduct(p) {
     if (p.comingSoon) {
         h = replaceRe(h, /<button type="button" class="page-btn page-btn-primary pd-add-btn" id="pd-add-btn">(\s*)<span>Add To Cart<\/span>/,
             '<button type="button" class="page-btn page-btn-primary pd-add-btn is-disabled" id="pd-add-btn" disabled aria-disabled="true">$1<span>Coming Soon</span>', 'pd-add-btn');
+    } else if (soldOut) {
+        h = replaceRe(h, /<button type="button" class="page-btn page-btn-primary pd-add-btn" id="pd-add-btn">(\s*)<span>Add To Cart<\/span>/,
+            '<button type="button" class="page-btn page-btn-primary pd-add-btn is-disabled" id="pd-add-btn" disabled aria-disabled="true">$1<span>Sold Out</span>', 'pd-add-btn');
     }
 
     h = replaceOnce(h, '<span class="pd-meta-value" id="pd-sku">FS-&middot;&middot;&middot;</span>', '<span class="pd-meta-value" id="pd-sku">FS-' + esc(p.id.toUpperCase()) + '</span>', 'pd-sku');
@@ -306,18 +317,20 @@ function shopCard(p) {
           '<span class="fb-hint">F &middot; B</span>'
         : '<img loading="lazy" decoding="async" src="' + esc(p.image) + '" alt="' + esc(altFor(p, 'front')) + '">';
     const cs = !!p.comingSoon;
+    const so = !cs && !!p.soldOut;
     let badge;
     if (cs && p.badge === 'Limited') badge = '<span class="product-badge">Limited</span>';
     else if (cs) badge = '<span class="product-badge product-badge-soon">Coming Soon</span>';
+    else if (so) badge = '<span class="product-badge product-badge-sold">Sold Out</span>';
     else badge = p.badge ? '<span class="product-badge">' + esc(p.badge) + '</span>' : '';
     const ariaName = esc(p.name + ' ' + p.tag);
     const price = cs
         ? '<span class="product-price product-price-soon">Coming Soon</span>'
         : '<span class="product-price" data-price-ngn="' + p.price + '">' + displayPrice(p) + '</span>';
-    const addBtn = cs
-        ? '<button class="product-add" disabled aria-disabled="true" aria-label="' + ariaName + ' coming soon">' + PLUS_SVG_16 + '</button>'
+    const addBtn = (cs || so)
+        ? '<button class="product-add" disabled aria-disabled="true" aria-label="' + ariaName + (cs ? ' coming soon' : ' sold out') + '">' + PLUS_SVG_16 + '</button>'
         : '<button class="product-add" aria-label="Add ' + ariaName + ' to cart">' + PLUS_SVG_16 + '</button>';
-    return '<article class="product-card shop-card' + (cs ? ' coming-soon' : '') + '" data-category="' + esc(p.category) + '">' +
+    return '<article class="product-card shop-card' + (cs ? ' coming-soon' : (so ? ' sold-out' : '')) + '" data-category="' + esc(p.category) + '">' +
         '<div class="product-glass">' + badge +
             '<a class="' + wrapClass + '" href="' + productHref(p.id) + '" aria-label="View ' + ariaName + '">' +
                 '<div class="product-glow"></div>' + imgs +

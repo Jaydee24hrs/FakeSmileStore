@@ -42,14 +42,19 @@
             : '<img loading="lazy" decoding="async" src="' + safeAttr(p.image) + '" alt="' + altFront + '">';
 
         const cs = !!p.comingSoon;
+        const so = !cs && !!p.soldOut;
 
         // One badge only (never stacked). For inactive products: keep a "Limited"
-        // badge as-is; everything else (Bestseller / New / none) shows "Coming Soon".
+        // badge as-is; everything else (Bestseller / New / none) shows "Coming
+        // Soon" — unless the product is sold out, which always shows "Sold Out"
+        // since that's more urgent/actionable than a Limited/New/Bestseller tag.
         let badge;
         if (cs && p.badge === 'Limited') {
             badge = '<span class="product-badge">Limited</span>';
         } else if (cs) {
             badge = '<span class="product-badge product-badge-soon">Coming Soon</span>';
+        } else if (so) {
+            badge = '<span class="product-badge product-badge-sold">Sold Out</span>';
         } else {
             badge = p.badge ? '<span class="product-badge">' + p.badge + '</span>' : '';
         }
@@ -58,15 +63,17 @@
 
         const addSvg = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
 
+        // Sold-out items still show their real price (they're priced, just
+        // unavailable right now) — only coming-soon items hide the price.
         const priceHTML = cs
             ? '<span class="product-price product-price-soon">Coming Soon</span>'
             : '<span class="product-price" data-price-ngn="' + p.price + '">' + formatMarked(p.price, 1) + '</span>';
 
-        const addBtn = cs
-            ? '<button class="product-add" disabled aria-disabled="true" aria-label="' + ariaName + ' coming soon">' + addSvg + '</button>'
+        const addBtn = (cs || so)
+            ? '<button class="product-add" disabled aria-disabled="true" aria-label="' + ariaName + (cs ? ' coming soon' : ' sold out') + '">' + addSvg + '</button>'
             : '<button class="product-add" aria-label="Add ' + ariaName + ' to cart">' + addSvg + '</button>';
 
-        return '<article class="product-card shop-card' + (cs ? ' coming-soon' : '') + '" data-category="' + safeAttr(p.category) + '">' +
+        return '<article class="product-card shop-card' + (cs ? ' coming-soon' : (so ? ' sold-out' : '')) + '" data-category="' + safeAttr(p.category) + '">' +
                  '<div class="product-glass">' +
                    badge +
                    '<a class="' + wrapClass + '" href="' + productUrl(p.id) + '" aria-label="View ' + ariaName + '">' +

@@ -52,6 +52,36 @@
     border: 1px solid rgba(0, 217, 87, 0.35);
 }
 
+/* ===== Sold-out products (was for sale, temporarily out of stock) ===== */
+.product-badge-sold {
+    background: rgba(20, 20, 20, 0.85) !important;
+    color: #e8b4b4 !important;
+    border: 1px solid rgba(255, 90, 90, 0.35);
+    backdrop-filter: blur(6px);
+}
+.product-card.sold-out .product-image-wrap img {
+    filter: grayscale(0.55) brightness(0.72);
+}
+.product-detail.sold-out .pd-image-frame img,
+.product-detail.sold-out .pd-thumbs img {
+    filter: grayscale(0.55) brightness(0.72);
+}
+.pd-related-sold {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #e8b4b4;
+    background: rgba(20, 20, 20, 0.85);
+    border: 1px solid rgba(255, 90, 90, 0.35);
+}
+
 /* ===== Resume-unfinished-payment banner (see base.js) ===== */
 .fs-resume-banner {
     position: fixed;

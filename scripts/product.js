@@ -86,7 +86,7 @@
                 url: url,
                 priceCurrency: 'NGN',
                 price: String(ngn),
-                availability: 'https://schema.org/InStock',
+                availability: product.soldOut ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
                 itemCondition: 'https://schema.org/NewCondition',
                 seller: { '@id': SITE + '/#org' },
                 shippingDetails: {
@@ -143,13 +143,16 @@
     if (heroSub) heroSub.textContent = `${product.category} · Crafted in Lagos · Free worldwide shipping.`;
 
     // ===== Populate info panel =====
+    const soldOut = !product.comingSoon && !!product.soldOut;
     const badgeEl = document.getElementById('pd-badge');
     if (badgeEl) {
         // One badge: inactive products keep a "Limited" badge but show "Coming
-        // Soon" for Bestseller/New/none.
+        // Soon" for Bestseller/New/none. Sold-out always shows "Sold Out".
         let badgeText = product.badge;
         if (product.comingSoon) badgeText = (product.badge === 'Limited') ? 'Limited' : 'Coming Soon';
+        else if (soldOut) badgeText = 'Sold Out';
         badgeEl.classList.toggle('product-badge-soon', badgeText === 'Coming Soon');
+        badgeEl.classList.toggle('product-badge-sold', badgeText === 'Sold Out');
         if (badgeText) {
             badgeEl.textContent = badgeText;
             badgeEl.hidden = false;
@@ -171,10 +174,13 @@
             encodeURIComponent('Review: ' + product.name + ' ' + product.tag) +
             '&body=' + encodeURIComponent('Order number (FS-...): \nHow does it fit? \nA few words: \n(Attach a photo if you like!)');
     }
-    // Match the shop card: dim the gallery for coming-soon products so the
-    // inactive state reads the same on the listing and the preview page.
+    // Match the shop card: dim the gallery for coming-soon/sold-out products
+    // so the inactive state reads the same on the listing and preview page.
     const galleryEl = document.getElementById('product-detail');
-    if (galleryEl) galleryEl.classList.toggle('coming-soon', !!product.comingSoon);
+    if (galleryEl) {
+        galleryEl.classList.toggle('coming-soon', !!product.comingSoon);
+        galleryEl.classList.toggle('sold-out', soldOut);
+    }
 
     const categoryEl = document.getElementById('pd-category');
     if (categoryEl) categoryEl.textContent = product.category;
@@ -327,12 +333,12 @@
 
     // ===== Add to Cart =====
     const addBtn = document.getElementById('pd-add-btn');
-    if (addBtn && product.comingSoon) {
+    if (addBtn && (product.comingSoon || soldOut)) {
         addBtn.disabled = true;
         addBtn.setAttribute('aria-disabled', 'true');
         addBtn.classList.add('is-disabled');
         const span = addBtn.querySelector('span');
-        if (span) span.textContent = 'Coming Soon';
+        if (span) span.textContent = product.comingSoon ? 'Coming Soon' : 'Sold Out';
     } else if (addBtn && typeof addToCart === 'function') {
         addBtn.addEventListener('click', () => {
             addToCart({
@@ -405,11 +411,14 @@
             const a = document.createElement('a');
             a.className = 'pd-related-card';
             a.href = productUrl(p.id);
+            const pSoldOut = !p.comingSoon && !!p.soldOut;
             a.innerHTML = `
                 <div class="pd-related-img">
                     ${(p.comingSoon && p.badge !== 'Limited')
                         ? '<span class="pd-related-soon">Coming Soon</span>'
-                        : (p.badge ? `<span class="pd-related-badge">${p.badge}</span>` : '')}
+                        : pSoldOut
+                            ? '<span class="pd-related-sold">Sold Out</span>'
+                            : (p.badge ? `<span class="pd-related-badge">${p.badge}</span>` : '')}
                     <img loading="lazy" decoding="async" src="${fsImg(p.image)}" alt="${altFor(p, 'front')}">
                 </div>
                 <div class="pd-related-info">

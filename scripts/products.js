@@ -1020,6 +1020,33 @@ Object.keys(PRICE_OVERRIDE).forEach((id) => {
     if (p) { p.price = PRICE_OVERRIDE[id]; p.comingSoon = false; }
 });
 
+/* =====================================================================
+   STOCK STATUS (sold out). Distinct from comingSoon ("not released yet,
+   no catalog price") — sold out means "was for sale, temporarily out of
+   stock": the price still shows, but Add to Cart is disabled and the
+   badge reads "Sold Out". List a product's id here to take it off sale;
+   remove the id to bring it back in stock, then re-run
+   `node tools/build-products.js` to regenerate the static pages + shop
+   grid. See tools/sold-out-backup.json for the full catalog snapshot
+   (every id that was NOT sold out) from the day this list was first
+   turned on, in case it's ever needed to reset from.
+   ===================================================================== */
+const SOLD_OUT_IDS = new Set([
+    'sunset-brick-hoodie', 'cloud-brick-hoodie', 'midnight-brick-hoodie',
+    'crimson-court-jersey', 'onyx-gold-jersey', 'twin-faces-tank', 'cream-faces-tank',
+    'forest-two-tone-long-sleeve', 'onyx-two-tone-long-sleeve', 'steel-brick-hoodie',
+    'forest-court-jersey', 'cloud-court-jersey', 'sunset-court-jersey',
+    'ivory-two-tone-long-sleeve', 'shadow-crest-hoodie', 'heather-crest-hoodie',
+    'pearl-crest-hoodie', 'onyx-anthem-tee', 'cloud-anthem-tee', 'sunset-echo-crewneck',
+    'midnight-echo-crewneck', 'forest-anthem-tee', 'stone-anthem-tee', 'crimson-anthem-tee',
+    'sand-echo-crewneck', 'charcoal-anthem-tee', 'sunset-signature-joggers',
+    'cloud-signature-joggers', 'midnight-signature-joggers', 'heather-stone-joggers',
+    'crimson-court-shorts', 'forest-court-shorts', 'cloud-stripe-shorts',
+    'sunset-court-shorts', 'onyx-gold-shorts', 'sunshine-bucket-hat', 'midnight-bucket-hat',
+    'stone-bucket-hat', 'crimson-bucket-hat', 'olive-globe-cap', 'voltage-globe-cap',
+]);
+Object.values(PRODUCTS).forEach((p) => { p.soldOut = SOLD_OUT_IDS.has(p.id); });
+
 /** Look up a product by id, returning null if not found. */
 function getProduct(id) {
     return id && PRODUCTS[id] ? PRODUCTS[id] : null;
