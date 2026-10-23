@@ -1042,8 +1042,7 @@ const SOLD_OUT_IDS = new Set([
     'sand-echo-crewneck', 'charcoal-anthem-tee', 'sunset-signature-joggers',
     'cloud-signature-joggers', 'midnight-signature-joggers', 'heather-stone-joggers',
     'crimson-court-shorts', 'forest-court-shorts', 'cloud-stripe-shorts',
-    'sunset-court-shorts', 'onyx-gold-shorts', 'sunshine-bucket-hat', 'midnight-bucket-hat',
-    'stone-bucket-hat', 'crimson-bucket-hat', 'olive-globe-cap', 'voltage-globe-cap',
+    'sunset-court-shorts', 'onyx-gold-shorts',
 ]);
 Object.values(PRODUCTS).forEach((p) => { p.soldOut = SOLD_OUT_IDS.has(p.id); });
 
