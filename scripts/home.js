@@ -2,79 +2,10 @@
 /* === HOME SCRIPT (index.html) ================ */
 /* ============================================= */
 
-// ===== HANGING RACK — home-page product rails =====
-// Each of the 4 category sections (#products, #tops, #bottoms, #headwear)
-// has an empty <div class="hanger-rail-track" id="rail-..."></div> left by
-// index.html for this to fill, picked by the SAME categoryHash products.js
-// already assigns every product for exactly this purpose (see "CANONICAL
-// CATEGORY + HOME-SECTION ANCHOR" in products.js). Pure mockups only —
-// no box, no carousel chrome, no price/badge/add-to-cart, no sold-out /
-// coming-soon treatment: just the garment hanging, with the existing
-// front/back hover-flip (styles/tops-fb.css, the "180 degree" view) where
-// a back image exists. Cards keep the "product-card" class purely so that
-// existing `.product-card:hover` rules (image lift, the F/B flip) keep
-// working with zero new CSS — syncHomeCardsToCatalog() below is guarded
-// to skip the "hanger-card" ones specifically so it can never re-inject a
-// badge into them.
-const HOME_RAILS = [
-    { trackId: 'rail-products', hash: 'products', limit: 12 },
-    { trackId: 'rail-tops', hash: 'tops', limit: 12 },
-    { trackId: 'rail-bottoms', hash: 'bottoms', limit: 12 },
-    { trackId: 'rail-headwear', hash: 'headwear', limit: 12 },
-];
-
-// A slim wire-hanger silhouette (hook loop + an open triangular frame),
-// stroked rather than filled — a boutique/studio look instead of a bold
-// graphic icon.
-const HANGER_SVG =
-    '<svg class="hanger-hook" viewBox="0 0 60 44" aria-hidden="true">' +
-        '<path d="M30 2c-4 0-7.2 2.8-7.2 6.3 0 2.2 1.3 4 3.4 4.9l1.8.8c1.5.6 2.5 1.9 2.5 3.4v2.6M30 19.6 4 37h52L30 19.6Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>' +
-    '</svg>';
-
-function hangerCardHTML(p) {
-    const hasBack = !!p.backImage;
-    const wrapClass = hasBack ? 'product-image-wrap product-image-fb' : 'product-image-wrap';
-    const altFront = p.name + ' ' + p.tag + ', front view, FakeSmile streetwear';
-    const altBack = p.name + ' ' + p.tag + ', back view, FakeSmile streetwear';
-    const imgs = hasBack
-        ? '<img loading="lazy" decoding="async" class="fb-front" src="' + p.image + '" alt="' + altFront + '">' +
-          '<img loading="lazy" decoding="async" class="fb-back" src="' + p.backImage + '" alt="' + altBack + '">'
-        : '<img loading="lazy" decoding="async" src="' + p.image + '" alt="' + altFront + '">';
-    const ariaName = p.name + ' ' + p.tag;
-
-    // Keeps the "product-card" class (not just "hanger-card") purely so the
-    // existing hover rules — image lift, and the front/back flip in
-    // tops-fb.css ("180 degree" view) — which are written against
-    // `.product-card:hover ...`, keep working with zero new CSS. The guard
-    // in syncHomeCardsToCatalog() below stops that legacy sync logic from
-    // touching these (it would otherwise re-inject a Sold Out/Coming Soon
-    // badge, which this pure-mockup rail deliberately has none of).
-    return '<article class="product-card hanger-card">' +
-        HANGER_SVG +
-        '<a class="' + wrapClass + '" href="' + productUrl(p.id) + '" aria-label="View ' + ariaName + '">' +
-            imgs +
-        '</a>' +
-    '</article>';
-}
-
-function renderHomeRails() {
-    if (typeof PRODUCTS === 'undefined') return;
-    const all = Object.values(PRODUCTS);
-    HOME_RAILS.forEach((cfg) => {
-        const track = document.getElementById(cfg.trackId);
-        if (!track) return;
-        const items = all.filter((p) => p.categoryHash === cfg.hash).slice(0, cfg.limit);
-        track.innerHTML = items.map(hangerCardHTML).join('');
-    });
-}
-renderHomeRails();
-
-// ===== SYNC HOME CARDS TO THE CATALOG =====
-// renderHomeRails() above already builds cards straight from PRODUCTS, so
-// this is mostly a no-op safety net now (kept in case any card is ever
-// hand-authored again). Pull the product id out of each card's link and
-// reconcile it with products.js so prices (incl. the per-item markup) and
-// Coming-Soon state match the shop instead of drifting.
+// ===== SYNC STATIC HOME CARDS TO THE CATALOG =====
+// The home carousels are hand-authored HTML. Pull the product id out of each
+// card's link and reconcile it with products.js so prices (incl. the per-item
+// markup) and Coming-Soon state match the shop instead of drifting.
 function cardProductId(card) {
     // Cards link to the static product page: products/<id>.html
     // (legacy product.html?id=<id> links are still understood).
@@ -87,9 +18,6 @@ function cardProductId(card) {
 function syncHomeCardsToCatalog() {
     if (typeof PRODUCTS === 'undefined') return;
     document.querySelectorAll('.product-card').forEach((card) => {
-        // Pure-mockup hanging rack cards: no price/badge/add-button to sync,
-        // and this must never re-inject a badge into them.
-        if (card.classList.contains('hanger-card')) return;
         const id = cardProductId(card);
         const p = id && PRODUCTS[id];
         if (!p) return;
