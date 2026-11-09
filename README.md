@@ -54,7 +54,7 @@ flow testing (shop → product → cart → checkout → orders).
 
 ```
 fakesmile33/
-├── index.html          Home — hero, category showcase, 3 product carousels, bento, CTA
+├── index.html          Home — hero, category showcase, 4 header-only drop banners, bento, CTA
 ├── shop.html           Full product grid with filters + sort
 ├── product.html        Product detail TEMPLATE (legacy ?id= route; .htaccess 301s it
 │                        to /products/<id>) — edit THIS, then rebuild
@@ -136,7 +136,7 @@ fakesmile33/
 
 | Page | Purpose | Scripts loaded |
 |---|---|---|
-| `index.html` | Home: hero + typewriter, category showcase, 3 carousels (Tops, Statement, Headwear), Full-Fit bridge banner, lifestyle banner, bento grid, contact CTA | products, base, home |
+| `index.html` | Home: hero + typewriter, category showcase, 4 header-only drop banners (#products, #tops, #bottoms, #headwear — no product carousels, just title/subtitle), Full-Fit bridge banner, lifestyle banner, bento grid, contact CTA | products, base, home |
 | `shop.html` | All 45 products in a grid; filter pills (All / Tops & Hoodies / Statement Tops / Joggers & Shorts / Headwear); sort (Featured / Price / Name) | products, base, shop |
 | `products/<id>.html` | **Static** product detail (generated). Full HTML + Product/Breadcrumb JSON-LD in the page; `product.js` hydrates it (sizes, qty, add-to-cart, tabs, re-randomized related). Lives one folder down: `<html data-root="../">` + `<body data-product-id>` | products, base, product |
 | `product.html` | The template the above is generated from. Also still works as `?id=<slug>` (legacy); on the live server `.htaccess` 301s `product?id=X` → `/products/X` | products, base, product |
@@ -611,6 +611,25 @@ helper, so both entry points feed the one real list.
 
 ## 16. Change Log
 
+- **Home page: removed the remaining 3 product carousels (#products, #tops,
+  #headwear), kept their headers — home page now has zero product
+  carousels.** Follows the same pattern already used for `#bottoms`: each
+  section keeps `.catalogue-ambient` + `.catalogue-header` (pretitle/title/
+  subtitle) and drops everything else (`.carousel-shell` — cards, prev/next
+  buttons, progress bar). Two subtitles referenced the now-gone interaction
+  and were reworded: `#products` dropped "Hover, glide, claim yours." →
+  "Claim yours."; `#tops` dropped "Hover any piece to flip the view." The
+  short-lived hanging-rail CSS added for `#products` earlier in this session
+  (hanger-hook SVGs, rod via `::before`) is dead code now that the section
+  has no cards, so it was deleted from `styles/home.css` rather than left
+  orphaned. Same as `#bottoms`: category links to `index.html#products` /
+  `#tops` / `#headwear` (footer, nav, bridge banner) still resolve since the
+  sections and their ids stay in place. `initCarousel` already no-ops on a
+  section with no `.carousel-track`, and `syncHomeCardsToCatalog` already
+  no-ops on a page with no `.product-card`, so no JS changes were needed.
+  Browsing the catalog now happens entirely on `shop.html` and the
+  product-detail pages; the home page's role is brand/hero + category
+  teasers only.
 - **Home page: removed the "Built for Motion" joggers + shorts carousel but
   kept its header; reverted the Sold Out / Coming Soon badge hide.** (1) The
   previous change (commenting out the badge pill in `home.js`'s
