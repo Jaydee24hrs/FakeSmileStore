@@ -23,14 +23,12 @@ const HOME_RAILS = [
     { trackId: 'rail-headwear', hash: 'headwear', limit: 12 },
 ];
 
-// A real hanger silhouette (hook loop + triangular shoulders + center
-// notch), not just a line — filled with currentColor so it can glow green
-// on hover via CSS.
+// A slim wire-hanger silhouette (hook loop + an open triangular frame),
+// stroked rather than filled — a boutique/studio look instead of a bold
+// graphic icon.
 const HANGER_SVG =
-    '<svg class="hanger-hook" viewBox="0 0 64 58" aria-hidden="true">' +
-        '<path d="M32 3c-5.5 0-10 3.9-10 8.7 0 3 1.9 5.6 4.9 6.9l2.4 1v3.6" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>' +
-        '<path d="M32 19 2 42h18l12-9 12 9h18L32 19Z" fill="currentColor"/>' +
-        '<rect x="27" y="40" width="10" height="3.4" rx="1.7" fill="currentColor"/>' +
+    '<svg class="hanger-hook" viewBox="0 0 60 44" aria-hidden="true">' +
+        '<path d="M30 2c-4 0-7.2 2.8-7.2 6.3 0 2.2 1.3 4 3.4 4.9l1.8.8c1.5.6 2.5 1.9 2.5 3.4v2.6M30 19.6 4 37h52L30 19.6Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>' +
     '</svg>';
 
 function hangerCardHTML(p) {
