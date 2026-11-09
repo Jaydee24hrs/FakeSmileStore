@@ -54,7 +54,7 @@ flow testing (shop → product → cart → checkout → orders).
 
 ```
 fakesmile33/
-├── index.html          Home — hero, category showcase, 4 header-only drop banners, bento, CTA
+├── index.html          Home — hero, category showcase, 4 hanging-rack product rails, bento, CTA
 ├── shop.html           Full product grid with filters + sort
 ├── product.html        Product detail TEMPLATE (legacy ?id= route; .htaccess 301s it
 │                        to /products/<id>) — edit THIS, then rebuild
@@ -136,7 +136,7 @@ fakesmile33/
 
 | Page | Purpose | Scripts loaded |
 |---|---|---|
-| `index.html` | Home: hero + typewriter, category showcase, 4 header-only drop banners (#products, #tops, #bottoms, #headwear — no product carousels, just title/subtitle), Full-Fit bridge banner, lifestyle banner, bento grid, contact CTA | products, base, home |
+| `index.html` | Home: hero + typewriter, category showcase, 4 hanging-rack product rails (#products, #tops, #bottoms, #headwear — rendered from `PRODUCTS` by `renderHomeRails()` in `home.js`, filtered by `categoryHash`), Full-Fit bridge banner, lifestyle banner, bento grid, contact CTA | products, base, home |
 | `shop.html` | All 45 products in a grid; filter pills (All / Tops & Hoodies / Statement Tops / Joggers & Shorts / Headwear); sort (Featured / Price / Name) | products, base, shop |
 | `products/<id>.html` | **Static** product detail (generated). Full HTML + Product/Breadcrumb JSON-LD in the page; `product.js` hydrates it (sizes, qty, add-to-cart, tabs, re-randomized related). Lives one folder down: `<html data-root="../">` + `<body data-product-id>` | products, base, product |
 | `product.html` | The template the above is generated from. Also still works as `?id=<slug>` (legacy); on the live server `.htaccess` 301s `product?id=X` → `/products/X` | products, base, product |
@@ -611,6 +611,34 @@ helper, so both entry points feed the one real list.
 
 ## 16. Change Log
 
+- **Home page: rebuilt all 4 category sections as a "hanging rack" —
+  garments hang from a rod via an SVG hanger instead of sitting in glass
+  cards, rendered dynamically from `products.js` instead of hand-authored.**
+  `index.html` gives each section (`#products`/`#tops`/`#bottoms`/
+  `#headwear`) an empty `<div class="carousel-track" id="rail-...">`; a new
+  `renderHomeRails()` in `home.js` (runs first, before `initCarousel` /
+  `syncHomeCardsToCatalog`) fills each one by filtering `PRODUCTS` on the
+  same `categoryHash` the catalog already assigns every product (`products`,
+  `tops`, `bottoms`, `headwear` — see "CANONICAL CATEGORY + HOME-SECTION
+  ANCHOR" in `products.js`), capped at 12 items per rail. Generated cards
+  keep the exact `.product-card`/`.product-glass`/`.product-add`/
+  `.product-price`/`.product-badge` classes the existing carousel JS and
+  add-to-cart listener already expect, so none of that needed changing —
+  only the new `.hanger-card` class (home-page cards only; shop.html and
+  product-detail pages still render their own, separately-styled glass
+  cards via `shop.js`/`build-products.js`, untouched here).
+  New look, scoped to `.hanger-card` in `styles/home.css`: a lit steel rod
+  (`.carousel-track::before`) spans each rack; each card gets a filled SVG
+  hanger (hook loop + triangular shoulders + center notch) that glows
+  brand-green on hover; cards sway gently and independently via a
+  `hangerSway` keyframe animation (staggered per `nth-child`, paused on
+  hover — intentionally NOT applied to `.product-card` itself, since
+  `initCarousel`'s JS already drives that element's `transform` for the
+  carousel depth effect, and a running CSS animation would have silently
+  overridden it); price renders as a rotated retail hang-tag (punched
+  hole, un-rotates on hover) instead of plain text. Two sections' stale
+  "hover to see more" subtitles were already reworded in the prior
+  carousel-removal commit and didn't need touching again.
 - **Home page: removed the remaining 3 product carousels (#products, #tops,
   #headwear), kept their headers — home page now has zero product
   carousels.** Follows the same pattern already used for `#bottoms`: each

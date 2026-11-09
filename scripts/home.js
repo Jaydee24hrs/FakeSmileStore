@@ -2,10 +2,95 @@
 /* === HOME SCRIPT (index.html) ================ */
 /* ============================================= */
 
-// ===== SYNC STATIC HOME CARDS TO THE CATALOG =====
-// The home carousels are hand-authored HTML. Pull the product id out of each
-// card's link and reconcile it with products.js so prices (incl. the per-item
-// markup) and Coming-Soon state match the shop instead of drifting.
+// ===== HANGING RACK — home-page product rails =====
+// Each of the 4 category sections (#products, #tops, #bottoms, #headwear)
+// has an empty <div class="carousel-track" id="rail-..."></div> left by
+// index.html for this to fill, picked by the SAME categoryHash products.js
+// already assigns every product for exactly this purpose (see "CANONICAL
+// CATEGORY + HOME-SECTION ANCHOR" in products.js). Cards reuse the existing
+// .product-card / .product-glass / .product-add / .product-price / .product-badge
+// classes so initCarousel, syncHomeCardsToCatalog and the delegated
+// add-to-cart listener below all keep working untouched — only the hanger
+// hook + rail styling (styles/home.css) is new.
+const HOME_RAILS = [
+    { trackId: 'rail-products', hash: 'products', limit: 12 },
+    { trackId: 'rail-tops', hash: 'tops', limit: 12 },
+    { trackId: 'rail-bottoms', hash: 'bottoms', limit: 12 },
+    { trackId: 'rail-headwear', hash: 'headwear', limit: 12 },
+];
+
+// A real hanger silhouette (hook loop + triangular shoulders + center
+// notch), not just a line — filled with currentColor so it can glow green
+// on hover via CSS, same trick the "+" icon already uses.
+const HANGER_SVG =
+    '<svg class="hanger-hook" viewBox="0 0 64 58" aria-hidden="true">' +
+        '<path d="M32 3c-5.5 0-10 3.9-10 8.7 0 3 1.9 5.6 4.9 6.9l2.4 1v3.6" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>' +
+        '<path d="M32 19 2 42h18l12-9 12 9h18L32 19Z" fill="currentColor"/>' +
+        '<rect x="27" y="40" width="10" height="3.4" rx="1.7" fill="currentColor"/>' +
+    '</svg>';
+
+const ADD_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+
+function hangerCardHTML(p) {
+    const hasBack = !!p.backImage;
+    const wrapClass = hasBack ? 'product-image-wrap product-image-fb' : 'product-image-wrap';
+    const altFront = p.name + ' ' + p.tag + ', front view, FakeSmile streetwear';
+    const altBack = p.name + ' ' + p.tag + ', back view, FakeSmile streetwear';
+    const imgs = hasBack
+        ? '<img loading="lazy" decoding="async" class="fb-front" src="' + p.image + '" alt="' + altFront + '">' +
+          '<img loading="lazy" decoding="async" class="fb-back" src="' + p.backImage + '" alt="' + altBack + '">' +
+          '<span class="fb-hint">F &middot; B</span>'
+        : '<img loading="lazy" decoding="async" src="' + p.image + '" alt="' + altFront + '">';
+
+    const cs = !!p.comingSoon;
+    const so = !cs && !!p.soldOut;
+    let badge = '';
+    if (cs && p.badge === 'Limited') badge = '<span class="product-badge">Limited</span>';
+    else if (cs) badge = '<span class="product-badge product-badge-soon">Coming Soon</span>';
+    else if (so) badge = '<span class="product-badge product-badge-sold">Sold Out</span>';
+    else if (p.badge) badge = '<span class="product-badge">' + p.badge + '</span>';
+
+    const ariaName = p.name + ' ' + p.tag;
+    const priceHTML = cs
+        ? '<span class="product-price product-price-soon">Coming Soon</span>'
+        : '<span class="product-price" data-price-ngn="' + p.price + '">' + (typeof formatMarked === 'function' ? formatMarked(p.price, 1) : p.price) + '</span>';
+    const addBtn = (cs || so)
+        ? '<button class="product-add" disabled aria-disabled="true" aria-label="' + ariaName + (cs ? ' coming soon' : ' sold out') + '">' + ADD_SVG + '</button>'
+        : '<button class="product-add" aria-label="Add ' + ariaName + ' to cart">' + ADD_SVG + '</button>';
+
+    return '<article class="product-card hanger-card' + (cs ? ' coming-soon' : (so ? ' sold-out' : '')) + '" data-tilt>' +
+        '<div class="product-glass">' +
+            HANGER_SVG + badge +
+            '<a class="' + wrapClass + '" href="' + productUrl(p.id) + '" aria-label="View ' + ariaName + '">' +
+                '<div class="product-glow"></div>' + imgs +
+            '</a>' +
+            '<div class="product-info">' +
+                '<span class="product-tag">' + p.tag + '</span>' +
+                '<h3 class="product-name">' + p.name + '</h3>' +
+                '<div class="product-meta">' + priceHTML + addBtn + '</div>' +
+            '</div>' +
+        '</div>' +
+    '</article>';
+}
+
+function renderHomeRails() {
+    if (typeof PRODUCTS === 'undefined') return;
+    const all = Object.values(PRODUCTS);
+    HOME_RAILS.forEach((cfg) => {
+        const track = document.getElementById(cfg.trackId);
+        if (!track) return;
+        const items = all.filter((p) => p.categoryHash === cfg.hash).slice(0, cfg.limit);
+        track.innerHTML = items.map(hangerCardHTML).join('');
+    });
+}
+renderHomeRails();
+
+// ===== SYNC HOME CARDS TO THE CATALOG =====
+// renderHomeRails() above already builds cards straight from PRODUCTS, so
+// this is mostly a no-op safety net now (kept in case any card is ever
+// hand-authored again). Pull the product id out of each card's link and
+// reconcile it with products.js so prices (incl. the per-item markup) and
+// Coming-Soon state match the shop instead of drifting.
 function cardProductId(card) {
     // Cards link to the static product page: products/<id>.html
     // (legacy product.html?id=<id> links are still understood).
