@@ -54,7 +54,7 @@ flow testing (shop → product → cart → checkout → orders).
 
 ```
 fakesmile33/
-├── index.html          Home — hero, category showcase, 4 product carousels, bento, CTA
+├── index.html          Home — hero, category showcase, 3 product carousels, bento, CTA
 ├── shop.html           Full product grid with filters + sort
 ├── product.html        Product detail TEMPLATE (legacy ?id= route; .htaccess 301s it
 │                        to /products/<id>) — edit THIS, then rebuild
@@ -136,7 +136,7 @@ fakesmile33/
 
 | Page | Purpose | Scripts loaded |
 |---|---|---|
-| `index.html` | Home: hero + typewriter, category showcase, 4 carousels (Tops, Statement, Bottoms, Headwear), Full-Fit bridge banner, lifestyle banner, bento grid, contact CTA | products, base, home |
+| `index.html` | Home: hero + typewriter, category showcase, 3 carousels (Tops, Statement, Headwear), Full-Fit bridge banner, lifestyle banner, bento grid, contact CTA | products, base, home |
 | `shop.html` | All 45 products in a grid; filter pills (All / Tops & Hoodies / Statement Tops / Joggers & Shorts / Headwear); sort (Featured / Price / Name) | products, base, shop |
 | `products/<id>.html` | **Static** product detail (generated). Full HTML + Product/Breadcrumb JSON-LD in the page; `product.js` hydrates it (sizes, qty, add-to-cart, tabs, re-randomized related). Lives one folder down: `<html data-root="../">` + `<body data-product-id>` | products, base, product |
 | `product.html` | The template the above is generated from. Also still works as `?id=<slug>` (legacy); on the live server `.htaccess` 301s `product?id=X` → `/products/X` | products, base, product |
@@ -611,6 +611,19 @@ helper, so both entry points feed the one real list.
 
 ## 16. Change Log
 
+- **Home page: removed the "Built for Motion" joggers + shorts carousel but
+  kept its header; reverted the Sold Out / Coming Soon badge hide.** (1) The
+  previous change (commenting out the badge pill in `home.js`'s
+  `syncHomeCardsToCatalog`) was wrong and was reverted, so the badge logic is
+  back as it was. (2) In `index.html` the `#bottoms` section now holds only its
+  header ("Drop 02, The Movement Series" / "Built for Motion" / subtitle); the
+  carousel (cards, arrows, progress bar) was deleted, so the home page now has
+  3 carousels (Tops, Statement, Headwear). Keeping the section means the
+  `index.html#bottoms` links (footer, breadcrumbs, category card, bridge
+  banner) still land on it. The joggers/shorts products are unchanged in
+  `products.js` and still sell via `shop.html` and their product pages.
+  `initCarousel` skips sections with no `.carousel-track`, so no JS change was
+  needed. Verified in headless Chrome (0 cards in `#bottoms`, 3 carousels).
 - **Removed every em/en-dash from visible site copy; tightened mobile hero
   spacing.** Two brand-owner-reported fixes: (1) On phones, `.hero-title`
   and `.hero-brand` kept their full desktop `margin-bottom`/`min-height`
