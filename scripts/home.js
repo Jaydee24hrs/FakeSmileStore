@@ -34,6 +34,10 @@ function syncHomeCardsToCatalog() {
                 priceEl.textContent = 'Coming Soon';
             }
             if (addBtn) { addBtn.disabled = true; addBtn.setAttribute('aria-disabled', 'true'); }
+            // Badge pill temporarily disabled on the homepage carousel — a
+            // new 3D badge design is coming to replace it. Functional state
+            // (disabled Add to Cart, price swap) is untouched above/below.
+            /*
             // One badge only — REPLACE the existing one (don't stack a second).
             // Keep "Limited" as-is; Bestseller/New/none become "Coming Soon".
             let badgeEl = card.querySelector('.product-badge');
@@ -49,6 +53,7 @@ function syncHomeCardsToCatalog() {
                 badgeEl.classList.add('product-badge-soon');
                 badgeEl.classList.remove('product-badge-sold');
             }
+            */
         } else if (soldOut) {
             card.classList.add('sold-out');
             card.classList.remove('coming-soon');
@@ -59,6 +64,9 @@ function syncHomeCardsToCatalog() {
                 priceEl.innerHTML = formatMarked(p.price, 1);
             }
             if (addBtn) { addBtn.disabled = true; addBtn.setAttribute('aria-disabled', 'true'); }
+            // Badge pill temporarily disabled on the homepage carousel — see
+            // the matching note in the comingSoon branch above.
+            /*
             let badgeEl = card.querySelector('.product-badge');
             if (!badgeEl) {
                 badgeEl = document.createElement('span');
@@ -68,6 +76,7 @@ function syncHomeCardsToCatalog() {
             badgeEl.textContent = 'Sold Out';
             badgeEl.classList.add('product-badge-sold');
             badgeEl.classList.remove('product-badge-soon');
+            */
         } else if (priceEl && typeof formatMarked === 'function') {
             priceEl.setAttribute('data-price-ngn', p.price);
             priceEl.innerHTML = formatMarked(p.price, 1);
