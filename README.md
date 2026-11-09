@@ -611,6 +611,26 @@ helper, so both entry points feed the one real list.
 
 ## 16. Change Log
 
+- **Home page hanging rack: stripped to pure mockups — no price, no box,
+  no carousel chrome, no sold-out/coming-soon badges.** Follow-up to the
+  hanging-rack rebuild below, after feedback that it still looked too much
+  like the old boxed carousel. `hangerCardHTML()` in `home.js` now emits
+  just the hanger SVG + the image link, nothing else (dropped `.product-
+  glass`, `.product-info`, price, badge, add-to-cart entirely). The
+  carousel buttons + progress bar are gone too — `index.html` now has a
+  plain `.hanger-rail-viewport` (native `overflow-x: auto`, no JS) wrapping
+  `.hanger-rail-track`, deliberately NOT named `.carousel-track` so
+  `initCarousel()` doesn't try to wire up prev/next buttons that no longer
+  exist (it already no-ops safely without a `.carousel-track` match).
+  Cards keep the "product-card" class alongside the new "hanger-card" one
+  purely so the existing `.product-card:hover` rules — the image lift and,
+  more importantly, the front/back hover-flip in `tops-fb.css` (the "180
+  degree" front/back view, using each product's existing front + back
+  photos) — keep working with zero new CSS. `syncHomeCardsToCatalog()` is
+  now guarded to skip any `.hanger-card` so it can never re-inject a
+  Sold-Out/Coming-Soon badge into them; every product renders identically
+  on the rack regardless of stock state, since there's nothing left to
+  differentiate.
 - **Home page: rebuilt all 4 category sections as a "hanging rack" —
   garments hang from a rod via an SVG hanger instead of sitting in glass
   cards, rendered dynamically from `products.js` instead of hand-authored.**

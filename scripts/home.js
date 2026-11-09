@@ -4,14 +4,18 @@
 
 // ===== HANGING RACK — home-page product rails =====
 // Each of the 4 category sections (#products, #tops, #bottoms, #headwear)
-// has an empty <div class="carousel-track" id="rail-..."></div> left by
+// has an empty <div class="hanger-rail-track" id="rail-..."></div> left by
 // index.html for this to fill, picked by the SAME categoryHash products.js
 // already assigns every product for exactly this purpose (see "CANONICAL
-// CATEGORY + HOME-SECTION ANCHOR" in products.js). Cards reuse the existing
-// .product-card / .product-glass / .product-add / .product-price / .product-badge
-// classes so initCarousel, syncHomeCardsToCatalog and the delegated
-// add-to-cart listener below all keep working untouched — only the hanger
-// hook + rail styling (styles/home.css) is new.
+// CATEGORY + HOME-SECTION ANCHOR" in products.js). Pure mockups only —
+// no box, no carousel chrome, no price/badge/add-to-cart, no sold-out /
+// coming-soon treatment: just the garment hanging, with the existing
+// front/back hover-flip (styles/tops-fb.css, the "180 degree" view) where
+// a back image exists. Cards keep the "product-card" class purely so that
+// existing `.product-card:hover` rules (image lift, the F/B flip) keep
+// working with zero new CSS — syncHomeCardsToCatalog() below is guarded
+// to skip the "hanger-card" ones specifically so it can never re-inject a
+// badge into them.
 const HOME_RAILS = [
     { trackId: 'rail-products', hash: 'products', limit: 12 },
     { trackId: 'rail-tops', hash: 'tops', limit: 12 },
@@ -21,15 +25,13 @@ const HOME_RAILS = [
 
 // A real hanger silhouette (hook loop + triangular shoulders + center
 // notch), not just a line — filled with currentColor so it can glow green
-// on hover via CSS, same trick the "+" icon already uses.
+// on hover via CSS.
 const HANGER_SVG =
     '<svg class="hanger-hook" viewBox="0 0 64 58" aria-hidden="true">' +
         '<path d="M32 3c-5.5 0-10 3.9-10 8.7 0 3 1.9 5.6 4.9 6.9l2.4 1v3.6" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>' +
         '<path d="M32 19 2 42h18l12-9 12 9h18L32 19Z" fill="currentColor"/>' +
         '<rect x="27" y="40" width="10" height="3.4" rx="1.7" fill="currentColor"/>' +
     '</svg>';
-
-const ADD_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
 
 function hangerCardHTML(p) {
     const hasBack = !!p.backImage;
@@ -38,38 +40,22 @@ function hangerCardHTML(p) {
     const altBack = p.name + ' ' + p.tag + ', back view, FakeSmile streetwear';
     const imgs = hasBack
         ? '<img loading="lazy" decoding="async" class="fb-front" src="' + p.image + '" alt="' + altFront + '">' +
-          '<img loading="lazy" decoding="async" class="fb-back" src="' + p.backImage + '" alt="' + altBack + '">' +
-          '<span class="fb-hint">F &middot; B</span>'
+          '<img loading="lazy" decoding="async" class="fb-back" src="' + p.backImage + '" alt="' + altBack + '">'
         : '<img loading="lazy" decoding="async" src="' + p.image + '" alt="' + altFront + '">';
-
-    const cs = !!p.comingSoon;
-    const so = !cs && !!p.soldOut;
-    let badge = '';
-    if (cs && p.badge === 'Limited') badge = '<span class="product-badge">Limited</span>';
-    else if (cs) badge = '<span class="product-badge product-badge-soon">Coming Soon</span>';
-    else if (so) badge = '<span class="product-badge product-badge-sold">Sold Out</span>';
-    else if (p.badge) badge = '<span class="product-badge">' + p.badge + '</span>';
-
     const ariaName = p.name + ' ' + p.tag;
-    const priceHTML = cs
-        ? '<span class="product-price product-price-soon">Coming Soon</span>'
-        : '<span class="product-price" data-price-ngn="' + p.price + '">' + (typeof formatMarked === 'function' ? formatMarked(p.price, 1) : p.price) + '</span>';
-    const addBtn = (cs || so)
-        ? '<button class="product-add" disabled aria-disabled="true" aria-label="' + ariaName + (cs ? ' coming soon' : ' sold out') + '">' + ADD_SVG + '</button>'
-        : '<button class="product-add" aria-label="Add ' + ariaName + ' to cart">' + ADD_SVG + '</button>';
 
-    return '<article class="product-card hanger-card' + (cs ? ' coming-soon' : (so ? ' sold-out' : '')) + '" data-tilt>' +
-        '<div class="product-glass">' +
-            HANGER_SVG + badge +
-            '<a class="' + wrapClass + '" href="' + productUrl(p.id) + '" aria-label="View ' + ariaName + '">' +
-                '<div class="product-glow"></div>' + imgs +
-            '</a>' +
-            '<div class="product-info">' +
-                '<span class="product-tag">' + p.tag + '</span>' +
-                '<h3 class="product-name">' + p.name + '</h3>' +
-                '<div class="product-meta">' + priceHTML + addBtn + '</div>' +
-            '</div>' +
-        '</div>' +
+    // Keeps the "product-card" class (not just "hanger-card") purely so the
+    // existing hover rules — image lift, and the front/back flip in
+    // tops-fb.css ("180 degree" view) — which are written against
+    // `.product-card:hover ...`, keep working with zero new CSS. The guard
+    // in syncHomeCardsToCatalog() below stops that legacy sync logic from
+    // touching these (it would otherwise re-inject a Sold Out/Coming Soon
+    // badge, which this pure-mockup rail deliberately has none of).
+    return '<article class="product-card hanger-card">' +
+        HANGER_SVG +
+        '<a class="' + wrapClass + '" href="' + productUrl(p.id) + '" aria-label="View ' + ariaName + '">' +
+            imgs +
+        '</a>' +
     '</article>';
 }
 
@@ -103,6 +89,9 @@ function cardProductId(card) {
 function syncHomeCardsToCatalog() {
     if (typeof PRODUCTS === 'undefined') return;
     document.querySelectorAll('.product-card').forEach((card) => {
+        // Pure-mockup hanging rack cards: no price/badge/add-button to sync,
+        // and this must never re-inject a badge into them.
+        if (card.classList.contains('hanger-card')) return;
         const id = cardProductId(card);
         const p = id && PRODUCTS[id];
         if (!p) return;

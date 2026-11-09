@@ -1011,21 +1011,34 @@
 
 /* ============================================= */
 /* ===== HANGING RACK (home-page rails) =========
-   All 4 home carousels (#products/#tops/#bottoms/
-   #headwear) render .hanger-card items via
-   renderHomeRails() in home.js. Scoped to
-   .hanger-card so shop.html / product-detail pages
-   — which reuse .product-card/.product-glass for a
-   different, boxed look — are untouched.
+   All 4 home sections (#products/#tops/#bottoms/
+   #headwear) render pure .hanger-card mockups via
+   renderHomeRails() in home.js: no box, no
+   carousel chrome, no price/badge/add-to-cart —
+   just the garment on a hanger, with the existing
+   front/back hover-flip (tops-fb.css) where a back
+   image exists. Native horizontal scroll, no JS.
    ============================================= */
-.catalogue-section .carousel-track {
+.hanger-rail-viewport {
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 0 6px 22px;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+    scrollbar-width: thin;
+}
+.hanger-rail-track {
+    display: flex;
+    gap: 22px;
+    max-width: 1500px;
+    margin: 0 auto;
     padding-top: 92px;
     position: relative;
 }
 
 /* The rod — a lit, slightly convex steel bar spanning the full rack
    (every item, not just the visible ones), so it scrolls as one piece. */
-.catalogue-section .carousel-track::before {
+.hanger-rail-track::before {
     content: '';
     position: absolute;
     top: 44px;
@@ -1044,37 +1057,8 @@
     z-index: 1;
 }
 
-.hanger-card .product-glass {
-    background: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    overflow: visible;
-    transform-origin: top center;
-    animation: hangerSway 5s ease-in-out infinite;
-}
-.hanger-card .product-glass::before,
-.hanger-card .product-glass::after {
-    display: none;
-}
-/* Organic, non-synchronized sway — each card drifts on its own timing. */
-@keyframes hangerSway {
-    0%, 100% { transform: rotate(-1.6deg); }
-    50% { transform: rotate(1.6deg); }
-}
-.hanger-card:nth-child(2n) .product-glass { animation-duration: 5.8s; animation-delay: -1.1s; }
-.hanger-card:nth-child(3n) .product-glass { animation-duration: 4.4s; animation-delay: -2.4s; }
-.hanger-card:nth-child(4n) .product-glass { animation-duration: 6.4s; animation-delay: -0.6s; }
-.hanger-card:nth-child(5n) .product-glass { animation-duration: 5.1s; animation-delay: -3.2s; }
-
-.hanger-card:hover .product-glass {
-    /* Only pause the sway here — a static `transform` on this rule would
-       lose to the running keyframe animation and never actually show.
-       The lift/scale/tilt feedback happens on .product-image-wrap img
-       (existing sitewide hover rule) and on the hook + price tag below. */
-    animation-play-state: paused;
+.hanger-card {
+    position: relative;
 }
 
 /* The hanger — hook loop + filled triangular shoulders + center notch,
@@ -1103,72 +1087,12 @@
     border-radius: 0;
     aspect-ratio: 3 / 4;
     margin-top: 4px;
+    margin-bottom: 0;
 }
-.hanger-card .product-glow {
-    width: 85%;
-    height: 58%;
-    opacity: 0.55;
-}
-
-.hanger-card .product-badge {
-    top: 0;
-    right: 4px;
-}
-
-.hanger-card .product-info {
-    text-align: center;
-}
-
-/* Price as a rotated retail hang-tag with a punched hole, instead of
-   plain text — a second, smaller nod to "hanging merchandise". */
-.hanger-card .product-meta {
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    margin-top: 6px;
-}
-.hanger-card .product-price {
-    position: relative;
-    display: inline-block;
-    background: linear-gradient(135deg, #ffffff, #e3f8ec);
-    color: #06150c;
-    padding: 6px 14px 6px 22px;
-    border-radius: 3px;
-    font-size: 12.5px;
-    font-weight: 800;
-    letter-spacing: 0.2px;
-    transform: rotate(-3deg);
-    box-shadow:
-        0 8px 16px rgba(0, 0, 0, 0.45),
-        0 0 0 1px rgba(0, 217, 87, 0.3);
-    transition: transform 0.35s ease;
-}
-.hanger-card .product-price::before {
-    content: '';
-    position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: #06150c;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7);
-}
-.hanger-card .product-price.product-price-soon {
-    background: linear-gradient(135deg, #2a2a2a, #161616);
-    color: rgba(255, 255, 255, 0.65);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12);
-}
-.hanger-card .product-price.product-price-soon::before {
-    background: rgba(255, 255, 255, 0.5);
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4);
-}
-.hanger-card:hover .product-price { transform: rotate(0deg) translateY(-2px); }
 
 @media (max-width: 720px) {
-    .catalogue-section .carousel-track { padding-top: 78px; }
-    .catalogue-section .carousel-track::before { top: 36px; left: -20px; right: -20px; height: 9px; }
+    .hanger-rail-track { padding-top: 78px; }
+    .hanger-rail-track::before { top: 36px; left: -20px; right: -20px; height: 9px; }
     .hanger-card .hanger-hook { top: -40px; width: 38px; height: 36px; }
 }
 
